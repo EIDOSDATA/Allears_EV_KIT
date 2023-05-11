@@ -1,0 +1,7 @@
+stim_lib_stim_cfg.c:25:6:stimLib_signalParamCheck	6
+stim_lib_stim_cfg.c:46:6:stimLib_triggerParamCheck	2
+stim_lib_stim_cfg.c:56:6:stimLib_paramSetting	2
+stim_lib_stim_cfg.c:70:6:stimLib_paramClear	1
+stim_lib_stim_cfg.c:80:6:stimLib_stimPulseStart	1
+stim_lib_stim_cfg.c:86:6:stimLib_stimPulseStop	2
+stim_lib_stim_cfg.c:99:6:stimLib_stimPulseSetiing	1

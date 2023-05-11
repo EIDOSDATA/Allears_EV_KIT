@@ -1,0 +1,4 @@
+td_debug.c:6:6:tdDebugInit	1
+td_debug.c:11:6:tdDebugDeInit	1
+td_debug.c:16:6:tdDebugPrintChar	3
+td_debug.c:31:6:tdDebugPrintHex	3

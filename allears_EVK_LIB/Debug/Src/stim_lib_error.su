@@ -1,0 +1,2 @@
+../Src/stim_lib_error.c:9:6:stimLib_errorHandle	8	static
+../Src/stim_lib_error.c:29:6:sitmLib_appErrorHandle_callback	4	static

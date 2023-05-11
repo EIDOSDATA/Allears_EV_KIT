@@ -1,0 +1,7 @@
+stim_lib_state.c:16:18:stimLib_stateGet	1
+stim_lib_state.c:21:6:stimLib_stateSet	18
+stim_lib_state.c:85:6:stimLib_stateSigParamSet	2
+stim_lib_state.c:98:6:stimLib_stateTrgParamSet	2
+stim_lib_state.c:116:6:stimLib_stateIsInSession	3
+stim_lib_state.c:129:6:stimLib_stateSigParamCheck	3
+stim_lib_state.c:143:6:stimLib_stateParamClear	1

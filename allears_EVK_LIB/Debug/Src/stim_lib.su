@@ -1,0 +1,11 @@
+../Src/stim_lib.c:22:9:stimLib_verGet	24	static
+../Src/stim_lib.c:49:22:stimLib_stimTypeGet	4	static
+../Src/stim_lib.c:58:16:stimLib_stimInit	16	static
+../Src/stim_lib.c:83:16:stimLib_stimDeinit	8	static
+../Src/stim_lib.c:92:18:stimLib_stimCurStateGet	8	static
+../Src/stim_lib.c:102:16:stimLib_stimSignalConfig	16	static
+../Src/stim_lib.c:125:16:stimLib_stimTriggerConfig	16	static
+../Src/stim_lib.c:151:16:stimLib_stimSessionStart	16	static
+../Src/stim_lib.c:196:16:stimLib_stimSessionStop	16	static
+../Src/stim_lib.c:234:16:stimLib_stimStart	8	static
+../Src/stim_lib.c:254:16:stimLib_stimPause	8	static

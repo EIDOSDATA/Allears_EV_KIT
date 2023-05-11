@@ -1,0 +1,2 @@
+../Core/Src/td_retarget.c:18:5:_write	32	static
+../Core/Src/td_retarget.c:29:5:__io_putchar	16	static

@@ -1,0 +1,4 @@
+../Core/Src/td_debug.c:6:6:tdDebugInit	4	static
+../Core/Src/td_debug.c:11:6:tdDebugDeInit	4	static
+../Core/Src/td_debug.c:16:6:tdDebugPrintChar	24	static
+../Core/Src/td_debug.c:31:6:tdDebugPrintHex	24	static

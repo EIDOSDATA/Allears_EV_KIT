@@ -1,0 +1,4 @@
+../Src/stim_lib_common.c:12:6:stimLib_chkSystem	4	static
+../Src/stim_lib_common.c:22:10:stimLib_getTick	8	static
+../Src/stim_lib_common.c:27:6:stimLib_delay	16	static
+../Src/stim_lib_common.c:32:6:sitmLib_emergencyStop	8	static
