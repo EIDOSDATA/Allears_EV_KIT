@@ -1,0 +1,2 @@
+../Src/stim_lib_current_st.c:17:6:stimLib_dacctrl_setRaw	8	static
+../Src/stim_lib_current_st.c:31:6:stimLib_dacctrl_offRaw	8	static

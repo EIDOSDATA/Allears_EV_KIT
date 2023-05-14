@@ -258,7 +258,7 @@ void stimLib_stepup_dataPrint(void)
 		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", stepup_fdbk_adc_avg));
 		TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
 
-#ifdef EVKIT_CC
+#ifdef STIM_LIB_EVKIT_CC
 		TD_DEBUG_PRINT(("DAC CTRL VALUE : %d\n\n", DAC_CONTROL_VALUE));
 #endif
 
@@ -268,20 +268,21 @@ void stimLib_stepup_dataPrint(void)
 }
 
 /*
- * STEP UP START :: TIMER
+ * DAC GPIO CONTROL
  * */
-void stimLib_stepupStart(void)
+void stimLib_dacctrl_Set(void)
 {
-	stimLib_stepup_adcStart();
-	stimLib_stepup_startRaw();
+	stimLib_dacctrl_setRaw();
 }
 
-void stimLib_stepupStop(void)
+void stimLib_dacctrl_Off(void)
 {
-	stimLib_stepup_stopRaw();
-	stimLib_stepup_adcStop();
+	stimLib_dacctrl_offRaw();
 }
- 
+
+/*
+ * STEP UP START :: TIMER
+ * */
 void stimLib_stepup_timerStart(void)
 {
 	stimLib_stepup_startRaw();
@@ -309,4 +310,23 @@ void stimLib_stepup_adcStart(void)
 void stimLib_stepup_adcStop(void)
 {
 	stimLib_stepup_adcStopRaw();
+}
+
+/* STEP UP FUNCTION Collection */
+void stimLib_stepupStart(void)
+{
+#ifdef STIM_LIB_EVKIT_CC
+	stimLib_dacctrl_Set();
+#endif
+	stimLib_stepup_adcStart();
+	stimLib_stepup_startRaw();
+}
+
+void stimLib_stepupStop(void)
+{
+#ifdef STIM_LIB_EVKIT_CC
+	stimLib_dacctrl_Off();
+#endif
+	stimLib_stepup_stopRaw();
+	stimLib_stepup_adcStop();
 }

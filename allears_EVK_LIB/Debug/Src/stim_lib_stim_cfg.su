@@ -3,5 +3,5 @@
 ../Src/stim_lib_stim_cfg.c:56:6:stimLib_paramSetting	16	static
 ../Src/stim_lib_stim_cfg.c:70:6:stimLib_paramClear	8	static
 ../Src/stim_lib_stim_cfg.c:80:6:stimLib_stimPulseStart	8	static
-../Src/stim_lib_stim_cfg.c:86:6:stimLib_stimPulseStop	8	static
-../Src/stim_lib_stim_cfg.c:99:6:stimLib_stimPulseSetiing	8	static
+../Src/stim_lib_stim_cfg.c:90:6:stimLib_stimPulseStop	8	static
+../Src/stim_lib_stim_cfg.c:103:6:stimLib_stimPulseSetiing	8	static

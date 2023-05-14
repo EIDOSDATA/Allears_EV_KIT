@@ -5,9 +5,11 @@ stim_lib_volt.c:175:6:stimLib_adc1_readBuffer	4
 stim_lib_volt.c:201:10:stimLib_stepup_adcAVG	2
 stim_lib_volt.c:215:10:stimLib_stepup_voltCalc	1
 stim_lib_volt.c:237:6:stimLib_stepup_dataPrint	3
-stim_lib_volt.c:273:6:stimLib_stepupStart	1
-stim_lib_volt.c:279:6:stimLib_stepupStop	1
-stim_lib_volt.c:285:6:stimLib_stepup_timerStart	1
-stim_lib_volt.c:293:6:stimLib_stepup_timerStop	1
-stim_lib_volt.c:301:6:stimLib_stepup_adcStart	1
-stim_lib_volt.c:309:6:stimLib_stepup_adcStop	1
+stim_lib_volt.c:273:6:stimLib_dacctrl_Set	1
+stim_lib_volt.c:278:6:stimLib_dacctrl_Off	1
+stim_lib_volt.c:286:6:stimLib_stepup_timerStart	1
+stim_lib_volt.c:294:6:stimLib_stepup_timerStop	1
+stim_lib_volt.c:302:6:stimLib_stepup_adcStart	1
+stim_lib_volt.c:310:6:stimLib_stepup_adcStop	1
+stim_lib_volt.c:316:6:stimLib_stepupStart	1
+stim_lib_volt.c:325:6:stimLib_stepupStop	1

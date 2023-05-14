@@ -81,6 +81,10 @@ void stimLib_stimPulseStart(void)
 {
 	stimLib_pulseConfigRaw();
 	stimLib_stimStartRaw();
+	if (STIM_LIB_STATE_TRG_VOLT_PRESTART == false)
+	{
+		stimLib_stepupStart();
+	}
 }
 
 void stimLib_stimPulseStop(void)
@@ -100,6 +104,4 @@ bool stimLib_stimPulseSetiing(void)
 {
 	return stimLib_paramPulseSettingRaw();
 }
-
-
 

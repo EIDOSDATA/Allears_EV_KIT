@@ -5,5 +5,5 @@
 
 USER_OBJS :=
 
-LIBS := -l:liballear_evk_lib_release.a
+LIBS := -l:liballear_evk_lib_debug.a
 

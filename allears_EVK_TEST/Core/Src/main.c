@@ -22,8 +22,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stim_lib.h"
-#include "stim_lib_st_inc.h"
-#include "stim_lib_type.h"
 #include "td_debug.h"
 /* USER CODE END Includes */
 
