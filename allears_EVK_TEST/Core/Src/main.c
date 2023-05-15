@@ -195,7 +195,7 @@ int main(void)
 
 	pulse_data.freq = 10;
 	pulse_data.pulse_width = 1000;
-	pulse_data.degree = 1;
+	pulse_data.degree = 20;
 	stimLib_stimSignalConfig(&pulse_data);
 
 	trg_data.volt_prestart = true;
