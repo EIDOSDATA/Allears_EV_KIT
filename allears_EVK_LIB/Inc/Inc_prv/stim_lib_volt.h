@@ -23,9 +23,11 @@ typedef struct
 #define STEPUP_TARGET_VOLTAGE						40
 #define DAC_CONTROL_VALUE							STIM_LIB_STATE_SIG_DEGREE
 
-#elif STIM_LIB_EVKIT_CV
+#else
+#ifdef STIM_LIB_EVKIT_CV
 #define STEPUP_TARGET_VOLTAGE						STIM_LIB_STATE_SIG_DEGREE
 #define DAC_CONTROL_VALUE							0
+#endif
 #endif
 
 #define STIM_LIB_STEPUP_TABLE_SIZE					30
@@ -39,6 +41,12 @@ typedef struct
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
 #define STIM_LIB_VOLTAGE_CTRL_PULSE					voltage_ctrl_pulse
 #define STIM_LIB_STEPUP_FEEDBACK_CNT				stepup_feedback_cnt
+
+/* STEPUP STATUS CHECK :: FLAG */
+#define STIM_LIB_STEPUP_IS_STARTED()				(stepup_status == true)
+#define STIM_LIB_STEPUP_SET_START()					stepup_status = true
+#define STIM_LIB_STEPUP_SET_STOP()					stepup_status = false
+extern bool stepup_status;
 
 /* STEPUP FEEDBACK */
 void stimLib_stepup_ctrlScheduler(void);

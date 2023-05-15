@@ -81,7 +81,7 @@ void stimLib_stimPulseStart(void)
 {
 	stimLib_pulseConfigRaw();
 	stimLib_stimStartRaw();
-	if (STIM_LIB_STATE_TRG_VOLT_PRESTART == false)
+	if (STIM_LIB_STATE_TRG_VOLT_PRESTART == false && STIM_LIB_STEPUP_IS_STARTED() == false)
 	{
 		stimLib_stepupStart();
 	}

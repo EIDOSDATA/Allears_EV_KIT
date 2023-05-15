@@ -75,6 +75,9 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	/* Application Code */
 }
 
+/*
+ * STIM LIB :: PULSE FINISH INTERRUPT
+ * */
 void HAL_TIM_ErrorCallback(TIM_HandleTypeDef *htim)
 {
 	stimLib_timError_callback(htim);
@@ -91,6 +94,54 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
 }
+
+/*
+ * TIMER INTERRUPT :: STEPUP SCHEDULER
+ * */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	stimLib_stepup_ctrlCallback(htim);
+}
+
+/*
+ * STIM LIB :: ADC Error Callback
+ * */
+void HAL_ADC_ErrorCallback(ADC_HandleTypeDef *hadc)
+{
+	stimLib_adcError_callback();
+}
+
+/*
+ * STIM LIB :: Ste-up ADC watchdog
+ * */
+void HAL_ADC_LevelOutOfWindowCallback(ADC_HandleTypeDef *hadc)
+{
+	stimLib_adcWatchdoc_callback();
+}
+
+#if 0
+/*
+ * STIM LIB :: Peak Detection Data Read
+ * */
+void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef *hadc)
+{
+	/*
+	 * How to read Peak Detection data
+	 * Please refer to the example code below
+	 * ----------------------------------------
+	 * uint8_t i;
+	 * if (hadc->Instance == hadc2.Instance)
+	 * {
+	 * 		for (i = 0; i < PD_ADC_CONVERSION_SIZE; i++)
+	 * 		{
+	 * 			USER_PD_ADC_BUFF_R[i] = PD_ADC_CONVERSION_BUFFER[i * 2];
+	 * 			USER_PD_ADC_BUFF_R[i] = PD_ADC_CONVERSION_BUFFER[(i * 2) + 1];
+	 * 		}
+	 * }
+	 * ----------------------------------------
+	 */
+}
+#endif
 
 /* USER CODE END PFP */
 
@@ -549,10 +600,10 @@ void MX_TIM6_Init(void)
 
 	/* USER CODE END TIM6_Init 1 */
 	htim6.Instance = TIM6;
-	htim6.Init.Prescaler = 0;
+	htim6.Init.Prescaler = 799;
 	htim6.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim6.Init.Period = 65535;
-	htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+	htim6.Init.Period = 9999;
+	htim6.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
 	if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
 	{
 		Error_Handler();

@@ -32,6 +32,7 @@ uint8_t stepup_feedback_cnt = 0;
 /* CONTROL FLAG */
 static bool SLOPE_CTRL_END_FLAG = false;
 static bool STEPUP_DATA_PRINT_FLAG = false;
+bool stepup_status = false;
 
 /* STEPUP FEEDBACK :: ADC1 BUFFER and CLAC Value */
 uint16_t adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; /* ADC1 */
@@ -315,6 +316,7 @@ void stimLib_stepup_adcStop(void)
 /* STEP UP FUNCTION Collection */
 void stimLib_stepupStart(void)
 {
+	STIM_LIB_STEPUP_SET_START();
 #ifdef STIM_LIB_EVKIT_CC
 	stimLib_dacctrl_Set();
 #endif
@@ -324,6 +326,7 @@ void stimLib_stepupStart(void)
 
 void stimLib_stepupStop(void)
 {
+	STIM_LIB_STEPUP_SET_STOP();
 #ifdef STIM_LIB_EVKIT_CC
 	stimLib_dacctrl_Off();
 #endif
