@@ -173,7 +173,7 @@ int main(void)
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	MX_USART3_UART_Init();
+	//MX_USART3_UART_Init();
 	stimLib_stimInit();
 #if 0
 	/* USER CODE END SysInit */
@@ -198,12 +198,12 @@ int main(void)
 	pulse_data.degree = 1;
 	stimLib_stimSignalConfig(&pulse_data);
 
-	trg_data.trg_out_enable = 1;
+	trg_data.volt_prestart = true;
+	trg_data.trg_out_enable = false;
 	trg_data.trg_out_active_pol = 1;
-
-	trg_data.trg_in_enable = 1;
+	trg_data.trg_in_enable = true;
 	trg_data.trg_in_active_pol = 1;
-	trg_data.trg_in_toggled = 1;
+	trg_data.trg_in_toggled = true;
 	stimLib_stimTriggerConfig(&trg_data);
 
 	stimLib_stimSessionStart();
@@ -222,6 +222,14 @@ int main(void)
 		pulse_data.pulse_width = 1000;
 		pulse_data.degree = 1;
 		stimLib_stimSignalConfig(&pulse_data);
+
+		trg_data.volt_prestart = false;
+		trg_data.trg_out_enable = false;
+		trg_data.trg_out_active_pol = 1;
+		trg_data.trg_in_enable = false;
+		trg_data.trg_in_active_pol = 1;
+		trg_data.trg_in_toggled = true;
+		stimLib_stimTriggerConfig(&trg_data);
 
 		stimLib_stimSessionStart();
 
