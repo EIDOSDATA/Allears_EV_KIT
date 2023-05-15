@@ -173,7 +173,7 @@ int main(void)
 	SystemClock_Config();
 
 	/* USER CODE BEGIN SysInit */
-	//MX_USART3_UART_Init();
+	MX_USART3_UART_Init();
 	stimLib_stimInit();
 #if 0
 	/* USER CODE END SysInit */
