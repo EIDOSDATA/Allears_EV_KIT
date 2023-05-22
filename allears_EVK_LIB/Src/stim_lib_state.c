@@ -34,15 +34,18 @@ bool stimLib_stateSet(stim_lib_state_t set_state)
 			break;
 
 		case stim_lib_state_idle:
-			if (STIM_LIB_CUR_STATE == stim_lib_state_uninitialized || STIM_LIB_CUR_STATE == stim_lib_state_session_idle
-					|| STIM_LIB_CUR_STATE == stim_lib_state_stimulating || STIM_LIB_CUR_STATE == stim_lib_state_stim_stopping)
+			if (STIM_LIB_CUR_STATE == stim_lib_state_uninitialized
+					|| STIM_LIB_CUR_STATE == stim_lib_state_session_idle
+					|| STIM_LIB_CUR_STATE == stim_lib_state_stimulating
+					|| STIM_LIB_CUR_STATE == stim_lib_state_stim_stopping)
 			{
 				rslt = true;
 			}
 			break;
 
 		case stim_lib_state_session_idle:
-			if (STIM_LIB_CUR_STATE == stim_lib_state_idle || STIM_LIB_CUR_STATE == stim_lib_state_stim_stopping)
+			if (STIM_LIB_CUR_STATE == stim_lib_state_idle
+					|| STIM_LIB_CUR_STATE == stim_lib_state_stim_stopping)
 			{
 				rslt = true;
 			}

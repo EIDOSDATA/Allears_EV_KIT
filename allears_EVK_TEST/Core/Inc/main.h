@@ -61,6 +61,7 @@ void MX_TIM2_Init(void);
 void MX_TIM6_Init(void);
 void MX_ADC1_Init(void);
 void MX_ADC2_Init(void);
+void MX_USART1_UART_Init(void);
 
 /* USER CODE BEGIN EFP */
 
@@ -136,7 +137,7 @@ void MX_ADC2_Init(void);
 #define TP1_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
-
+UART_HandleTypeDef* tdUsart1_handlerGet(void);
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

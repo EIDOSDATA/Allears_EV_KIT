@@ -1,7 +1,7 @@
 ../Src/stim_lib_state.c:16:18:stimLib_stateGet	4	static
 ../Src/stim_lib_state.c:21:6:stimLib_stateSet	24	static
-../Src/stim_lib_state.c:85:6:stimLib_stateSigParamSet	16	static
-../Src/stim_lib_state.c:98:6:stimLib_stateTrgParamSet	16	static
-../Src/stim_lib_state.c:116:6:stimLib_stateIsInSession	4	static
-../Src/stim_lib_state.c:129:6:stimLib_stateSigParamCheck	8	static
-../Src/stim_lib_state.c:143:6:stimLib_stateParamClear	4	static
+../Src/stim_lib_state.c:88:6:stimLib_stateSigParamSet	16	static
+../Src/stim_lib_state.c:101:6:stimLib_stateTrgParamSet	16	static
+../Src/stim_lib_state.c:119:6:stimLib_stateIsInSession	4	static
+../Src/stim_lib_state.c:132:6:stimLib_stateSigParamCheck	8	static
+../Src/stim_lib_state.c:146:6:stimLib_stateParamClear	4	static

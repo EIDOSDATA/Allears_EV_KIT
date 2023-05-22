@@ -40,8 +40,7 @@ void stimLib_stepup_stopRaw(void)
 
 void stimLib_stepup_adcStartRaw(void)
 {
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adc1_conv_buff,
-			STIM_LIB_ADC1_TOTAL_SIZE);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adc1_conv_buff, STIM_LIB_ADC1_TOTAL_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_adc1, DMA_IT_HT | DMA_IT_TC);
 	__HAL_ADC_DISABLE_IT(&hadc1, ADC_IT_OVR);
 }

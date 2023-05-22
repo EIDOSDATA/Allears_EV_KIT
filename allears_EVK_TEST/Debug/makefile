@@ -11,6 +11,10 @@ RM := rm -rf
 -include sources.mk
 -include Drivers/STM32L4xx_HAL_Driver/Src/subdir.mk
 -include Core/Startup/subdir.mk
+-include Core/Src/user_app/uart_debug/subdir.mk
+-include Core/Src/user_app/uart_bluetooth/subdir.mk
+-include Core/Src/user_app/stimulation/subdir.mk
+-include Core/Src/user_app/general/subdir.mk
 -include Core/Src/subdir.mk
 -include objects.mk
 
@@ -61,7 +65,7 @@ main-build: allears_EVK_TEST.elf secondary-outputs
 
 # Tool invocations
 allears_EVK_TEST.elf allears_EVK_TEST.map: $(OBJS) $(USER_OBJS) C:\Users\eidos\GitHub\Allears_EV_KIT\allears_EVK_TEST\STM32L412RBTXP_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "allears_EVK_TEST.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\eidos\GitHub\Allears_EV_KIT\allears_EVK_TEST\STM32L412RBTXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="allears_EVK_TEST.map" -Wl,--gc-sections -static -L"C:\Users\eidos\GitHub\Allears_EV_KIT\allears_EVK_TEST\Core\StimLib" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+	arm-none-eabi-gcc -o "allears_EVK_TEST.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\eidos\GitHub\Allears_EV_KIT\allears_EVK_TEST\STM32L412RBTXP_FLASH.ld" --specs=nosys.specs -Wl,-Map="allears_EVK_TEST.map" -Wl,--gc-sections -static -L"C:\Users\eidos\GitHub\Allears_EV_KIT\allears_EVK_TEST\Core\lib" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

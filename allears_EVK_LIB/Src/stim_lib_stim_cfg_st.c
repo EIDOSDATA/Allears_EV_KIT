@@ -113,7 +113,6 @@ void stimLib_paramTrgSettingRaw(void)
 	/* GPIO INIT */
 	GPIO_InitTypeDef GPIO_InitStruct = { 0 };
 
-
 	if(STIM_LIB_TRG_INPUT_IS_ENABLED() == false)
 		return;
 	
@@ -149,7 +148,6 @@ void stimLib_paramTrgSettingRaw(void)
 
 	HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(EXTI0_IRQn);
-
 }
 
 void stimLib_paramTrgResettingRaw(void)
@@ -177,9 +175,8 @@ bool stimLib_pulseConfigRaw(void)
 
 bool stimLib_stimStartRaw(void)
 {
-
 	/* START PULSE TIMER CH4 :: DAC_ON_N or STIM_DISCHARGE :: GPIOA PIN 3 */
-	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DAC_ON_BUF, 4);
+	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH,(const uint32_t*) STIM_LIB_DMA_DAC_ON_BUF, 4);
 	__HAL_DMA_DISABLE_IT(&hdma_tim2_ch2_ch4, (DMA_IT_TC | DMA_IT_HT));
 
 	/* START PULSE TIMER CH2 :: ANODE :: GPIOA PIN 1 */

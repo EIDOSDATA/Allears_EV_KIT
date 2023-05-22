@@ -15,10 +15,8 @@
 #include "stim_lib_stim_cfg.h"
 #include "stim_lib_state.h"
 
-
 #define STIM_LIB_RESOURCE_INIT_ERROR				false
 #define STIM_LIB_RESOURCE_INIT_OK					true
-
 
 static void stimLib_initResource(bool *resource_check)
 {
@@ -38,6 +36,7 @@ static void stimLib_initResource(bool *resource_check)
 	{
 		switch (i)
 		{
+
 		case stim_lib_resrc_dma:
 			resource_check[i] = stimLib_dmaInit();
 			break;

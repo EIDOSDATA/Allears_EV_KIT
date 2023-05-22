@@ -60,13 +60,12 @@ bool stimLib_dmaInit(void)
 	/* DMA1_Channel1_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
-	/* DMA1_Channel7_IRQn interrupt configuration */
-	HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 1, 0);
-	HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
-
 	/* DMA1_Channel2_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+	/* DMA1_Channel7_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 1, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
 
 	return STIM_LIB_RESOURCE_INIT_OK;
 }
@@ -183,7 +182,7 @@ bool stimLib_tim2_Init(void)
 	}
 
 	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC,
-			STIM_LIB_PULSE_TRG_OUT_TIM_CH) != HAL_OK)
+	STIM_LIB_PULSE_TRG_OUT_TIM_CH) != HAL_OK)
 	{
 		return false;
 	}
@@ -192,7 +191,7 @@ bool stimLib_tim2_Init(void)
 	sConfigOC.Pulse = STIM_LIB_ANODE_PULSE_TIME;
 	sConfigOC.OCPolarity = TIM_OCPOLARITY_HIGH;
 	if (HAL_TIM_PWM_ConfigChannel(&htim2, &sConfigOC,
-			STIM_LIB_PULSE_ANODE_TIM_CH) != HAL_OK)
+	STIM_LIB_PULSE_ANODE_TIM_CH) != HAL_OK)
 	{
 		return false;
 	}
@@ -201,7 +200,7 @@ bool stimLib_tim2_Init(void)
 	sConfigOC.OCMode = TIM_OCMODE_TOGGLE;
 	sConfigOC.Pulse = STIM_LIB_CATHODE_PULSE_TIME1;
 	if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC,
-			STIM_LIB_PULSE_CATHODE_TIM_CH) != HAL_OK)
+	STIM_LIB_PULSE_CATHODE_TIM_CH) != HAL_OK)
 	{
 		return false;
 	}
@@ -213,7 +212,7 @@ bool stimLib_tim2_Init(void)
 					sConfigOC.Pulse = STIM_LIB_DISCHARGE_PULSE_TIME1;
 		#endif
 	if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC,
-			STIM_LIB_PULSE_DAC_ON_TIM_CH) != HAL_OK)
+	STIM_LIB_PULSE_DAC_ON_TIM_CH) != HAL_OK)
 	{
 		return false;
 	}
@@ -400,7 +399,7 @@ void stimLib_gpioDeinit(void)
 					| STIM_LIB_DAC_N5_PIN | STIM_LIB_DAC_N6_PIN
 					| STIM_LIB_DAC_N7_PIN | STIM_LIB_PEAK_DISCHG_SW_PIN);
 	HAL_GPIO_DeInit(STIM_LIB_PEAK_DETECTION_PWR_SW_GPIO_PORT,
-			STIM_LIB_PEAK_DETECTION_PWR_SW_PIN);
+	STIM_LIB_PEAK_DETECTION_PWR_SW_PIN);
 }
 
 void stimLib_dmaDeinit(void)

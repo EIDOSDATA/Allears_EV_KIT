@@ -210,7 +210,6 @@ void stimLib_tim_msppostInit(TIM_HandleTypeDef *htim)
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 		GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 	}
 }
 

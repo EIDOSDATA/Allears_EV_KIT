@@ -1,4 +1,4 @@
 ../Src/stim_lib_volt_st.c:19:6:stimLib_stepup_startRaw	16	static
 ../Src/stim_lib_volt_st.c:33:6:stimLib_stepup_stopRaw	8	static
 ../Src/stim_lib_volt_st.c:41:6:stimLib_stepup_adcStartRaw	8	static
-../Src/stim_lib_volt_st.c:49:6:stimLib_stepup_adcStopRaw	8	static
+../Src/stim_lib_volt_st.c:48:6:stimLib_stepup_adcStopRaw	8	static

@@ -1,6 +1,6 @@
 stim_lib_stim_cfg_st.c:26:6:stimLib_paramPulseSettingRaw	10
 stim_lib_stim_cfg_st.c:111:6:stimLib_paramTrgSettingRaw	10
-stim_lib_stim_cfg_st.c:155:6:stimLib_paramTrgResettingRaw	1
-stim_lib_stim_cfg_st.c:160:6:stimLib_pulseConfigRaw	1
-stim_lib_stim_cfg_st.c:178:6:stimLib_stimStartRaw	2
-stim_lib_stim_cfg_st.c:202:6:stimLib_stimStopRaw	1
+stim_lib_stim_cfg_st.c:153:6:stimLib_paramTrgResettingRaw	1
+stim_lib_stim_cfg_st.c:158:6:stimLib_pulseConfigRaw	1
+stim_lib_stim_cfg_st.c:176:6:stimLib_stimStartRaw	2
+stim_lib_stim_cfg_st.c:199:6:stimLib_stimStopRaw	1

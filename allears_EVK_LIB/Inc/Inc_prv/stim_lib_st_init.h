@@ -6,7 +6,6 @@
 #include "stm32l412xx.h"
 #include "stm32l4xx_hal.h"
 
-
 typedef enum
 {
 	stim_lib_resrc_dma = 0x00,
@@ -19,7 +18,6 @@ typedef enum
 
 	stim_lib_resrc_max
 } stim_lib_resrc_t;
-
 
 #define STIM_LIB_RESRC_START							stim_lib_resrc_dma
 #define STIM_LIB_RESOURCE_INIT_ERROR					false
@@ -108,7 +106,6 @@ typedef enum
 #define STIM_LIB_PULSE_DAC_ON_TIM_CH								TIM_CHANNEL_4
 #define STIM_LIB_PULSE_TRG_OUT_TIM_CH								TIM_CHANNEL_1
 
-
 /* ADC Handler */
 extern ADC_HandleTypeDef hadc1;
 extern ADC_HandleTypeDef hadc2;
@@ -121,7 +118,6 @@ extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim6;
 extern DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 extern DMA_HandleTypeDef hdma_tim2_ch3;
-
 
 /* INIT FUNCTION */
 bool stimLib_gpioInit(void);

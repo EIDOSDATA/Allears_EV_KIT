@@ -70,7 +70,7 @@ C_DEPS += \
 
 # Each subdirectory must supply rules for building sources it contributes
 Drivers/STM32L4xx_HAL_Driver/Src/%.o Drivers/STM32L4xx_HAL_Driver/Src/%.su Drivers/STM32L4xx_HAL_Driver/Src/%.cyclo: ../Drivers/STM32L4xx_HAL_Driver/Src/%.c Drivers/STM32L4xx_HAL_Driver/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DTD_DEBUG_ENABLED -DUSE_HAL_DRIVER -DSTM32L412xx -DSTIM_LIB_EVKIT_CC -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m4 -std=gnu11 -g3 -DDEBUG -DTD_DEBUG_ENABLED -DUSE_HAL_DRIVER -DSTM32L412xx -DSTIM_LIB_EVKIT_CC -c -I../Core/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc -I../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32L4xx/Include -I../Drivers/CMSIS/Include -I"C:/Users/eidos/GitHub/Allears_EV_KIT/allears_EVK_TEST/Core/Inc/user_app/general" -I"C:/Users/eidos/GitHub/Allears_EV_KIT/allears_EVK_TEST/Core/Inc/user_app/uart_bluetooth" -I"C:/Users/eidos/GitHub/Allears_EV_KIT/allears_EVK_TEST/Core/Inc/user_app/uart_debug" -I"C:/Users/eidos/GitHub/Allears_EV_KIT/allears_EVK_TEST/Core/Inc/user_app/stimulation" -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -o "$@"
 
 clean: clean-Drivers-2f-STM32L4xx_HAL_Driver-2f-Src
 

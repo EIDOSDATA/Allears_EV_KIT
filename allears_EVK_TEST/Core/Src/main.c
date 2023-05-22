@@ -22,6 +22,13 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stim_lib.h"
+
+#include "td_schedule.h"
+
+#include "td_private.h"
+#include "bt_msg_private.h"
+#include "td_uart1.h"
+
 #include "td_debug.h"
 /* USER CODE END Includes */
 
@@ -52,7 +59,10 @@ TIM_HandleTypeDef htim6;
 DMA_HandleTypeDef hdma_tim2_ch2_ch4;
 DMA_HandleTypeDef hdma_tim2_ch3;
 
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart3;
+DMA_HandleTypeDef hdma_usart1_rx;
+DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -61,6 +71,20 @@ UART_HandleTypeDef huart3;
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+UART_HandleTypeDef* tdUsart1_handlerGet(void)
+{
+	return &huart1;
+}
+
+void USER_DMA_INIT(void)
+{
+	/* DMA1_Channel4_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+	/* DMA1_Channel5_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
+}
 
 /*
  * STIM LIB :: EXTI CALLBACK
@@ -175,6 +199,8 @@ int main(void)
 	/* USER CODE BEGIN SysInit */
 	MX_USART3_UART_Init();
 	stimLib_stimInit();
+	USER_DMA_INIT();
+	MX_USART1_UART_Init();
 #if 0
 	/* USER CODE END SysInit */
 
@@ -187,8 +213,16 @@ int main(void)
 	MX_TIM6_Init();
 	MX_ADC1_Init();
 	MX_ADC2_Init();
+	MX_USART1_UART_Init();
 	/* USER CODE BEGIN 2 */
 #endif
+	TD_DEBUG_INIT();
+	TD_DEBUG_PRINT(("main() starts\n"));
+
+	tdUart1_init();
+	btMsg_init();
+
+#if 0
 	stim_signal_cfg_t pulse_data;
 
 	stim_trg_cfg_t trg_data;
@@ -207,6 +241,10 @@ int main(void)
 	stimLib_stimTriggerConfig(&trg_data);
 
 	stimLib_stimSessionStart();
+	stimLib_stimStart();
+	stimLib_stimPause();
+	stimLib_stimSessionStop();
+#endif
 
 	/* USER CODE END 2 */
 
@@ -240,6 +278,9 @@ int main(void)
 		HAL_Delay(300);
 		stimLib_stimSessionStop();
 #endif
+		td_Schedule();
+		//btMsg_rcvData_handle();
+
 	}
 	/* USER CODE END 3 */
 }
@@ -629,6 +670,41 @@ void MX_TIM6_Init(void)
 }
 
 /**
+ * @brief USART1 Initialization Function
+ * @param None
+ * @retval None
+ */
+void MX_USART1_UART_Init(void)
+{
+
+	/* USER CODE BEGIN USART1_Init 0 */
+
+	/* USER CODE END USART1_Init 0 */
+
+	/* USER CODE BEGIN USART1_Init 1 */
+
+	/* USER CODE END USART1_Init 1 */
+	huart1.Instance = USART1;
+	huart1.Init.BaudRate = 115200;
+	huart1.Init.WordLength = UART_WORDLENGTH_8B;
+	huart1.Init.StopBits = UART_STOPBITS_1;
+	huart1.Init.Parity = UART_PARITY_NONE;
+	huart1.Init.Mode = UART_MODE_TX_RX;
+	huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+	huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+	huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+	huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+	if (HAL_UART_Init(&huart1) != HAL_OK)
+	{
+		Error_Handler();
+	}
+	/* USER CODE BEGIN USART1_Init 2 */
+
+	/* USER CODE END USART1_Init 2 */
+
+}
+
+/**
  * @brief USART3 Initialization Function
  * @param None
  * @retval None
@@ -680,6 +756,12 @@ void MX_DMA_Init(void)
 	/* DMA1_Channel2_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
+	/* DMA1_Channel4_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
+	/* DMA1_Channel5_IRQn interrupt configuration */
+	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
+	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 	/* DMA1_Channel7_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel7_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel7_IRQn);
@@ -745,14 +827,6 @@ void MX_GPIO_Init(void)
 	GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-	/*Configure GPIO pins : ST_UART_TX_Pin ST_UART_RX_Pin */
-	GPIO_InitStruct.Pin = ST_UART_TX_Pin | ST_UART_RX_Pin;
-	GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-	GPIO_InitStruct.Pull = GPIO_NOPULL;
-	GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-	GPIO_InitStruct.Alternate = GPIO_AF7_USART1;
-	HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 	/*Configure GPIO pins : QCC_CTRL0_Pin QCC_CTRL1_Pin */
 	GPIO_InitStruct.Pin = QCC_CTRL0_Pin | QCC_CTRL1_Pin;
