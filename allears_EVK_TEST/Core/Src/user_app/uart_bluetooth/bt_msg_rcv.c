@@ -30,10 +30,6 @@ void bt_mode_set_req(uint8 *msg)
 
 	TD_DEBUG_PRINT(("mode = %d\n", mode));
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	if (msg[BT_MSG_LEN_IX] == 1)
 	{
 		/* Handle MSG */
@@ -61,10 +57,6 @@ void bt_level_set_req(uint8 *msg)
 
 	TD_DEBUG_PRINT(("level = %d\n", level));
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	if (td_Stim_Cur_Mode_Get() == 0)
 	{
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
@@ -97,12 +89,9 @@ void bt_stimul_req(uint8 *msg)
 
 	TD_DEBUG_PRINT(("req = %d\n", req));
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	if (td_Stim_Cur_Mode_Get() == 0 && td_Stim_Cur_Detection_Level_Get() == 0)
 	{
+		td_Stim_FSM_Stop();
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
 	}
 	else if (msg[BT_MSG_LEN_IX] == 1 && (AUL_BT_MSG_STIMUL_STOP == req || req == AUL_BT_MSG_STIMUL_START))
@@ -132,10 +121,6 @@ void bt_elect_detect_req(uint8 *msg)
 	level = msg[BT_MSG_DATA_IX];
 	(void) level;
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	if (td_Stim_Detection_LV_Check_Is_Active() == false && td_Stim_Is_Started())
 	{
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
@@ -158,10 +143,6 @@ void bt_man_mode_req(uint8 *msg)
 {
 	(void) msg;
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	bt_msg_res_t rsp_code;
 	uint8 i;
 
@@ -322,12 +303,12 @@ void bt_stim_trg_cfg_req(uint8 *msg)
 	{
 		rsp_code = BT_MSG_RES_INVALID_PARAM;
 
-		ex_trg_data.volt_prestart = false;
-		ex_trg_data.trg_out_enable = false;
-		ex_trg_data.trg_out_active_pol = 1;
-		ex_trg_data.trg_in_enable = false;
-		ex_trg_data.trg_in_active_pol = 1;
-		ex_trg_data.trg_in_toggled = false;
+		TD_MANUAL_VOLT_PRESTART = false;
+		TD_MANUAL_TRG_OUT_ENA = false;
+		TD_MANUAL_TRG_OUT_ACT_POL = 1;
+		TD_MANUAL_TRG_IN_ENA = false;
+		TD_MANUAL_TRG_IN_ACT_POL = 1;
+		TD_MANUAL_TRG_IN_TOGGLED = false;
 
 		/* Length */
 		if (msg[BT_MSG_LEN_IX] != 6)
@@ -338,48 +319,48 @@ void bt_stim_trg_cfg_req(uint8 *msg)
 		i = BT_MSG_DATA_IX;
 
 		/* Voltage pre-start: 1byt. true : pre-start / false : do not pre-start :: 0 */
-		ex_trg_data.volt_prestart = msg[i];
-		if (true != ex_trg_data.volt_prestart || false != ex_trg_data.volt_prestart)
+		TD_MANUAL_VOLT_PRESTART = msg[i];
+		if (true != TD_MANUAL_VOLT_PRESTART && false != TD_MANUAL_VOLT_PRESTART)
 		{
 			break;
 		}
 		i++;
 
 		/* Trigger Output Enable :: 1 */
-		ex_trg_data.trg_out_enable = msg[i];
-		if (true != ex_trg_data.trg_out_enable || false != ex_trg_data.trg_out_enable)
+		TD_MANUAL_TRG_OUT_ENA = msg[i];
+		if (true != TD_MANUAL_TRG_OUT_ENA && false != TD_MANUAL_TRG_OUT_ENA)
 		{
 			break;
 		}
 		i++;
 
 		/* Trigger Output Active Pol Setting :: 2 */
-		ex_trg_data.trg_out_active_pol = msg[i];
-		if (0 != ex_trg_data.trg_out_active_pol || 1 != ex_trg_data.trg_out_active_pol)
+		TD_MANUAL_TRG_OUT_ACT_POL = msg[i];
+		if (0 != TD_MANUAL_TRG_OUT_ACT_POL && 1 != TD_MANUAL_TRG_OUT_ACT_POL)
 		{
 			break;
 		}
 		i++;
 
 		/* Trigger Input Enable :: 3*/
-		ex_trg_data.trg_in_enable = msg[i];
-		if (true != ex_trg_data.trg_in_enable || false != ex_trg_data.trg_in_enable)
+		TD_MANUAL_TRG_IN_ENA = msg[i];
+		if (true != TD_MANUAL_TRG_IN_ENA && false != TD_MANUAL_TRG_IN_ENA)
 		{
 			break;
 		}
 		i++;
 
 		/* Trigger Input Active Pol Setting :: 4 */
-		ex_trg_data.trg_in_active_pol = msg[i];
-		if (0 != ex_trg_data.trg_in_active_pol || 1 != ex_trg_data.trg_in_active_pol)
+		TD_MANUAL_TRG_IN_ACT_POL = msg[i];
+		if (0 != TD_MANUAL_TRG_IN_ACT_POL && 1 != TD_MANUAL_TRG_IN_ACT_POL)
 		{
 			break;
 		}
 		i++;
 
 		/* Trigger Input Toggle Active Setting :: 5 */
-		ex_trg_data.trg_in_toggled = msg[i];
-		if (true != ex_trg_data.trg_in_toggled || false != ex_trg_data.trg_in_toggled)
+		TD_MANUAL_TRG_IN_TOGGLED = msg[i];
+		if (true != TD_MANUAL_TRG_IN_TOGGLED && false != TD_MANUAL_TRG_IN_TOGGLED)
 		{
 			break;
 		}
@@ -393,13 +374,12 @@ void bt_stim_trg_cfg_req(uint8 *msg)
 		TD_DEBUG_PRINT(("Params OK\n"));
 	}
 
-	TD_DEBUG_PRINT(("Pre-Start: %d\r\n", ex_trg_data.volt_prestart));
-	TD_DEBUG_PRINT(("Trigger Output ENA: %d\r\n", ex_trg_data.trg_out_enable));
-	TD_DEBUG_PRINT(("Trigger Output Act POL: %d\r\n", ex_trg_data.trg_out_active_pol));
-	TD_DEBUG_PRINT(("Trigger Input ENA: %d\r\n", ex_trg_data.trg_in_enable));
-	TD_DEBUG_PRINT(("Trigger Input Act POL: %d\r\n", ex_trg_data.trg_in_active_pol));
-	TD_DEBUG_PRINT(("Trigger Input Toggled : %d\r\n", ex_trg_data.trg_in_toggled));
+	TD_DEBUG_PRINT(("Pre-Start: %d\r\n", TD_MANUAL_VOLT_PRESTART));
+	TD_DEBUG_PRINT(("Trigger Output ENA: %d\r\n", TD_MANUAL_TRG_OUT_ENA));
+	TD_DEBUG_PRINT(("Trigger Output Act POL: %d\r\n", TD_MANUAL_TRG_OUT_ACT_POL));
+	TD_DEBUG_PRINT(("Trigger Input ENA: %d\r\n", TD_MANUAL_TRG_IN_ENA));
+	TD_DEBUG_PRINT(("Trigger Input Act POL: %d\r\n", TD_MANUAL_TRG_IN_ACT_POL));
+	TD_DEBUG_PRINT(("Trigger Input Toggled : %d\r\n", TD_MANUAL_TRG_IN_TOGGLED));
 
-	stimLib_stimTriggerConfig(&ex_trg_data);
-
+	td_Stim_Trigger_Config_Update();
 }

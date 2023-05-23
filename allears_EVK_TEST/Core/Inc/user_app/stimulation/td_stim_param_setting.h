@@ -81,8 +81,9 @@ typedef struct
 	uint16_t puls_width; /* us */
 	uint8_t voltage; /* V */
 } td_stim_eldet_cfg_t;
+
 /*
- * MANUAL MODE PARAMETER
+ * MANUAL MODE PULSE PARAMETER
  * */
 typedef struct
 {
@@ -103,10 +104,25 @@ extern td_stim_manual_param_t ex_manual_param;
 #define TD_MANUAL_GP_ON_TIME							ex_manual_param.gp_on_time
 
 /*
- * STIMULATE PWM PULSE PARAMETER :: FREQ, PULSE WIDTH, DEGREE(Voltage or Current*(DAC)), Trigger Setting
+ * MANUAL MODE TRIGGER PARAMETER
  * */
-extern stim_signal_cfg_t ex_pulse_data;
-extern stim_trg_cfg_t ex_trg_data;
+typedef struct
+{
+	bool volt_prestart; /* Hz */
+	bool trg_out_enable; /* us */
+	uint8_t trg_out_active_pol; /* V */
+	bool trg_in_enable; /* DAC Step */
+	uint8_t trg_in_active_pol; /* s */
+	bool trg_in_toggled; /* s */
+} td_stim_trigger_param_t;
+
+extern td_stim_trigger_param_t ex_man_trg_param;
+#define TD_MANUAL_VOLT_PRESTART							ex_man_trg_param.volt_prestart
+#define TD_MANUAL_TRG_OUT_ENA							ex_man_trg_param.trg_out_enable
+#define TD_MANUAL_TRG_OUT_ACT_POL						ex_man_trg_param.trg_out_active_pol
+#define TD_MANUAL_TRG_IN_ENA							ex_man_trg_param.trg_in_enable
+#define TD_MANUAL_TRG_IN_ACT_POL						ex_man_trg_param.trg_in_active_pol
+#define TD_MANUAL_TRG_IN_TOGGLED						ex_man_trg_param.trg_in_toggled
 
 /*
  * --------
@@ -160,11 +176,16 @@ void td_Stim_Level_Config_Update(uint8_t level);
 /* STIM DETECTION LEVEL CHECK */
 void td_Stim_Detection_Check_Start(uint8_t level);
 
-/* BLE STIM PARAMETER CONTROL FUNCTION */
-void td_Stim_Control(uint8_t start);
-
 /* MANUAL MODE START */
 void td_Stim_Manual_Mode_Start(void);
+
+/* Trigger Mode Setting */
+void td_Stim_Trigger_Config_Update(void);
+
+/* BLE STIM PARAMETER CONTROL FUNCTION */
+void td_Stim_Control(uint8_t start);
+void td_Stim_FSM_Start(void);
+void td_Stim_FSM_Stop(void);
 
 /* PARAMETER CONTROL FUNCTION :: SCHEDULER */
 void td_Stim_Param_Update_Handle(void);

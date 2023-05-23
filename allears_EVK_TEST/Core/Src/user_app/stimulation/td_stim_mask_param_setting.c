@@ -18,19 +18,21 @@
 
 /*
  * STIMULATE PWM PULSE PARAMETER :: FREQ, PULSE WIDTH, DEGREE(Voltage or Current*(DAC)), Trigger Setting
+ *
+ * LIB CONTROL VALUE
  * */
 stim_signal_cfg_t ex_pulse_data;
 stim_trg_cfg_t ex_trg_data;
 
 /*
- * GROUP PULSE PARAMETER :: RAW STRUCT
+ * BLE MANUAL MODE
+ * 1. GROUP PULSE PARAMETER :: RAW STRUCT
+ * 2. MANUAL CONTROL PULSE PARAM
+ * 3. MANUAL CONTROL TRIGGER PARAM
  * */
 td_stim_gpmode_ctrl_param_t ex_raw_gpmode_ctrl_param;
-
-/*
- * BLE MANUAL MODE :: MASK LAYER
- * */
 td_stim_manual_param_t ex_manual_param;
+td_stim_trigger_param_t ex_man_trg_param;
 
 typedef struct
 {
@@ -357,6 +359,56 @@ void td_Stim_Manual_Mode_Start(void)
 }
 
 /*
+ * Trigger MODE Setting
+ * TODO:
+ * Add in future
+ * */
+void td_Stim_Trigger_Config_Update(void)
+{
+	/*
+	 * TODO:
+	 * TEST PLS
+	 * */
+	/* MANUAL PULSE DATA SETTING */
+	if (TD_MANUAL_PULSE_FREQ == 0 || TD_MANUAL_PULSE_WIDTH == 0 || TD_MANUAL_TARGET_VOLTAGE == 0)
+	{
+		ex_pulse_data.freq = 10;
+		ex_pulse_data.pulse_width = 1000;
+
+#ifdef STIM_LIB_EVKIT_CV
+		ex_pulse_data.degree = 15;
+#endif
+#ifdef STIM_LIB_EVKIT_CC
+		ex_pulse_data.degree = 1;
+#endif
+		stimLib_stimSignalConfig(&ex_pulse_data);
+	}
+	else
+	{
+		ex_pulse_data.freq = TD_MANUAL_PULSE_FREQ;
+		ex_pulse_data.pulse_width = TD_MANUAL_PULSE_WIDTH;
+#ifdef STIM_LIB_EVKIT_CV
+		ex_pulse_data.degree = TD_MANUAL_TARGET_VOLTAGE;
+#endif
+#ifdef STIM_LIB_EVKIT_CC
+			ex_pulse_data.degree = TD_MANUAL_TARGET_DAC;
+#endif
+	}
+	stimLib_stimSignalConfig(&ex_pulse_data);
+
+	/* TRIGGER SETTING */
+	ex_trg_data.volt_prestart = TD_MANUAL_VOLT_PRESTART;
+	ex_trg_data.trg_out_enable = TD_MANUAL_TRG_OUT_ENA;
+	ex_trg_data.trg_out_active_pol = TD_MANUAL_TRG_OUT_ACT_POL;
+	ex_trg_data.trg_in_enable = TD_MANUAL_TRG_IN_ENA;
+	ex_trg_data.trg_in_active_pol = TD_MANUAL_TRG_IN_ACT_POL;
+	ex_trg_data.trg_in_toggled = TD_MANUAL_TRG_IN_TOGGLED;
+
+	stimLib_stimTriggerConfig(&ex_trg_data);
+	td_Set_Sys_FSM_State_Start();
+}
+
+/*
  * BLE STIM PARAMETER CONTROL FUNCTION
  * */
 void td_Stim_Control(uint8_t start)
@@ -445,6 +497,15 @@ void td_Stim_Control(uint8_t start)
 		td_Set_Sys_FSM_State_Start();
 	}
 	TD_STIM_ACTIVE_CHNAGE(start);
+}
+
+void td_Stim_FSM_Start(void)
+{
+	td_Set_Sys_FSM_State_Start();
+}
+void td_Stim_FSM_Stop(void)
+{
+	td_Set_Sys_FSM_State_Stop();
 }
 
 /*

@@ -225,12 +225,13 @@ int main(void)
 #if 0
 	stim_signal_cfg_t pulse_data;
 
-	stim_trg_cfg_t trg_data;
-
 	pulse_data.freq = 10;
 	pulse_data.pulse_width = 1000;
 	pulse_data.degree = 20;
 	stimLib_stimSignalConfig(&pulse_data);
+#endif
+#if 0
+	stim_trg_cfg_t trg_data;
 
 	trg_data.volt_prestart = true;
 	trg_data.trg_out_enable = false;
@@ -239,11 +240,6 @@ int main(void)
 	trg_data.trg_in_active_pol = 1;
 	trg_data.trg_in_toggled = true;
 	stimLib_stimTriggerConfig(&trg_data);
-
-	stimLib_stimSessionStart();
-	stimLib_stimStart();
-	stimLib_stimPause();
-	stimLib_stimSessionStop();
 #endif
 
 	/* USER CODE END 2 */
