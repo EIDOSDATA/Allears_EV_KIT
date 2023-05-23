@@ -18,7 +18,9 @@ void tdDebugPrintChar(uint8_t *data, uint16_t len)
 	uint16_t i;
 
 	if (len == 0)
+	{
 		return;
+	}
 
 	for (i = 0; i < len; i++)
 	{
@@ -33,7 +35,9 @@ void tdDebugPrintHex(uint8_t *data, uint16_t len)
 	uint16_t i;
 
 	if (len == 0)
+	{
 		return;
+	}
 
 	for (i = 0; i < len; i++)
 	{

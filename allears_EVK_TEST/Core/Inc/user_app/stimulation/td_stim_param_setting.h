@@ -16,9 +16,7 @@
 
 typedef enum
 {
-	td_stim_op_none = 0x00, td_stim_op_normal = 1, td_stim_op_elect_detect = 2,
-
-	td_stim_op_max = 3
+	TD_STIM_OP_NONE = 0x00, TD_STIM_OP_NORMAL, TD_STIM_OP_ELECT_DETECT, TD_STIM_OP_MAX
 } td_stim_op_t;
 
 /*
@@ -35,12 +33,11 @@ typedef enum
 	TD_MASSAGE_H_MODE = 6,
 	/* BY SSI */
 	TD_MANUAL_MODE = 0x80,
-
 	TD_STIM_MODE_MAX = 7
 } td_stim_mode_t;
 
 /*
- * GROUP PULSE PARAMETER STRUCT :: RAW
+ * GROUP PULSE PARAMETER STRUCT :: RAW SETTING
  * */
 typedef struct
 {

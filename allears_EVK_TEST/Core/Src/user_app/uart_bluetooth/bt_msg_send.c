@@ -7,7 +7,6 @@
 
 #include "td_debug.h"
 
-
 #define BT_MSG_RES_LEN_DEFAULT				2
 #define BT_MSG_RES_DATA_LEN_MAX				15
 
@@ -15,9 +14,7 @@
 
 #define BT_MSG_SEND()						tdUart1_sendData(BT_MSG_SEND_BUF, BT_MSG_SIZE_MAX)
 
-
 uint8 gBtMsg_sendBuf[BT_MSG_SIZE_MAX];
-
 
 static inline void bt_msg_send_init_INLINE(void)
 {
@@ -26,16 +23,15 @@ static inline void bt_msg_send_init_INLINE(void)
 	BT_MSG_SEND_BUF[BT_MSG_START_CODE_IX] = BT_MSG_START_CODE;
 }
 
-
-void bt_msg_res(bt_msg_type_t type, bt_msg_res_t res, uint8* data, uint8 data_len)
+void bt_msg_res(bt_msg_type_t type, bt_msg_res_t res, uint8 *data, uint8 data_len)
 {
-	if(type >= BT_MSG_TYPE_MAX || res >= BT_MSG_RES_MAX)
+	if (type >= BT_MSG_TYPE_MAX || res >= BT_MSG_RES_MAX)
 		return;
 
-	if(data == NULL)
+	if (data == NULL)
 		data_len = 0;
-	else if(data_len > BT_MSG_RES_DATA_LEN_MAX)
-			data_len = BT_MSG_RES_DATA_LEN_MAX;
+	else if (data_len > BT_MSG_RES_DATA_LEN_MAX)
+		data_len = BT_MSG_RES_DATA_LEN_MAX;
 
 	bt_msg_send_init_INLINE();
 
@@ -44,7 +40,7 @@ void bt_msg_res(bt_msg_type_t type, bt_msg_res_t res, uint8* data, uint8 data_le
 	BT_MSG_SEND_BUF[BT_MSG_DATA_IX] = type;
 	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 1] = res;
 
-	if(data_len > 0)
+	if (data_len > 0)
 	{
 		memcpy(&BT_MSG_SEND_BUF[BT_MSG_DATA_IX + BT_MSG_RES_LEN_DEFAULT], data, data_len);
 	}
@@ -59,10 +55,10 @@ void bt_state_ind(void)
 #if 1
 	BT_MSG_SEND_BUF[BT_MSG_TYPE_IX] = BT_STATE_IND;
 	BT_MSG_SEND_BUF[BT_MSG_LEN_IX] = 4;
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX] = td_Stim_Is_Started();				/* stimul start */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 1] = td_Stim_Cur_Mode_Get();			/* mode */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 2] = td_Stim_Cur_Level_Get();			/* level */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 3] = td_Stim_Detection_Level();	/* elect detect */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX] = td_Stim_Is_Started(); /* stimul start */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 1] = td_Stim_Cur_Mode_Get(); /* mode */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 2] = td_Stim_Cur_Level_Get(); /* level */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 3] = td_Stim_Detection_Level(); /* elect detect */
 #endif
 
 	BT_MSG_SEND();

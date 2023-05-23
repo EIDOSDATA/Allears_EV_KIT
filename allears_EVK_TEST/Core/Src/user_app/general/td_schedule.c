@@ -88,8 +88,7 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		}
 
 		/* IF :: STATUS SLEEP >> AWAKE */
-		if (td_Get_Current_GP_State() == td_gp_sleep
-				&& gp_ctrl_cnt_tim16 == pwm_disable_tim)
+		if (td_Get_Current_GP_State() == td_gp_sleep && gp_ctrl_cnt_tim16 == pwm_disable_tim)
 		{
 			stimLib_stimStart();
 			gp_stat = td_gp_awake;
@@ -97,8 +96,7 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		}
 
 		/* IF :: STATUS AWAKE >> SLEEP */
-		else if (td_Get_Current_GP_State() == td_gp_awake
-				&& gp_ctrl_cnt_tim16 == pwm_enable_tim)
+		else if (td_Get_Current_GP_State() == td_gp_awake && gp_ctrl_cnt_tim16 == pwm_enable_tim)
 		{
 			stimLib_stimPause();
 			gp_stat = td_gp_sleep;

@@ -3,11 +3,7 @@
 
 typedef enum
 {
-	td_sys_state_idle = 0x00,
-	td_sys_state_run,
-	td_sys_state_init,
-	td_sys_state_error,
-	td_sys_state_max
+	TD_SYS_STATE_IDLE = 0x00, TD_SYS_STATE_RUN, TD_SYS_STATE_INIT, TD_SYS_STATE_ERROR, TD_SYS_STATE_MAX
 } td_sys_state_t;
 
 #define TD_CUR_SYS_STATE								td_sys_fsm_state.state

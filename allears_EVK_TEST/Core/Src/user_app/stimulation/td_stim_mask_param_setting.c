@@ -94,7 +94,7 @@ uint8_t td_GP_Mode_Is_Ready(void) // RETURN GROUP PULSE MODE FLAG
 {
 	uint8_t gp_ready_f = 0;
 
-	if (td_Get_Sys_FSM_State() == td_sys_state_run && TD_RAW_GROUP_PULSE_F == 1)
+	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN && TD_RAW_GROUP_PULSE_F == 1)
 	{
 		gp_ready_f = 1;
 	}
@@ -147,10 +147,8 @@ void td_Stim_Mode_Config_Get(uint8_t mode)
 		mode = 0;
 	}
 
-	TD_STIM_MODE_CFG_TABLE->gp_mode_enable = TD_STIM_MODE_CFG_GP_ENABLE_GET(
-			mode);
-	TD_STIM_MODE_CFG_TABLE->gp_off_time = TD_STIM_MODE_CFG_GP_OFF_TIME_GET(
-			mode);
+	TD_STIM_MODE_CFG_TABLE->gp_mode_enable = TD_STIM_MODE_CFG_GP_ENABLE_GET(mode);
+	TD_STIM_MODE_CFG_TABLE->gp_off_time = TD_STIM_MODE_CFG_GP_OFF_TIME_GET(mode);
 	TD_STIM_MODE_CFG_TABLE->gp_on_time = TD_STIM_MODE_CFG_GP_ON_TIME_GET(mode);
 }
 
@@ -166,7 +164,7 @@ void td_Stim_Mode_Config_Update(uint8_t mode)
 	}
 
 	/* CHANGE TO NEW MODE */
-	TD_RAW_MODE_SET_F = td_stim_op_normal;
+	TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;
 	TD_RAW_STIM_MODE = mode;
 
 	/* APPLY PULSE FREQ */
@@ -213,10 +211,8 @@ void td_Stim_Level_Config_Get(uint8_t level)
 	}
 
 	TD_STIM_LEVEL_CFG_TABLE->puls_width = TD_STIM_LEVEL_CFG_PW_GET(level);
-	TD_STIM_LEVEL_CFG_TABLE->output_target_voltage = TD_STIM_LEVEL_CFG_VOLT_GET(
-			level);
-	TD_STIM_LEVEL_CFG_TABLE->current_strength_step = TD_STIM_LEVEL_CFG_DAC_GET(
-			level);
+	TD_STIM_LEVEL_CFG_TABLE->output_target_voltage = TD_STIM_LEVEL_CFG_VOLT_GET(level);
+	TD_STIM_LEVEL_CFG_TABLE->current_strength_step = TD_STIM_LEVEL_CFG_DAC_GET(level);
 }
 
 /*
@@ -242,7 +238,7 @@ void td_Stim_Level_Config_Update(uint8_t level)
 #endif
 
 	TD_RAW_PWM_CHANGE_F = 1;
-	TD_RAW_MODE_SET_F = td_stim_op_normal;
+	TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;
 
 	/* UPDATE LEVEL */
 	TD_STIM_STATE_LEVEL_UPDATE(level);
@@ -260,7 +256,7 @@ void td_Stim_Level_Config_Update(uint8_t level)
 
 	stimLib_stimSignalConfig(&ex_pulse_data);
 
-	if (td_Get_Sys_FSM_State() == td_sys_state_run)
+	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN)
 	{
 		stimLib_stimSessionStart();
 		stimLib_stimStart();
@@ -275,9 +271,7 @@ void td_Stim_Detection_Check_Start(uint8_t level)
 	TD_DEBUG_PRINT(("td_Stim_Detection_Check_Start: %d\r\n", level));
 
 	/* Level 0 means stop electeric detect or reset parameters */
-	if (level != 0
-			&& (level > TD_STIM_ELDET_LEVEL_MAX
-					|| TD_STIM_CUR_DETECTOIN_LEVEL == level))
+	if (level != 0 && (level > TD_STIM_ELDET_LEVEL_MAX || TD_STIM_CUR_DETECTOIN_LEVEL == level))
 	{
 		TD_DEBUG_PRINT(("STIM DETECTION IS IGNORED: %d\r\n", level));
 		return;
@@ -317,7 +311,7 @@ void td_Stim_Detection_Check_Start(uint8_t level)
 void td_Stim_Manual_Mode_Start(void)
 {
 	/* Change to new mode */
-	TD_RAW_MODE_SET_F = td_stim_op_normal;
+	TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;
 	TD_RAW_STIM_MODE = TD_MANUAL_MODE;
 
 	/* Apply group pulse */
@@ -349,7 +343,7 @@ void td_Stim_Manual_Mode_Start(void)
 	TD_RAW_PWM_CHANGE_F = 1;
 
 	/* Update stimulation state */
-	TD_STIM_ACTIVE_CHNAGE(td_sys_state_run);
+	TD_STIM_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 
 	/* Reset current mode */
 	TD_STIM_STATE_MODE_UPDATE(0);
@@ -372,8 +366,7 @@ void td_Stim_Control(uint8_t start)
 	/* IF STOPPING, ANYWAY STOP STIMUALTIONS */
 	if (start != 0 && TD_STIM_ACTIVE == start)
 	{
-		TD_DEBUG_PRINT(
-				("THE SAME STIM The same STIM state: %d\r\n", TD_STIM_ACTIVE));
+		TD_DEBUG_PRINT(("THE SAME STIM The same STIM state: %d\r\n", TD_STIM_ACTIVE));
 		return;
 	}
 
@@ -391,7 +384,7 @@ void td_Stim_Control(uint8_t start)
 		}
 
 		/* DEFAULT MODE SET IS 1 */
-		TD_RAW_MODE_SET_F = td_stim_op_normal;
+		TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;
 
 		/* RESET STIM LEVEL */
 		TD_STIM_STATE_LEVEL_UPDATE(0);
@@ -422,8 +415,34 @@ void td_Stim_Control(uint8_t start)
 	else if (start == 1)
 	{
 		TD_DEBUG_PRINT(("START\r\n"));
+
+#if 0
+		/*
+		 * PARAMETER RESETTING
+		 * MODE
+		 * */
+		ex_pulse_data.freq = TD_STIM_MODE_CFG_PULSE_FREQ_GET(TD_RAW_STIM_MODE);
+		TD_RAW_GROUP_PULSE_F = TD_STIM_MODE_CFG_GP_ENABLE_GET(TD_RAW_STIM_MODE);
+		TD_RAW_GROUP_PULSE_DISABLE_TIME = TD_STIM_MODE_CFG_GP_OFF_TIME_GET(TD_RAW_STIM_MODE);
+		TD_RAW_GROUP_PULSE_ENABLE_TIME = TD_STIM_MODE_CFG_GP_ON_TIME_GET(TD_RAW_STIM_MODE);
+
+		/*
+		 * PARAMETER RESETTING
+		 * LEVEL
+		 * */
+		ex_pulse_data.pulse_width = TD_STIM_LEVEL_CFG_PW_GET(TD_RAW_STIM_LEVEL);
+#ifdef STIM_LIB_EVKIT_CV
+		ex_pulse_data.degree = TD_STIM_LEVEL_CFG_VOLT_GET(TD_RAW_STIM_LEVEL);
+#endif
+
+#ifdef STIM_LIB_EVKIT_CC
+		ex_pulse_data.degree = TD_STIM_LEVEL_CFG_DAC_GET(TD_RAW_STIM_LEVEL);
+#endif
+
+		stimLib_stimSignalConfig(&ex_pulse_data);
+#endif
 		/* STIM STOP :: SYSTEM FSM */
-		td_Set_Sys_FSM_State_Start(); // TD_RAW_STIM_START_F = 1;
+		td_Set_Sys_FSM_State_Start();
 	}
 	TD_STIM_ACTIVE_CHNAGE(start);
 }
@@ -434,21 +453,16 @@ void td_Stim_Control(uint8_t start)
 void td_Stim_Param_Update_Handle(void)
 {
 	/* Send state change ind */
-	if (TD_STIM_ACTIVE
-			!= td_Get_Sys_FSM_State() || TD_STIM_CUR_MODE != TD_RAW_STIM_MODE
-			|| TD_STIM_CUR_LEVEL != TD_RAW_STIM_LEVEL /*|| ElecDetEndFlag == 1*/)
+	if (TD_STIM_ACTIVE != td_Get_Sys_FSM_State() || TD_STIM_CUR_MODE != TD_RAW_STIM_MODE || TD_STIM_CUR_LEVEL != TD_RAW_STIM_LEVEL /*|| ElecDetEndFlag == 1*/)
 	{
 		TD_DEBUG_PRINT(("STIM STATE CHANGE\r\n"));
 
-		TD_DEBUG_PRINT(
-				("START: %d >> %d\r\n", TD_STIM_ACTIVE, td_Get_Sys_FSM_State()));
-		TD_DEBUG_PRINT(
-				("MODE: %d >> %d\r\n", TD_STIM_CUR_MODE, TD_RAW_STIM_MODE));
-		TD_DEBUG_PRINT(
-				("LEVLE: %d >> %d\r\n", TD_STIM_CUR_LEVEL, TD_RAW_STIM_LEVEL));
-		//TD_DEBUG_PRINT(("El Det: %d\n", ElecDetFlag));
+		TD_DEBUG_PRINT(("START: %d >> %d\r\n", TD_STIM_ACTIVE, td_Get_Sys_FSM_State()));
+		TD_DEBUG_PRINT(("MODE: %d >> %d\r\n", TD_STIM_CUR_MODE, TD_RAW_STIM_MODE));
+		TD_DEBUG_PRINT(("LEVLE: %d >> %d\r\n", TD_STIM_CUR_LEVEL, TD_RAW_STIM_LEVEL));
+		/* TD_DEBUG_PRINT(("El Det: %d\n", ElecDetFlag)); */
 
-		TD_STIM_ACTIVE_CHNAGE(td_Get_Sys_FSM_State()); // TD_RAW_STIM_START_F
+		TD_STIM_ACTIVE_CHNAGE(td_Get_Sys_FSM_State());
 		TD_STIM_STATE_MODE_UPDATE(TD_RAW_STIM_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_RAW_STIM_LEVEL);
 
@@ -480,8 +494,7 @@ void td_Stim_Timeout_Ctrl(uint8_t start)
 
 void td_Stim_Timeout_Handle(void)
 {
-	if (TD_STIM_TIMEOUT_STARTED == true
-			&& TD_STIM_TIMEOUT_CNT <= TD_STIM_TIMEOUT_THRESHOLD_VALUE)
+	if (TD_STIM_TIMEOUT_STARTED == true && TD_STIM_TIMEOUT_CNT <= TD_STIM_TIMEOUT_THRESHOLD_VALUE)
 	{
 		TD_STIM_TIMEOUT_CNT++;
 

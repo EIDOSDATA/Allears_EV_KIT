@@ -9,13 +9,13 @@ typedef struct
 	td_sys_state_t state;
 } td_sys_state_data_t;
 td_sys_state_data_t td_sys_fsm_state;
-td_sys_state_t cur_state = td_sys_state_idle;
+td_sys_state_t cur_state = TD_SYS_STATE_IDLE;
 
 /* while out code*/
 void td_Sys_FSM_State_Init(void)
 {
-	TD_CUR_SYS_STATE = td_sys_state_max;
-	td_Set_Sys_FSM_State(td_sys_state_init);
+	TD_CUR_SYS_STATE = TD_SYS_STATE_MAX;
+	td_Set_Sys_FSM_State(TD_SYS_STATE_INIT);
 }
 
 td_sys_state_t td_Get_Sys_FSM_State(void)
@@ -25,23 +25,23 @@ td_sys_state_t td_Get_Sys_FSM_State(void)
 
 void td_Set_Sys_FSM_State_Start_FORCE()
 {
-	TD_CUR_SYS_STATE = td_sys_state_run;
-	cur_state = td_sys_state_run;
+	TD_CUR_SYS_STATE = TD_SYS_STATE_RUN;
+	cur_state = TD_SYS_STATE_RUN;
 }
 void td_Set_Sys_FSM_State_Stop_FORCE()
 {
-	TD_CUR_SYS_STATE = td_sys_state_idle;
-	cur_state = td_sys_state_idle;
+	TD_CUR_SYS_STATE = TD_SYS_STATE_IDLE;
+	cur_state = TD_SYS_STATE_IDLE;
 }
 
 void td_Set_Sys_FSM_State_Start()
 {
-	cur_state = td_sys_state_run;
+	cur_state = TD_SYS_STATE_RUN;
 }
 
 void td_Set_Sys_FSM_State_Stop()
 {
-	cur_state = td_sys_state_idle;
+	cur_state = TD_SYS_STATE_IDLE;
 }
 
 void td_Sys_FSM_State_Handle(void)
@@ -50,13 +50,13 @@ void td_Sys_FSM_State_Handle(void)
 #if 0
 	if (td_Btn_IsHandled() == true)
 	{
-		if (cur_state == td_sys_state_idle)
+		if (cur_state == TD_SYS_STATE_IDLE)
 		{
-			cur_state = td_sys_state_run;
+			cur_state = TD_SYS_STATE_RUN;
 		}
-		else if (cur_state == td_sys_state_run)
+		else if (cur_state == TD_SYS_STATE_RUN)
 		{
-			cur_state = td_sys_state_idle;
+			cur_state = TD_SYS_STATE_IDLE;
 		}
 	}
 #endif
@@ -73,16 +73,16 @@ void td_Sys_FSM_State_Handle(void)
 void td_Set_Sys_FSM_State(td_sys_state_t state)
 {
 
-	if (TD_CUR_SYS_STATE == state || state >= td_sys_state_max)
+	if (TD_CUR_SYS_STATE == state || state >= TD_SYS_STATE_MAX)
 	{
 		return;
 	}
 
 	switch (state)
 	{
-	case td_sys_state_init:
+	case TD_SYS_STATE_INIT:
 		break;
-	case td_sys_state_idle:
+	case TD_SYS_STATE_IDLE:
 
 		/* STIM PAUSE */
 		stimLib_stimPause();
@@ -90,7 +90,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 		/* SESSION STOP */
 		stimLib_stimSessionStop();
 
-	case td_sys_state_run:
+	case TD_SYS_STATE_RUN:
 
 		/* SESSION START */
 		stimLib_stimSessionStart();
@@ -100,7 +100,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 
 		break;
 
-	case td_sys_state_error:
+	case TD_SYS_STATE_ERROR:
 		TD_DEBUG_PRINT(("ERROR TD STATE: %d\n", state));
 		break;
 

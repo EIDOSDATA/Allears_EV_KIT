@@ -8,8 +8,6 @@
 #include "td_uart1_q.h"
 #include "td_debug.h"
 
-
-
 #define TD_UART1_DMA_TX_BUF_SIZE				BT_MSG_SIZE_MAX
 #define TD_UART1_DMA_RX_BUF_SIZE				BT_MSG_SIZE_MAX
 #define TD_UART1_DMA_TX_WAIT_TIME				0xFFFF
@@ -20,10 +18,8 @@
 #define TD_UART_DMA_TX_BUF_CLEAR()				memset(TD_UART1_DMA_TX_BUF, 0, TD_UART1_DMA_TX_BUF_SIZE)
 #define TD_UART_DMA_RX_BUF_CLEAR()				memset(TD_UART1_DMA_RX_BUF, 0, TD_UART1_DMA_RX_BUF_SIZE)
 
-
 uint8_t gTdUart1_dmaTxBuf[TD_UART1_DMA_TX_BUF_SIZE];
 uint8_t gTdUart1_dmaRxBuf[TD_UART1_DMA_RX_BUF_SIZE];
-
 
 void tdUart1_init(void)
 {
@@ -35,12 +31,12 @@ void tdUart1_init(void)
 	tdUart1_receiveData();
 }
 
-void tdUart1_sendData(uint8_t* data, uint8_t size)
+void tdUart1_sendData(uint8_t *data, uint8_t size)
 {
 	uint32 i;
-	UART_HandleTypeDef* uart_h = tdUsart1_handlerGet();
+	UART_HandleTypeDef *uart_h = tdUsart1_handlerGet();
 
-	if(data == NULL || size == 0 || uart_h == NULL)
+	if (data == NULL || size == 0 || uart_h == NULL)
 	{
 		TD_DEBUG_PRINT(("tdUart1_sendData() ERR: PARAM\n"));
 		return;
@@ -54,9 +50,10 @@ void tdUart1_sendData(uint8_t* data, uint8_t size)
 	}
 #else
 	/* To be used in interrupt handler also */
-	for(i=0; (i<TD_UART1_DMA_TX_WAIT_TIME) && (uart_h->gState != HAL_UART_STATE_READY); i++);
+	for (i = 0; (i < TD_UART1_DMA_TX_WAIT_TIME) && (uart_h->gState != HAL_UART_STATE_READY); i++)
+		;
 
-	if(i >= TD_UART1_DMA_TX_WAIT_TIME)
+	if (i >= TD_UART1_DMA_TX_WAIT_TIME)
 	{
 		TD_DEBUG_PRINT(("tdUart1_sendData() ERR: BUSY\n"));
 		return;
@@ -65,7 +62,7 @@ void tdUart1_sendData(uint8_t* data, uint8_t size)
 
 	TD_UART_DMA_TX_BUF_CLEAR();
 
-	if(size > TD_UART1_DMA_TX_BUF_SIZE)
+	if (size > TD_UART1_DMA_TX_BUF_SIZE)
 		size = TD_UART1_DMA_TX_BUF_SIZE;
 
 	memcpy(TD_UART1_DMA_TX_BUF, data, size);
@@ -77,15 +74,15 @@ void tdUart1_sendData(uint8_t* data, uint8_t size)
 
 void tdUart1_receiveData(void)
 {
-	UART_HandleTypeDef* uart_h = tdUsart1_handlerGet();
+	UART_HandleTypeDef *uart_h = tdUsart1_handlerGet();
 
-	if(uart_h == NULL)
+	if (uart_h == NULL)
 	{
 		TD_DEBUG_PRINT(("tdUart1_receiveData() ERR: PARAM\n"));
 		return;
 	}
 
-	if(uart_h->RxState != HAL_UART_STATE_READY)
+	if (uart_h->RxState != HAL_UART_STATE_READY)
 	{
 		TD_DEBUG_PRINT(("tdUart1_receiveData() ERR: BUSY\n"));
 		return;
@@ -97,11 +94,10 @@ void tdUart1_receiveData(void)
 	__HAL_DMA_DISABLE_IT(uart_h->hdmarx, DMA_IT_HT);
 }
 
-
 /* Rx complete when Idle */
- void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
+void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Rx event\n"));
 		memcpy(TD_UART1_DMA_RX_BUF, huart->pRxBuffPtr, Size);
@@ -112,12 +108,12 @@ void tdUart1_receiveData(void)
 		tdUart1Q_putData(TD_UART1_DMA_RX_BUF, Size);
 
 		TD_UART_DMA_RX_BUF_CLEAR();
-	}	
+	}
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Rx comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
@@ -126,33 +122,33 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Rx Half comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
-	}	
+	}
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Tx comlete\n"));
-	}	
+	}
 }
 
 void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Tx Half comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
-	}	
+	}
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
-	if(huart->Instance == USART1)
+	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Error: %lx\n", huart->ErrorCode));
 	}
