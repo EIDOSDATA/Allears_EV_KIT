@@ -1,6 +1,0 @@
-../Src/stim_lib_stim_cfg_st.c:26:6:stimLib_paramPulseSettingRaw	56	static
-../Src/stim_lib_stim_cfg_st.c:111:6:stimLib_paramTrgSettingRaw	32	static
-../Src/stim_lib_stim_cfg_st.c:153:6:stimLib_paramTrgResettingRaw	8	static
-../Src/stim_lib_stim_cfg_st.c:158:6:stimLib_pulseConfigRaw	4	static
-../Src/stim_lib_stim_cfg_st.c:176:6:stimLib_stimStartRaw	8	static
-../Src/stim_lib_stim_cfg_st.c:199:6:stimLib_stimStopRaw	8	static

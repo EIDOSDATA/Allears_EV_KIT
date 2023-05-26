@@ -1,3 +1,0 @@
-../Src/stim_lib_st.c:6:6:stimLib_chkSystem	4	static
-../Src/stim_lib_st.c:16:10:stimLib_getTick	8	static
-../Src/stim_lib_st.c:21:6:stimLib_delay	16	static

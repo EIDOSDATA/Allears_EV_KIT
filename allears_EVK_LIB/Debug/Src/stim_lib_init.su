@@ -1,3 +1,0 @@
-../Src/stim_lib_init.c:21:13:stimLib_initResource	32	static
-../Src/stim_lib_init.c:79:9:stimLib_initResrc	16	static
-../Src/stim_lib_init.c:154:9:stimLib_deinitResrc	8	static
