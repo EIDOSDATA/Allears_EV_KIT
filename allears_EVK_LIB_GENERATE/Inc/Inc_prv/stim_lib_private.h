@@ -10,4 +10,6 @@
 
 #define STIM_LIB_SYSTEM_CLOCK_HZ				80000000
 
+
 #endif	/* STIMUL_LIB_PRIVATE_H */
+
