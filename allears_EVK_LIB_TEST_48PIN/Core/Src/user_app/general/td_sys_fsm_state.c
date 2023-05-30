@@ -4,6 +4,8 @@
 #include "td_sys_fsm_state.h"
 #include "td_debug.h"
 
+extern TIM_HandleTypeDef htim16;
+
 typedef struct
 {
 	td_sys_state_t state;
@@ -83,6 +85,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 	case TD_SYS_STATE_INIT:
 		break;
 	case TD_SYS_STATE_IDLE:
+		HAL_TIM_Base_Stop_IT(&htim16);
 
 		/* STIM PAUSE */
 		stimLib_stimPause();
@@ -91,6 +94,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 		stimLib_stimSessionStop();
 
 	case TD_SYS_STATE_RUN:
+		HAL_TIM_Base_Start_IT(&htim16);
 
 		/* SESSION START */
 		stimLib_stimSessionStart();
