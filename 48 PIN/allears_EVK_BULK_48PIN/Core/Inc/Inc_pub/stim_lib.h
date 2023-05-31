@@ -128,6 +128,16 @@ stim_lib_rsp_t stimLib_stimStart(void);
 */
 stim_lib_rsp_t stimLib_stimPause(void);
 
+/*
+	BRIEF
+		- Pause stimulation signal output in a session.
+	PARAM:
+		- void
+	RETRUN:
+		- Result of Pausing stimulation signal output in a session
+*/
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg);
+
 
 /*
 	Definition in application area

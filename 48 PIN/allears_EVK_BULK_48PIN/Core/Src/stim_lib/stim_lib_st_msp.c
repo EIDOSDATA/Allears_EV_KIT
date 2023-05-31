@@ -172,7 +172,7 @@ void stimLib_tim_basemspInit(TIM_HandleTypeDef *htim_base)
 	if (htim_base->Instance == TIM6)
 	{
 		__HAL_RCC_TIM6_CLK_ENABLE();
-		HAL_NVIC_SetPriority(TIM6_IRQn, 2, 0);
+		HAL_NVIC_SetPriority(TIM6_IRQn, 1, 0);
 		HAL_NVIC_EnableIRQ(TIM6_IRQn);
 	}
 }

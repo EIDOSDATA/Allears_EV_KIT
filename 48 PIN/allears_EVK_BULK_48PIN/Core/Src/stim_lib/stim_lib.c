@@ -210,7 +210,7 @@ stim_lib_rsp_t stimLib_stimSessionStop(void)
 		return stim_lib_stim_rsp_system_fault;
 	}
 
-	if (stimLib_stateGet() == stim_lib_state_session_idle) // if (stimLib_stateGet() == stim_lib_state_session_idle)
+	if (stimLib_stateGet() == stim_lib_state_session_idle)
 	{
 		stimLib_stepupStop();
 
@@ -269,6 +269,30 @@ stim_lib_rsp_t stimLib_stimPause(void)
 
 #endif
 
+		return stim_lib_stim_rsp_ok;
+	}
+	else
+	{
+		return stim_lib_stim_rsp_invalid_status;
+	}
+}
+
+/*
+ * TODO:
+ * STEPUP TEST
+ * */
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
+{
+	if (signal_cfg == NULL || stimLib_signalParamCheck(signal_cfg) == false)
+	{
+		return stim_lib_stim_rsp_invalid_parameter;
+	}
+
+	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
+			|| stimLib_stateGet() == stim_lib_state_stimulating)
+	{
+		stimLib_stateSigParamSet(signal_cfg);
+		stimLib_pulseConfigRaw();
 		return stim_lib_stim_rsp_ok;
 	}
 	else

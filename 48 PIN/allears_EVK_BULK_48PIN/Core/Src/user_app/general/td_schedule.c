@@ -57,13 +57,15 @@ void td_Schedule(void)
 
 	if (HAL_GetTick() - schdule_tick >= TD_SCHED_HANDLE_PERIOD)
 	{
+#ifndef TD_GPIO_UNUSED
 		td_Sys_FSM_State_Handle();
 		td_Btn_Handle();
+		//td_Led_Handle();
 
 		/* STIM */
 		td_Stim_Param_Update_Handle();
 		td_Stim_Timeout_Handle();
-
+#endif
 		schdule_tick = HAL_GetTick();
 	}
 }

@@ -17,21 +17,21 @@
 /* STEPUP VOLTAGE PARAMETER */
 #define R1_Vstup									3600 /* 3.6M Ohm */
 #define R2_Vstup									110 /* 110K Ohm */
-#define STEPUP_VOLTAGE_SCALE_SIZE					100000
-#define STEPUP_DEC_PLACES							5
-#define STEPUP_FDBK_VOLT_RANGE						1.8 * STEPUP_VOLTAGE_SCALE_SIZE
+#define STEPUP_VOLTAGE_SCALE_SIZE					10000
+#define STEPUP_DEC_PLACES							4
+#define STEPUP_FDBK_VOLT_RANGE						(int)(1.8 * STEPUP_VOLTAGE_SCALE_SIZE)
 
 /* STEPUP REFERENCE VALUE :: EXTERN */
 #define STEPUP_REF_VALUE							exStimLib_stepup_table
 extern stim_lib_stepup_ref_value_t exStimLib_stepup_table[STIM_LIB_STEPUP_TABLE_SIZE];
 
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
-uint8_t voltage_ctrl_pulse = 0;
-uint8_t stepup_feedback_cnt = 0;
+int voltage_ctrl_pulse = 0;
+int stepup_feedback_cnt = 0;
 
 /* CONTROL FLAG */
-static bool SLOPE_CTRL_END_FLAG = false;
-static bool STEPUP_DATA_PRINT_FLAG = false;
+bool SLOPE_CTRL_END_FLAG = false;
+bool STEPUP_DATA_PRINT_FLAG = false;
 bool stepup_status = false;
 
 /* STEPUP FEEDBACK :: ADC1 BUFFER and CLAC Value */
@@ -57,7 +57,7 @@ void stimLib_stepup_ctrlScheduler(void)
 		STEPUP_DATA_PRINT_FLAG = true;
 	}
 	/* VOLTAGE RANGE KEEPING CONTROL */
-	else if (STIM_LIB_STEPUP_FEEDBACK_CNT == 1 && SLOPE_CTRL_END_FLAG == true)
+	if (STIM_LIB_STEPUP_FEEDBACK_CNT == 1 && SLOPE_CTRL_END_FLAG == true)
 	{
 		stimLib_stepup_voltFeedback();
 		STIM_LIB_STEPUP_FEEDBACK_CNT = 0;
@@ -82,90 +82,118 @@ void stimLib_stepup_voltFeedback(void)
 	 *
 	 * FUNCTION : stimLib_voltCfg(stepup_fdbk_volt);
 	 * */
-	//stimLib_voltCfg(stepup_fdbk_volt);
+	stimLib_voltCfg(stepup_fdbk_volt);
 }
 
 /*
  * STEP UP VOLTAGE CONFIG
  * */
-void stimLib_voltCfg(uint64_t stepup_voltage)
+void stimLib_voltCfg(uint32_t stepup_voltage)
 {
 	uint32_t voltage_scaleup_val = STEPUP_TARGET_VOLTAGE * STEPUP_VOLTAGE_SCALE_SIZE;
 
 #define VOLTAGE_DIFFERENCE_ABS		abs(voltage_scaleup_val - stepup_voltage)
-#define FAST_STEPUP_VOLTAGE			6 * STEPUP_VOLTAGE_SCALE_SIZE /* 6 V(voltage) */
-#define FAST_STEPUP_ENABLE			VOLTAGE_DIFFERENCE_ABS > FAST_STEPUP_VOLTAGE
+#define FAST_STEPUP_VOLTAGE			4 * STEPUP_VOLTAGE_SCALE_SIZE /* 4 V(voltage) */
+#define FAST_STEPUP_INC_ENABLE		VOLTAGE_DIFFERENCE_ABS > FAST_STEPUP_VOLTAGE
+#define FAST_STEPUP_DEC_ENABLE		VOLTAGE_DIFFERENCE_ABS < FAST_STEPUP_VOLTAGE
 
+#define OUTPUT_VOLTAGE_IS_LOW		voltage_scaleup_val - STEPUP_FDBK_VOLT_RANGE > stepup_voltage
+#define OUTPUT_VOLTAGE_IS_HIGH		voltage_scaleup_val + STEPUP_FDBK_VOLT_RANGE < stepup_voltage
+#define OUTPUT_VOLTAGE_IS_SAME		(voltage_scaleup_val - STEPUP_FDBK_VOLT_RANGE < stepup_voltage) && (voltage_scaleup_val + STEPUP_FDBK_VOLT_RANGE > stepup_voltage)
+
+#if 0
 #define OUTPUT_VOLTAGE_IS_LOW		voltage_scaleup_val > stepup_voltage
 #define OUTPUT_VOLTAGE_IS_HIGH		voltage_scaleup_val < stepup_voltage
 #define OUTPUT_VOLTAGE_IS_SAME		voltage_scaleup_val == stepup_voltage
+#endif
+
+#if 0
+	TD_DEBUG_PRINT(("-----FEED BACK-----\n"));
+	TD_DEBUG_PRINT(("VOLTAGE_DIFFERENCE_ABS : %d\n", VOLTAGE_DIFFERENCE_ABS));
+	TD_DEBUG_PRINT(("STEPUP_FDBK_VOLT_RANGE : %d\n", STEPUP_FDBK_VOLT_RANGE));
+	TD_DEBUG_PRINT(("\r\n"));
+
+	TD_DEBUG_PRINT(("SLOPE_CTRL_END_FLAG : %d\n", SLOPE_CTRL_END_FLAG));
+	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_LOW : %d\n", OUTPUT_VOLTAGE_IS_LOW));
+	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_HIGH : %d\n", OUTPUT_VOLTAGE_IS_HIGH));
+	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_SAME : %d\n", OUTPUT_VOLTAGE_IS_SAME));
+	TD_DEBUG_PRINT(("\r\n"));
+#endif
 
 	if (VOLTAGE_DIFFERENCE_ABS < STEPUP_FDBK_VOLT_RANGE)
 	{
 		if (OUTPUT_VOLTAGE_IS_LOW)
 		{
 			STIM_LIB_VOLTAGE_CTRL_PULSE++;
+
 			if (STIM_LIB_VOLTAGE_CTRL_PULSE > STIM_LIB_STEPUP_CTRL_TABLE_LIMIT - 1)
 			{
 				STIM_LIB_VOLTAGE_CTRL_PULSE = STIM_LIB_STEPUP_CTRL_TABLE_LIMIT - 1;
 			}
 		}
 
-		else if (OUTPUT_VOLTAGE_IS_HIGH)
+		if (OUTPUT_VOLTAGE_IS_HIGH)
 		{
 			STIM_LIB_VOLTAGE_CTRL_PULSE--;
-		}
 
+			if (STIM_LIB_VOLTAGE_CTRL_PULSE < 0)
+			{
+				STIM_LIB_VOLTAGE_CTRL_PULSE = 0;
+			}
+		}
 		SLOPE_CTRL_END_FLAG = true;
 		TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
+		return;
 	}
 
-	else if (VOLTAGE_DIFFERENCE_ABS > STEPUP_FDBK_VOLT_RANGE)
+	if (VOLTAGE_DIFFERENCE_ABS > STEPUP_FDBK_VOLT_RANGE)
 	{
 		if (OUTPUT_VOLTAGE_IS_LOW)
 		{
-			/*
-			 * FAST STEPUP
-			 * When you set the voltage, raise the voltage here.
-			 */
-			if (FAST_STEPUP_ENABLE)
+			if (FAST_STEPUP_INC_ENABLE)
 			{
-				STIM_LIB_VOLTAGE_CTRL_PULSE += 6;
+				STIM_LIB_VOLTAGE_CTRL_PULSE += 1;
 			}
 			else
 			{
 				STIM_LIB_VOLTAGE_CTRL_PULSE += 1;
 			}
 
-			SLOPE_CTRL_END_FLAG = false;
 			if (STIM_LIB_VOLTAGE_CTRL_PULSE > STIM_LIB_STEPUP_CTRL_TABLE_LIMIT - 1)
 			{
 				STIM_LIB_VOLTAGE_CTRL_PULSE = STIM_LIB_STEPUP_CTRL_TABLE_LIMIT - 1;
 			}
 		}
-		else if (OUTPUT_VOLTAGE_IS_HIGH)
+
+		if (OUTPUT_VOLTAGE_IS_HIGH)
 		{
-			STIM_LIB_VOLTAGE_CTRL_PULSE--;
-			SLOPE_CTRL_END_FLAG = true;
-			if (STIM_LIB_VOLTAGE_CTRL_PULSE <= 0)
+			if (FAST_STEPUP_DEC_ENABLE)
+			{
+				STIM_LIB_VOLTAGE_CTRL_PULSE -= 1;
+			}
+			else
+			{
+				STIM_LIB_VOLTAGE_CTRL_PULSE -= 1;
+			}
+
+			if (STIM_LIB_VOLTAGE_CTRL_PULSE < 0)
 			{
 				STIM_LIB_VOLTAGE_CTRL_PULSE = 0;
 			}
 		}
+		SLOPE_CTRL_END_FLAG = false;
 		TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
-
+		return;
 	}
 
 	else if (OUTPUT_VOLTAGE_IS_SAME)
 	{
 		SLOPE_CTRL_END_FLAG = true;
 	}
-
 	else
 	{
 		SLOPE_CTRL_END_FLAG = true;
 	}
-
 }
 
 /*
@@ -176,6 +204,7 @@ void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff, ui
 	uint8_t i;
 	for (i = 0; i < conv_length; i++)
 	{
+#if 1
 		/*
 		 * STEP UP ADC FILTER
 		 * When the ADC buffer is read once,
@@ -189,6 +218,9 @@ void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff, ui
 		{
 			stepup_buff[i] = adc1_conv_buff[i + 1];
 		}
+#else
+		stepup_buff[i] = adc1_conv_buff[i];
+#endif
 	}
 }
 
@@ -229,8 +261,8 @@ void stimLib_stepup_dataPrint(void)
 	{
 		uint8_t i;
 		uint8_t dec_point[STEPUP_DEC_PLACES];
-		int mode_val = STEPUP_VOLTAGE_SCALE_SIZE;
-		uint32_t n_number = (int) (stepup_fdbk_volt / STEPUP_VOLTAGE_SCALE_SIZE);
+		uint32_t mode_val = STEPUP_VOLTAGE_SCALE_SIZE;
+		uint32_t n_number = stepup_fdbk_volt / STEPUP_VOLTAGE_SCALE_SIZE;
 
 		for (i = 0; i < STEPUP_DEC_PLACES; i++)
 		{
@@ -240,11 +272,13 @@ void stimLib_stepup_dataPrint(void)
 
 		/* dec_point[0] = fdbk_adc_voltage % STEPUP_VOLTAGE_SCALE; */
 		TD_DEBUG_PRINT(("----- STEP-UP -----\n"));
+
 		TD_DEBUG_PRINT(("TARGET VOLTAGE : %d\n", STEPUP_TARGET_VOLTAGE));
 
 		TD_DEBUG_PRINT(("MEAS Voltage : %ld.%d%d%d%d%d\n", n_number, dec_point[0], dec_point[1], dec_point[2], dec_point[3], dec_point[4]));
 		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", stepup_fdbk_adc_avg));
 		TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
+		TD_DEBUG_PRINT(("\r\n"));
 
 #ifdef STIM_LIB_EVKIT_CC
 		TD_DEBUG_PRINT(("DAC CTRL VALUE : %d\n\n", DAC_CONTROL_VALUE));

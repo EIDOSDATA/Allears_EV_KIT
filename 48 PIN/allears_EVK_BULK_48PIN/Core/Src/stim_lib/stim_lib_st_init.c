@@ -45,7 +45,6 @@ bool stimLib_gpioInit(void)
 	GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
 	GPIO_InitStruct.Pull = GPIO_NOPULL;
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
 #endif
 
 	return true;
@@ -57,8 +56,7 @@ bool stimLib_dmaInit(void)
 	__HAL_RCC_DMA1_CLK_ENABLE();
 	__HAL_RCC_DMA2_CLK_ENABLE();
 
-	/* DMA interrupt init */
-
+	/* PWM PULSE DMA Interrupt INIT */
 	/* DMA1_Channel1_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 1, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
@@ -84,13 +82,34 @@ bool stimLib_tim1_Init(void)
 	TIM_BreakDeadTimeConfigTypeDef sBreakDeadTimeConfig =
 	{ 0 };
 
+#ifdef STIM_LIB_EVKIT_CV
+	/*
+	 * STEP UP INPUT VOLTAGE : 5.3v
+	 * TIMER HZ : 10.0 kHz
+	 * Test End point Resistance : 50 kΩ
+	 * */
 	htim1.Instance = TIM1;
-	htim1.Init.Prescaler = 3;
+	htim1.Init.Prescaler = 0;
 	htim1.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-	htim1.Init.Period = 9999;
+	htim1.Init.Period = 7999;
 	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim1.Init.RepetitionCounter = 0;
 	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+#endif
+#ifdef STIM_LIB_EVKIT_CC
+	/*
+	 * STEP UP INPUT VOLTAGE : 5.3v
+	 * TIMER HZ : 4.0 kHz
+	 * Test End point Resistance : 50 kΩ
+	 * */
+	htim1.Instance = TIM1;
+	htim1.Init.Prescaler = 0;
+	htim1.Init.CounterMode = TIM_COUNTERMODE_DOWN;
+	htim1.Init.Period = 19999;
+	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+	htim1.Init.RepetitionCounter = 0;
+	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+#endif
 	if (HAL_TIM_PWM_Init(&htim1) != HAL_OK)
 	{
 		return false;
@@ -268,7 +287,7 @@ bool stimLib_adc1_Init(void)
 	/** Common config
 	 */
 	hadc1.Instance = ADC1;
-	hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV1;
+	hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
 	hadc1.Init.Resolution = ADC_RESOLUTION_12B;
 	hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
 	hadc1.Init.ScanConvMode = ADC_SCAN_DISABLE;
@@ -308,7 +327,14 @@ bool stimLib_adc1_Init(void)
 	AnalogWDGConfig.WatchdogMode = ADC_ANALOGWATCHDOG_SINGLE_REG;
 	AnalogWDGConfig.Channel = ADC_CHANNEL_9;
 	AnalogWDGConfig.ITMode = ENABLE;
-	AnalogWDGConfig.HighThreshold = 2600;
+#ifdef STIM_LIB_EVKIT_CV
+	AnalogWDGConfig.HighThreshold = 3280; /* STEP UP LIMIT : 50V */
+#endif
+
+#ifdef STIM_LIB_EVKIT_CC
+	AnalogWDGConfig.HighThreshold = 2800; /* STEP UP LIMIT : 43V */
+#endif
+
 	AnalogWDGConfig.LowThreshold = 0;
 	if (HAL_ADC_AnalogWDGConfig(&hadc1, &AnalogWDGConfig) != HAL_OK)
 	{
@@ -319,7 +345,11 @@ bool stimLib_adc1_Init(void)
 	 */
 	sConfig.Channel = ADC_CHANNEL_9;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
+	/*
+	 * TODO:
+	 * TEST : ADC_SAMPLETIME_47CYCLES_5 or ADC_SAMPLETIME_640CYCLES_5
+	 * */
+	sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
 	sConfig.SingleDiff = ADC_SINGLE_ENDED;
 	sConfig.OffsetNumber = ADC_OFFSET_NONE;
 	sConfig.Offset = 0;

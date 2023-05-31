@@ -84,6 +84,12 @@ typedef struct
 #define TD_BT_MSG_STIM_DETECTION_LEVEL_MAX				16
 
 /*
+ * STEP UP Application Control Param
+ * */
+extern int td_volt_ctrl_pulse;
+#define TD_VOLTAGE_CTRL_PULSE				td_volt_ctrl_pulse
+
+/*
  * PARAMETER TABLE
  * */
 extern td_stim_mode_pulse_freq_t ex_stim_mode_pulse_freq_table[TD_STIM_MODE_NUM_MAX];

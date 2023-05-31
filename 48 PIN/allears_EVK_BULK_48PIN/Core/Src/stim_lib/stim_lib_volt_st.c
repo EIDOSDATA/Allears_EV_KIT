@@ -13,8 +13,8 @@
 extern uint16_t adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; // ADC1
 
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
-extern uint8_t voltage_ctrl_pulse;
-extern uint8_t stepup_feedback_cnt;
+extern int voltage_ctrl_pulse;
+extern int stepup_feedback_cnt;
 
 void stimLib_stepup_startRaw(void)
 {

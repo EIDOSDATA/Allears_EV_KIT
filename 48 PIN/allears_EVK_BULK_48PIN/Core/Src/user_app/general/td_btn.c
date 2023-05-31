@@ -16,11 +16,8 @@
 
 /*
  * STEP UP TEST
- * #include "stim_lib_volt.h"
- * extern uint8_t voltage_ctrl_pulse;
- * */
-#include "stim_lib_volt.h"
-extern uint8_t voltage_ctrl_pulse;
+ */
+int td_volt_ctrl_pulse = 0;
 
 td_btn_state_data_t td_start_btn_state;
 td_btn_state_data_t td_stim_up_btn_state;
@@ -97,6 +94,7 @@ void td_StimUp_Btn_Action(void)
 	if (up_pressed != TD_STIM_UP_BTN_STATE_PRESSED)
 	{
 		TD_STIM_UP_BTN_STATE_PRESSED = up_pressed;
+		TD_VOLTAGE_CTRL_PULSE = TIM1->CCR1;
 #ifdef DEBUG
 		TD_DEBUG_PRINT(("UP BTN : %d\n", up_pressed));
 #endif
@@ -106,17 +104,17 @@ void td_StimUp_Btn_Action(void)
 		else
 		{
 			/* BUTTON PRESSED, Send Signal >> STEP UP PULSE WIDTH CONTROL */
-#if 1
-			STIM_LIB_VOLTAGE_CTRL_PULSE++;
-			if (STIM_LIB_VOLTAGE_CTRL_PULSE == 0)
+#ifdef TD_STEPUP_ADC_TUNNING
+			TD_VOLTAGE_CTRL_PULSE++;
+			if (TD_VOLTAGE_CTRL_PULSE == 0)
 			{
-				STIM_LIB_VOLTAGE_CTRL_PULSE = 255;
+				TD_VOLTAGE_CTRL_PULSE = 65535;
 			}
-			TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
-			TD_DEBUG_PRINT(("STEP UP VPW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
+			TIM1->CCR1 = TD_VOLTAGE_CTRL_PULSE;
+			TD_DEBUG_PRINT(("STEP UP VPW : %d\n", TD_VOLTAGE_CTRL_PULSE));
 #else
 			TD_RAW_STIM_LEVEL++;
-			if(TD_RAW_STIM_LEVEL > TD_STIM_LEVEL_MAX)
+			if (TD_RAW_STIM_LEVEL > TD_STIM_LEVEL_MAX)
 			{
 				TD_RAW_STIM_LEVEL = TD_STIM_LEVEL_MAX;
 			}
@@ -159,6 +157,7 @@ void td_StimDown_Btn_Action(void)
 	if (down_pressed != TD_STIM_DOWN_BTN_STATE_PRESSED)
 	{
 		TD_STIM_DOWN_BTN_STATE_PRESSED = down_pressed;
+		TD_VOLTAGE_CTRL_PULSE = TIM1->CCR1;
 #ifdef DEBUG
 		TD_DEBUG_PRINT(("DOWN BTN : %d\n", down_pressed));
 #endif
@@ -167,18 +166,18 @@ void td_StimDown_Btn_Action(void)
 		}
 		else
 		{
-#if 1
+#ifdef TD_STEPUP_ADC_TUNNING
 			/* BUTTON PRESSED, Send Signal >> STEP UP PULSE WIDTH CONTROL */
-			STIM_LIB_VOLTAGE_CTRL_PULSE--;
-			if (STIM_LIB_VOLTAGE_CTRL_PULSE == 255)
+			TD_VOLTAGE_CTRL_PULSE--;
+			if (TD_VOLTAGE_CTRL_PULSE == 65535)
 			{
-				STIM_LIB_VOLTAGE_CTRL_PULSE = 0;
+				TD_VOLTAGE_CTRL_PULSE = 0;
 			}
-			TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
-			TD_DEBUG_PRINT(("STEP UP VPW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
+			TIM1->CCR1 = TD_VOLTAGE_CTRL_PULSE;
+			TD_DEBUG_PRINT(("STEP UP VPW : %d\n", TD_VOLTAGE_CTRL_PULSE));
 #else
 			TD_RAW_STIM_LEVEL--;
-			if(TD_RAW_STIM_LEVEL == 255)
+			if (TD_RAW_STIM_LEVEL == 255)
 			{
 				TD_RAW_STIM_LEVEL = 0;
 			}

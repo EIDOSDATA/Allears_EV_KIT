@@ -21,12 +21,10 @@ void stimLib_stimStopDelayRaw(void)
 		 * At the end of the pulse, I change the OC mode immediately to drop the GPIO to the LOW level.
 		 * */
 		TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_OC2M);
-		TIM2->CCMR1 |= (TIM_OCMODE_FORCED_INACTIVE)
-				| (TIM_OCMODE_FORCED_INACTIVE << 8U);
+		TIM2->CCMR1 |= (TIM_OCMODE_FORCED_INACTIVE) | (TIM_OCMODE_FORCED_INACTIVE << 8U);
 
 		TIM2->CCMR2 &= ~(TIM_CCMR2_OC3M | TIM_CCMR2_OC4M);
-		TIM2->CCMR2 |= (TIM_OCMODE_FORCED_INACTIVE)
-				| (TIM_OCMODE_FORCED_INACTIVE << 8U);
+		TIM2->CCMR2 |= (TIM_OCMODE_FORCED_INACTIVE) | (TIM_OCMODE_FORCED_INACTIVE << 8U);
 
 		/*
 		 * Since it must be used not only in the polling method but also inside the interrupt, the Delay function is avoided and replaced with a For statement.

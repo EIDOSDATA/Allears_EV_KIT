@@ -14,7 +14,7 @@ td_stim_mode_pulse_freq_t ex_stim_mode_pulse_freq_table[TD_STIM_MODE_NUM_MAX] =
 #if 1
 		/* Mode 0 ~ 6 */
 		{ 0 }, // MODE 0 >> TD_STOP_MODE
-		{ 1 }, // MODE 1 >> TD_NEEDLE_MODE
+		{ 10 }, // MODE 1 >> TD_NEEDLE_MODE
 		{ 10 }, // MODE2 >> TD_NEEDLE_MODE
 		{ 3 }, // MODE 3 >> TD_TAPPING_M_MODE
 		{ 4 }, // MODE 4 >> TD_TAPPING_H_MODE
@@ -50,6 +50,9 @@ td_stim_mode_cfg_group_pulse_t ex_stim_mode_cfg_gp_table[TD_STIM_MODE_NUM_MAX] =
 td_stim_level_cfg_t ex_cc_stim_levelcfg_table[TD_STIM_LEVEL_NUM_MAX] =
 {
 /* {PULSE WIDTH, VOLTAGE, DAC}*/
+/*
+ * The voltage is fixed in the library, but is put in the application for explicit purposes.
+ * */
 /* Level 0 ~ 5 */
 { 100, 0, 0 },
 { 100, 40, 1 },
@@ -92,40 +95,45 @@ td_stim_level_cfg_t ex_cc_stim_levelcfg_table[TD_STIM_LEVEL_NUM_MAX] =
 #ifdef STIM_LIB_EVKIT_CV
 td_stim_level_cfg_t ex_cc_stim_levelcfg_table[TD_STIM_LEVEL_NUM_MAX] =
 {
+/* {PULSE WIDTH, VOLTAGE, DAC}*/
+/*
+ * The DAC Value is unused in the library(CV), but is put in the application for explicit purposes.
+ * */
+/* Level 0 ~ 5 */
 { 100, 0, 0 },
 { 100, 15, 0 },
 { 300, 15, 0 },
-{ 600, 15, 0 },
-{ 900, 15, 0 },
+{ 500, 15, 0 },
+{ 700, 15, 0 },
 { 100, 20, 0 },
 
 /* Level 6 ~ 8 */
 { 300, 20, 0 },
-{ 600, 20, 0 },
-{ 900, 20, 0 },
+{ 500, 20, 0 },
+{ 700, 20, 0 },
 
 /* Level 9 ~ 11 */
-{ 100, 25, 0 },
 { 300, 25, 0 },
-{ 600, 25, 0 },
+{ 500, 25, 0 },
+{ 700, 25, 0 },
 
 /* Level 12 ~ 14 */
-{ 900, 25, 0 },
-{ 100, 30, 0 },
 { 300, 30, 0 },
+{ 500, 30, 0 },
+{ 700, 30, 0 },
 
 /* Level 15 ~ 17 */
-{ 600, 30, 0 },
-{ 900, 30, 0 },
-{ 100, 35, 0 },
+{ 300, 35, 0 },
+{ 500, 35, 0 },
+{ 700, 35, 0 },
 
 /* Level 18 ~ 20 */
-{ 300, 35, 0 },
-{ 600, 35, 0 },
-{ 900, 35, 0 },
+{ 300, 40, 0 },
+{ 500, 40, 0 },
+{ 700, 40, 0 },
 
 /* Level 21 ~ 23 */
-{ 300, 40, 0 },
-{ 600, 40, 0 },
-{ 900, 40, 0 } };
+{ 300, 45, 0 },
+{ 500, 45, 0 },
+{ 700, 45, 0 } };
 #endif

@@ -4,6 +4,8 @@
  *  Created on: 2023. 3. 10.
  *      Author: eidos
  */
+#include "main.h"
+
 #include "stim_lib.h"
 #include "stim_lib_st_inc.h"
 #include "stim_lib_type.h"
@@ -15,6 +17,8 @@
 #include "bt_msg_private.h"
 
 #include "td_debug.h"
+
+extern TIM_HandleTypeDef htim16;
 
 /*
  * STIMULATE PWM PULSE PARAMETER :: FREQ, PULSE WIDTH, DEGREE(Voltage or Current*(DAC)), Trigger Setting
@@ -239,30 +243,20 @@ void td_Stim_Level_Config_Update(uint8_t level)
 	ex_pulse_data.degree = TD_STIM_LEVEL_CFG_DAC_GET(level);
 #endif
 
+	//HAL_TIM_Base_Stop_IT(&htim16);
+	TIM16->CNT = 0;
+	//HAL_TIM_Base_Start_IT(&htim16);
+
+	TIM2->CCER = 0x0000;
+
 	TD_RAW_PWM_CHANGE_F = 1;
 	TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;
 
 	/* UPDATE LEVEL */
 	TD_STIM_STATE_LEVEL_UPDATE(level);
 
-	/*
-	 * STIM LIB PARAMETER UPDATE SEQUENCE
-	 * 1. stim Pause
-	 * 2. session Stop
-	 * 3. STIM Parameter Update
-	 * 4. session ReStart
-	 * 5. stim ReStart
-	 * */
-	stimLib_stimPause();
-	stimLib_stimSessionStop();
-
-	stimLib_stimSignalConfig(&ex_pulse_data);
-
-	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN)
-	{
-		stimLib_stimSessionStart();
-		stimLib_stimStart();
-	}
+	/* Pulse Parameter Setting and Change */
+	stimLib_stimIntensiveChange(&ex_pulse_data);
 }
 
 /*

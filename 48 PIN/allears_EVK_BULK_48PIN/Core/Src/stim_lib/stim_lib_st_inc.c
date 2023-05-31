@@ -33,7 +33,7 @@ static void stim_lib_trg_input_active_high_handle(void);
 void stimLib_adcWatchdoc_callback(void)
 {
 	TD_DEBUG_PRINT(("WATCH DOC INTERRUPT :: stimLib_adcWatchdoc_callback()\r\n"));
-	TD_DEBUG_PRINT(("SYSTEM ALL STOP AND RESETs\r\n"));
+	TD_DEBUG_PRINT(("SYSTEM ALL STOP AND RESET\r\n"));
 
 	stimLib_errorHandle();
 

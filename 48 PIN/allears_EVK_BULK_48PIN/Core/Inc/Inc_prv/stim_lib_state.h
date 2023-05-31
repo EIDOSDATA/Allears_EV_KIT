@@ -5,20 +5,20 @@
 #include "stim_lib_private.h"
 
 /* Stimulation signal config */
-#define STIM_LIB_STATE_SIG						exStimLib_state.signal_cfg
-#define STIM_LIB_STATE_SIG_FREQ					exStimLib_state.signal_cfg.freq
-#define STIM_LIB_STATE_SIG_PW					exStimLib_state.signal_cfg.pulse_width
-#define STIM_LIB_STATE_SIG_DEGREE				exStimLib_state.signal_cfg.degree
-#define STIM_LIB_STATE_SIG_PEAK_DET_CALLBACK	exStimLib_state.signal_cfg.peak_detect_callback
+#define STIM_LIB_STATE_SIG							exStimLib_state.signal_cfg
+#define STIM_LIB_STATE_SIG_FREQ						exStimLib_state.signal_cfg.freq
+#define STIM_LIB_STATE_SIG_PW						exStimLib_state.signal_cfg.pulse_width
+#define STIM_LIB_STATE_SIG_DEGREE					exStimLib_state.signal_cfg.degree
+#define STIM_LIB_STATE_SIG_PEAK_DET_CALLBACK		exStimLib_state.signal_cfg.peak_detect_callback
 
 /* Stimulation trigger config */
-#define STIM_LIB_STATE_TRG						exStimLib_state.trg_cfg
-#define STIM_LIB_STATE_TRG_VOLT_PRESTART		exStimLib_state.trg_cfg.volt_prestart
-#define STIM_LIB_STATE_TRG_OUT_ENABLE			exStimLib_state.trg_cfg.trg_out_enable
-#define STIM_LIB_STATE_TRG_OUT_ACT_POL			exStimLib_state.trg_cfg.trg_out_active_pol
-#define STIM_LIB_STATE_TRG_IN_ENABLE			exStimLib_state.trg_cfg.trg_in_enable
-#define STIM_LIB_STATE_TRG_IN_ACT_POL			exStimLib_state.trg_cfg.trg_in_active_pol
-#define STIM_LIB_STATE_TRG_IN_TOGGLED			exStimLib_state.trg_cfg.trg_in_toggled
+#define STIM_LIB_STATE_TRG							exStimLib_state.trg_cfg
+#define STIM_LIB_STATE_TRG_VOLT_PRESTART			exStimLib_state.trg_cfg.volt_prestart
+#define STIM_LIB_STATE_TRG_OUT_ENABLE				exStimLib_state.trg_cfg.trg_out_enable
+#define STIM_LIB_STATE_TRG_OUT_ACT_POL				exStimLib_state.trg_cfg.trg_out_active_pol
+#define STIM_LIB_STATE_TRG_IN_ENABLE				exStimLib_state.trg_cfg.trg_in_enable
+#define STIM_LIB_STATE_TRG_IN_ACT_POL				exStimLib_state.trg_cfg.trg_in_active_pol
+#define STIM_LIB_STATE_TRG_IN_TOGGLED				exStimLib_state.trg_cfg.trg_in_toggled
 
 /* SYSTEM MASTER CLOCK VALUE */
 #define STIM_LIB_SYSTEM_CLK_FREQ					HAL_RCC_GetHCLKFreq()
@@ -42,28 +42,28 @@
 #define STIM_LIB_SIGNAL_DEAD_TIME					20	/* 20us */
 
 /* TIM2 TOTAL PULSE SIZE */
-#define STIM_LIB_TOTAL_PULSE_WIDTH					(int)(STIM_LIB_SIGNAL_GLICH_TIME * 2) + (STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME
+#define STIM_LIB_TOTAL_PULSE_WIDTH					(int)((STIM_LIB_SIGNAL_GLICH_TIME * 2) + (STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME)
 
 /* STIM TINER :: TIM2 CHANNEL 1 :: TRIGGER OUTPUT PULSE :: PWM OUTPUT */
 #define STIM_LIB_TRG_OUTPUT_PULSE_TIME				(int)STIM_LIB_TOTAL_PULSE_WIDTH
 
 /* STIM TIMER :: TIM2 CHANNEL 2 :: ANODE PULSE :: PWM OUTPUT*/
-#define STIM_LIB_ANODE_PULSE_TIME					(int)STIM_LIB_STATE_SIG_PW + (STIM_LIB_SIGNAL_GLICH_TIME * 2)
+#define STIM_LIB_ANODE_PULSE_TIME					(int)(STIM_LIB_STATE_SIG_PW + (STIM_LIB_SIGNAL_GLICH_TIME * 2))
 
 /* STIM TIMER :: TIM2 CHANNEL 3 :: CATHODE PULSE :: OUTPUT COMPAIR DMA */
-#define STIM_LIB_CATHODE_PULSE_TIME0				(int)(STIM_LIB_SIGNAL_GLICH_TIME * 2) + (STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME
-#define STIM_LIB_CATHODE_PULSE_TIME1				(int)STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_DEAD_TIME
+#define STIM_LIB_CATHODE_PULSE_TIME0				(int)((STIM_LIB_SIGNAL_GLICH_TIME * 2) + (STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME)
+#define STIM_LIB_CATHODE_PULSE_TIME1				(int)(STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_DEAD_TIME)
 
 /* STIM TIMER :: TIM2 CHANNEL 4 :: DAC ON CONTROL :: OUTPUT COMPAIR DMA >> CONST CURRENT PULSE */
-#define STIM_LIB_DAC_CTRL_TIME0						(int)STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_GLICH_TIME
-#define STIM_LIB_DAC_CTRL_TIME1						(int)STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_SIGNAL_GLICH_TIME
-#define STIM_LIB_DAC_CTRL_TIME2						(int)(STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_SIGNAL_GLICH_TIME // 2PW + D + S
+#define STIM_LIB_DAC_CTRL_TIME0						(int)(STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_GLICH_TIME)
+#define STIM_LIB_DAC_CTRL_TIME1						(int)(STIM_LIB_STATE_SIG_PW + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_SIGNAL_GLICH_TIME)
+#define STIM_LIB_DAC_CTRL_TIME2						(int)((STIM_LIB_STATE_SIG_PW * 2) + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_SIGNAL_GLICH_TIME) // 2PW + D + S
 #define STIM_LIB_DAC_CTRL_TIME3						(int)STIM_LIB_SIGNAL_GLICH_TIME
 
 /* STIM TIMER :: TIM2 CHANNEL 4 :: DISCHARGE CONTROL PULSE :: OUTPUT COMPAIR DMA >> CONST VOLTAGE PULSE */
 #define STIM_LIB_DISCHARGE_PULSE_WIDTH				5000 /* 5000us >> 5ms */
-#define STIM_LIB_DISCHARGE_PULSE_TIME0				(int)STIM_LIB_TOTAL_PULSE_WIDTH + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_DISCHARGE_PULSE_WIDTH
-#define STIM_LIB_DISCHARGE_PULSE_TIME1				(int)STIM_LIB_TOTAL_PULSE_WIDTH + STIM_LIB_SIGNAL_DEAD_TIME
+#define STIM_LIB_DISCHARGE_PULSE_TIME0				(int)(STIM_LIB_TOTAL_PULSE_WIDTH + STIM_LIB_SIGNAL_DEAD_TIME + STIM_LIB_DISCHARGE_PULSE_WIDTH)
+#define STIM_LIB_DISCHARGE_PULSE_TIME1				(int)(STIM_LIB_TOTAL_PULSE_WIDTH + STIM_LIB_SIGNAL_DEAD_TIME)
 
 /*
  * STEP UP FEEDBACK TIMER CONFIG

@@ -33,6 +33,7 @@
 #include "td_schedule.h"
 #include "td_private.h"
 #include "td_uart1.h"
+#include "td_stim_param_setting.h"
 #endif
 
 #include "td_debug.h"
@@ -72,6 +73,7 @@ DMA_HandleTypeDef hdma_usart1_rx;
 DMA_HandleTypeDef hdma_usart1_tx;
 
 /* USER CODE BEGIN PV */
+int td_tim16_cnt = 0;
 
 /* USER CODE END PV */
 
@@ -89,11 +91,13 @@ UART_HandleTypeDef* tdUsart1_handlerGet(void)
 
 void USER_DMA_Init(void)
 {
+#ifdef TD_GPIO_UNUSED
+	__HAL_RCC_DMA1_CLK_ENABLE();
+	__HAL_RCC_DMA2_CLK_ENABLE();
+#endif
 	/* UART1 DMA RX and TX */
-	/* DMA1_Channel4_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel4_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel4_IRQn);
-	/* DMA1_Channel5_IRQn interrupt configuration */
 	HAL_NVIC_SetPriority(DMA1_Channel5_IRQn, 0, 0);
 	HAL_NVIC_EnableIRQ(DMA1_Channel5_IRQn);
 }
@@ -202,7 +206,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	stimLib_stepup_ctrlCallback(htim);
 	if (htim->Instance == TIM16)
 	{
+		td_tim16_cnt++;
+		if (td_tim16_cnt >= 2 && TD_RAW_PWM_CHANGE_F == 1)
+		{
+			TIM2->CCER = 0x1112;
+			td_tim16_cnt = 0;
+			TD_RAW_PWM_CHANGE_F = 0;
+		}
 		td_Group_Pulse_Mode_Control_Scheduler();
+
 	}
 }
 
@@ -281,14 +293,18 @@ int main(void)
 	/* USER CODE BEGIN SysInit */
 #if 1
 	MX_USART3_UART_Init();
+#ifndef TD_GPIO_UNUSED
 	stimLib_stimInit();
+#endif
 	USER_DMA_Init();
+	MX_USART3_UART_Init();
+#ifndef TD_GPIO_UNUSED
 	USER_GPIO_Init();
+#endif
 	MX_USART1_UART_Init();
 	MX_TIM16_Init();
 #else
 	/* USER CODE END SysInit */
-
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_DMA_Init();
@@ -316,17 +332,21 @@ int main(void)
 	btMsg_init();
 
 	/* STIM LIB PULSE SETTING */
-#if 1
+#ifdef TD_STEPUP_ADC_TUNNING
 	stim_signal_cfg_t pulse_data;
+#endif
 
+#ifdef TD_STIM_PULSE_TEST
+	stim_signal_cfg_t pulse_data;
 	pulse_data.freq = 10;
 	pulse_data.pulse_width = 1000;
-	pulse_data.degree = 20;
+	pulse_data.degree = 40;
 	stimLib_stimSignalConfig(&pulse_data);
 #endif
 
 	/* STIM LIB TRIGGER SETTING */
-#if 0
+#ifdef TD_STIM_PULSE_TEST
+#ifdef TD_STIM_TRIGGER_TEST
 	stim_trg_cfg_t trg_data;
 
 	trg_data.volt_prestart = false;
@@ -338,7 +358,6 @@ int main(void)
 	stimLib_stimTriggerConfig(&trg_data);
 #endif
 
-#if 0
 	stimLib_stimSessionStart();
 #endif
 	/* USER CODE END 2 */
@@ -350,15 +369,18 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-		pulse_data.freq = 10;
-		pulse_data.pulse_width = 1000;
-		pulse_data.degree = 20;
-		stimLib_stimSignalConfig(&pulse_data);
 
-#if 0
+#ifdef TD_STEPUP_ADC_TUNNING
 		pulse_data.freq = 10;
 		pulse_data.pulse_width = 1000;
-		pulse_data.degree = 1;
+		pulse_data.degree = 45;
+		stimLib_stimSignalConfig(&pulse_data);
+#endif
+
+#ifdef TD_STIM_TRIGGER_TEST
+		pulse_data.freq = 10;
+		pulse_data.pulse_width = 1000;
+		pulse_data.degree = 40;
 		stimLib_stimSignalConfig(&pulse_data);
 
 		trg_data.volt_prestart = false;
@@ -378,7 +400,9 @@ int main(void)
 		HAL_Delay(300);
 		stimLib_stimSessionStop();
 #endif
+
 		td_Schedule();
+
 	}
 	/* USER CODE END 3 */
 }
@@ -607,9 +631,9 @@ void MX_TIM1_Init(void)
 
 	/* USER CODE END TIM1_Init 1 */
 	htim1.Instance = TIM1;
-	htim1.Init.Prescaler = 3;
+	htim1.Init.Prescaler = 0;
 	htim1.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-	htim1.Init.Period = 9999;
+	htim1.Init.Period = 19999;
 	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim1.Init.RepetitionCounter = 0;
 	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;

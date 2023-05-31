@@ -85,6 +85,10 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 	case TD_SYS_STATE_INIT:
 		break;
 	case TD_SYS_STATE_IDLE:
+
+		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+
+		/* GROUP PULSE SCHEDULER TIMER */
 		HAL_TIM_Base_Stop_IT(&htim16);
 
 		/* STIM PAUSE */
@@ -93,6 +97,8 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 		/* SESSION STOP */
 		stimLib_stimSessionStop();
 
+		break;
+
 	case TD_SYS_STATE_RUN:
 
 		/* SESSION START */
@@ -100,6 +106,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 
 		/* STIM START */
 		stimLib_stimStart();
+		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
 		HAL_TIM_Base_Start_IT(&htim16);
 

@@ -10,7 +10,7 @@
 
 #include "td_types.h"
 
-#define TD_SCHED_HANDLE_PERIOD			10 /* 10 ms */
+#define TD_SCHED_HANDLE_PERIOD			1 /* 10 ms */
 
 /*
  * POLLING SCHEDULEER :: CALL BY MAIN.C

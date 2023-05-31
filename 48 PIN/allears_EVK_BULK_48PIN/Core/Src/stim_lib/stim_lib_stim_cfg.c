@@ -19,7 +19,13 @@
 #define STIM_LIB_SIGNAL_PW_IS_VALID(param)				(STIM_LIB_SIGNAL_PW_MIN <= param && param <= STIM_LIB_SIGNAL_PW_MAX)
 
 #define STIM_LIB_SIGNAL_DEGREE_MIN						0
+
+#ifdef STIM_LIB_EVKIT_CC
 #define STIM_LIB_SIGNAL_DEGREE_MAX						255
+#endif
+#ifdef STIM_LIB_EVKIT_CV
+#define STIM_LIB_SIGNAL_DEGREE_MAX						STIM_LIB_STEPUP_MAXIMUM_VOLTAGE
+#endif
 #define STIM_LIB_SIGNAL_DGREE_IS_VALID(param)			(param <= STIM_LIB_SIGNAL_DEGREE_MAX)				/* unsigned is always bigger than 0 */
 
 bool stimLib_signalParamCheck(stim_signal_cfg_t *cfg)
