@@ -63,7 +63,10 @@ void stimLib_stepup_ctrlScheduler(void)
 		STIM_LIB_STEPUP_FEEDBACK_CNT = 0;
 		STEPUP_DATA_PRINT_FLAG = true;
 	}
+	/* STEP UP DATA PRINT */
+#ifdef TD_STEPUP_ADC_TUNNING
 	stimLib_stepup_dataPrint();
+#endif
 }
 
 /*
@@ -107,7 +110,7 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 #define OUTPUT_VOLTAGE_IS_SAME		voltage_scaleup_val == stepup_voltage
 #endif
 
-#if 0
+#ifdef TD_STEPUP_ADC_TUNNING
 	TD_DEBUG_PRINT(("-----FEED BACK-----\n"));
 	TD_DEBUG_PRINT(("VOLTAGE_DIFFERENCE_ABS : %d\n", VOLTAGE_DIFFERENCE_ABS));
 	TD_DEBUG_PRINT(("STEPUP_FDBK_VOLT_RANGE : %d\n", STEPUP_FDBK_VOLT_RANGE));

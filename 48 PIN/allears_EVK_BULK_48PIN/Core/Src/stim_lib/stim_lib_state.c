@@ -41,6 +41,11 @@ bool stimLib_stateSet(stim_lib_state_t set_state)
 			}
 			break;
 
+			/*
+			 * TODO:
+			 * STIM TEST
+			 * ADD POINT : State Simulating >> Session IDLE
+			 * */
 		case stim_lib_state_session_idle:
 			if (STIM_LIB_CUR_STATE == stim_lib_state_idle || STIM_LIB_CUR_STATE == stim_lib_state_stim_stopping)
 			{

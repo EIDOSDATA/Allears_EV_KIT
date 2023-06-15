@@ -75,9 +75,9 @@ void td_Schedule(void)
  * */
 void td_Group_Pulse_Mode_Control_Scheduler(void)
 {
-	/* TIME VALUE = 100ms * 10 */
-	uint16_t pwm_disable_tim = (TD_RAW_GROUP_PULSE_DISABLE_TIME * 10) - 1;
-	uint16_t pwm_enable_tim = (TD_RAW_GROUP_PULSE_ENABLE_TIME * 10);
+	/* TIME VALUE = 100ms * 10 >> 1ms * 1000 */
+	uint32_t pwm_disable_tim = (TD_RAW_GROUP_PULSE_DISABLE_TIME * 10) - 1;
+	uint32_t pwm_enable_tim = (TD_RAW_GROUP_PULSE_ENABLE_TIME * 10);
 
 #if 1
 	/* CHANGE Group Pulse MODE */
@@ -94,6 +94,7 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		/* IF :: STATUS SLEEP >> AWAKE */
 		if (td_Get_Current_GP_State() == td_gp_sleep && gp_ctrl_cnt_tim16 == pwm_disable_tim)
 		{
+			//TIM2->CCER = 0x1112;
 			stimLib_stimStart();
 			gp_stat = td_gp_awake;
 			gp_ctrl_cnt_tim16 = 0;
@@ -102,6 +103,7 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		/* IF :: STATUS AWAKE >> SLEEP */
 		else if (td_Get_Current_GP_State() == td_gp_awake && gp_ctrl_cnt_tim16 == pwm_enable_tim)
 		{
+			//TIM2->CCER = 0x0000;
 			stimLib_stimPause();
 			gp_stat = td_gp_sleep;
 			gp_ctrl_cnt_tim16 = 0;

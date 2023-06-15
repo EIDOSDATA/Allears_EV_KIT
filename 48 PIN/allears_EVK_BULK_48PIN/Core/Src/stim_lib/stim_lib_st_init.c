@@ -230,9 +230,10 @@ bool stimLib_tim2_Init(void)
 	}
 
 	/* CHANNEL 4 :: DAC_ON_N PULSE or STIM DISCHARGE PULSE */
-#if 1
-	sConfigOC.Pulse = STIM_LIB_SIGNAL_GLICH_TIME;
-#else
+#ifdef STIM_LIB_EVKIT_CC
+	sConfigOC.Pulse = STIM_LIB_SIGNAL_GLICH_TIME; // STIM_LIB_DAC_CTRL_TIME3
+#endif
+#ifdef STIM_LIB_EVKIT_CV
 	sConfigOC.Pulse = STIM_LIB_DISCHARGE_PULSE_TIME1;
 #endif
 	if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC,
@@ -345,10 +346,7 @@ bool stimLib_adc1_Init(void)
 	 */
 	sConfig.Channel = ADC_CHANNEL_9;
 	sConfig.Rank = ADC_REGULAR_RANK_1;
-	/*
-	 * TODO:
-	 * TEST : ADC_SAMPLETIME_47CYCLES_5 or ADC_SAMPLETIME_640CYCLES_5
-	 * */
+
 	sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
 	sConfig.SingleDiff = ADC_SINGLE_ENDED;
 	sConfig.OffsetNumber = ADC_OFFSET_NONE;

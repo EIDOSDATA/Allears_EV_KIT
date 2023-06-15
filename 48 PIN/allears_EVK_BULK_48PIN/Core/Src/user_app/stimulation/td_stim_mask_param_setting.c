@@ -19,7 +19,7 @@
 #include "td_debug.h"
 
 extern TIM_HandleTypeDef htim16;
-
+extern int td_tim16_cnt;
 /*
  * STIMULATE PWM PULSE PARAMETER :: FREQ, PULSE WIDTH, DEGREE(Voltage or Current*(DAC)), Trigger Setting
  *
@@ -233,6 +233,7 @@ void td_Stim_Level_Config_Update(uint8_t level)
 		return;
 	}
 	TD_RAW_STIM_LEVEL = level;
+
 	ex_pulse_data.pulse_width = TD_STIM_LEVEL_CFG_PW_GET(level);
 
 #ifdef STIM_LIB_EVKIT_CV
@@ -242,12 +243,7 @@ void td_Stim_Level_Config_Update(uint8_t level)
 #ifdef STIM_LIB_EVKIT_CC
 	ex_pulse_data.degree = TD_STIM_LEVEL_CFG_DAC_GET(level);
 #endif
-
-	//HAL_TIM_Base_Stop_IT(&htim16);
-	TIM16->CNT = 0;
-	//HAL_TIM_Base_Start_IT(&htim16);
-
-	TIM2->CCER = 0x0000;
+	td_tim16_cnt = 0;
 
 	TD_RAW_PWM_CHANGE_F = 1;
 	TD_RAW_MODE_SET_F = TD_STIM_OP_NORMAL;

@@ -254,6 +254,10 @@ stim_lib_rsp_t stimLib_stimPause(void)
 {
 	if (stimLib_stateGet() == stim_lib_state_stimulating)
 	{
+		/*
+		 * TODO:
+		 * STIM ENDPOINT TEST
+		 * */
 #if 0
 		/*
 		 * CALL STIMULATION STOP FUNCTION
@@ -279,7 +283,57 @@ stim_lib_rsp_t stimLib_stimPause(void)
 
 /*
  * TODO:
- * STEPUP TEST
+ * STIM TEST
+ * */
+#if 0
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
+{
+	if (signal_cfg == NULL || stimLib_signalParamCheck(signal_cfg) == false)
+	{
+		return stim_lib_stim_rsp_invalid_parameter;
+	}
+
+	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
+			|| stimLib_stateGet() == stim_lib_state_stimulating)
+	{
+		stimLib_stateSigParamSet(signal_cfg);
+
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStopRaw();
+			for (int i = 0; i < 0xffff; i++)
+				;
+		}
+
+		while (stimLib_paramPulseSettingRaw() != true)
+			;
+		/*
+		 stimLib_stimPulseSetiing();
+		 for (int i = 0; i < 0x1ffff; i++)
+		 ;
+		 */
+
+		//if (stimLib_stateGet() == stim_lib_state_stimulating || stimLib_stateGet() == stim_lib_state_session_idle)
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_pulseConfigRaw();
+			for (int i = 0; i < 0xffff; i++)
+				;
+			stimLib_stimStartRaw();
+		}
+		return stim_lib_stim_rsp_ok;
+	}
+	else
+	{
+		return stim_lib_stim_rsp_invalid_status;
+	}
+}
+#endif
+
+#if 0
+/*
+ * TODO:
+ * STIM TEST
  * */
 stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 {
@@ -292,7 +346,25 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 			|| stimLib_stateGet() == stim_lib_state_stimulating)
 	{
 		stimLib_stateSigParamSet(signal_cfg);
-		stimLib_pulseConfigRaw();
+
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStopDelayRaw();
+			stimLib_stateSet(stim_lib_state_stim_stopping);
+#if 0
+			stimLib_stimStopRaw();
+			for (int i = 0; i < 0xffff; i++)
+				;
+#endif
+		}
+
+		stimLib_stimPulseSetiing();
+
+		//if (stimLib_stateGet() == stim_lib_state_stimulating || stimLib_stateGet() == stim_lib_state_session_idle)
+		if (stimLib_stateGet() == stim_lib_state_session_idle)
+		{
+			stimLib_stimPulseStart();
+		}
 		return stim_lib_stim_rsp_ok;
 	}
 	else
@@ -301,3 +373,35 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 	}
 }
 
+#endif
+
+#if 1
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
+{
+	if (signal_cfg == NULL || stimLib_signalParamCheck(signal_cfg) == false)
+	{
+		return stim_lib_stim_rsp_invalid_parameter;
+	}
+
+	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
+			|| stimLib_stateGet() == stim_lib_state_stimulating)
+	{
+		stimLib_stateSigParamSet(signal_cfg);
+		stimLib_stimPulseSetiing();
+		stimLib_pulseConfigRaw();
+
+		for (int i = 0; i < 0x13880; i++)
+			;
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStartRaw();
+		}
+
+		return stim_lib_stim_rsp_ok;
+	}
+	else
+	{
+		return stim_lib_stim_rsp_invalid_status;
+	}
+}
+#endif

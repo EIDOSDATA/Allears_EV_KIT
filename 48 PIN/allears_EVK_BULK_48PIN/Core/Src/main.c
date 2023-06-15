@@ -194,8 +194,14 @@ void HAL_TIM_PWM_PulseFinishedHalfCpltCallback(TIM_HandleTypeDef *htim)
 
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
+	/*
+	 * TODO:
+	 * STIM TEST
+	 * */
+#if 1
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
+#endif
 }
 
 /*
@@ -207,13 +213,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim->Instance == TIM16)
 	{
 		td_tim16_cnt++;
-		if (td_tim16_cnt >= 2 && TD_RAW_PWM_CHANGE_F == 1)
+		/*
+		 if (td_tim16_cnt >= 10 && TD_RAW_PWM_CHANGE_F == 1)
+		 {
+		 TIM2->CCER = 0x1112;
+		 td_tim16_cnt = 0;
+		 TD_RAW_PWM_CHANGE_F = 0;
+		 }
+		 */
+
+		if (td_tim16_cnt >= 1 && TD_RAW_GROUP_PULSE_F == 1)
 		{
-			TIM2->CCER = 0x1112;
+			td_Group_Pulse_Mode_Control_Scheduler();
 			td_tim16_cnt = 0;
-			TD_RAW_PWM_CHANGE_F = 0;
 		}
-		td_Group_Pulse_Mode_Control_Scheduler();
 
 	}
 }
@@ -305,6 +318,7 @@ int main(void)
 	MX_TIM16_Init();
 #else
 	/* USER CODE END SysInit */
+
 	/* Initialize all configured peripherals */
 	MX_GPIO_Init();
 	MX_DMA_Init();

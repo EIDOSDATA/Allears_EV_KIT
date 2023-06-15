@@ -88,9 +88,10 @@ bool stimLib_paramPulseSettingRaw(void)
 	}
 
 	/* CHANNEL 4 :: DAC_ON_N PULSE or STIM DISCHARGE PULSE */
-#if 1
-	sConfigOC.Pulse = STIM_LIB_SIGNAL_GLICH_TIME;
-#else
+#ifdef STIM_LIB_EVKIT_CC
+	sConfigOC.Pulse = STIM_LIB_SIGNAL_GLICH_TIME; // STIM_LIB_DAC_CTRL_TIME3
+#endif
+#ifdef STIM_LIB_EVKIT_CV
 	sConfigOC.Pulse = STIM_LIB_DISCHARGE_PULSE_TIME1;
 #endif
 	if (HAL_TIM_OC_ConfigChannel(&htim2, &sConfigOC, STIM_LIB_PULSE_DAC_ON_TIM_CH) != HAL_OK)
@@ -187,6 +188,12 @@ bool stimLib_stimStartRaw(void)
 	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DAC_ON_BUF, 4);
 #else
 #ifdef STIM_LIB_EVKIT_CV
+	/*
+	 * TODO:
+	 * APPLICATION TEST
+	 * HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DISCHG_BUF, 2);
+	 * __HAL_DMA_DISABLE_IT(&hdma_tim2_ch2_ch4, (DMA_IT_TC | DMA_IT_HT));
+	 * */
 	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DISCHG_BUF, 2);
 #endif
 #endif
@@ -215,9 +222,15 @@ bool stimLib_stimStopRaw(void)
 	 * OCREF cannot be changed in stop state
 	 * Check stimLib_trgPauseRaw() Function
 	 * */
+
+	/*
+	 * TODO:
+	 * STIM ENDPOINT TEST
+	 * */
+#if 0
 	TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_OC2M);
 	TIM2->CCMR1 |= (TIM_OCMODE_PWM1) | (TIM_OCMODE_PWM1 << 8U);
-
+#endif
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_TRG_OUT_TIM_CH);
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_ANODE_TIM_CH);
 

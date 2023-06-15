@@ -14,7 +14,7 @@ td_stim_mode_pulse_freq_t ex_stim_mode_pulse_freq_table[TD_STIM_MODE_NUM_MAX] =
 #if 1
 		/* Mode 0 ~ 6 */
 		{ 0 }, // MODE 0 >> TD_STOP_MODE
-		{ 10 }, // MODE 1 >> TD_NEEDLE_MODE
+		{ 30 }, // MODE 1 >> TD_NEEDLE_MODE
 		{ 10 }, // MODE2 >> TD_NEEDLE_MODE
 		{ 3 }, // MODE 3 >> TD_TAPPING_M_MODE
 		{ 4 }, // MODE 4 >> TD_TAPPING_H_MODE
