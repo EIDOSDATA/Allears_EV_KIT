@@ -4,49 +4,32 @@
  *  Created on: 2023. 3. 8.
  *      Author: eidos
  */
-
 #include "stim_lib.h"
+#include "stim_lib_st_inc.h"
+#include "stim_lib_type.h"
 
 #include "td_schedule.h"
 #include "td_btn.h"
+
+#include "td_system_manager.h"
 #include "td_stim_param_setting.h"
-#include "td_sys_fsm_state.h"
+#include "td_stim_param_table.h"
+
 #include "td_uart1.h"
 #include "td_debug.h"
 #include "td_private.h"
 #include "bt_msg_private.h"
 
-typedef enum
-{
-	td_gp_sleep = 0, td_gp_awake = 1, td_gp_init = 2, td_gp_state_max
-} td_stim_group_pulse_state_t;
-uint8_t gp_stat = td_gp_init;
+static uint8_t GP_SYS_STATE = TD_GP_STATE_MAX;
+uint8_t gp_cur_stat = TD_GP_INIT;
 
 /* TIMER COUNTER VALUE :: INTERRUPT SCHEDULER */
-uint8_t stepup_feedback_cnt_tim6 = 0;
-uint16_t gp_ctrl_cnt_tim16 = 1;
+uint16_t gp_ctrl_cnt_tim16 = 0;
+uint8_t gp_sequence_pos = 0;
+uint16_t pwm_holding_tim = 0; // = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) - 1;
 
 /* TIMER COUNTER VALUE :: POLLING SCHEDULER */
 static uint32_t schdule_tick = 0;
-
-/*
- * GP STATUS SETTING
- * */
-void td_Set_GP_State_Awake(void)
-{
-	gp_stat = td_gp_awake;
-}
-
-void td_Set_GP_State_Sleep(void)
-{
-	gp_stat = td_gp_sleep;
-}
-
-uint8_t td_Get_Current_GP_State(void)
-{
-	return gp_stat;
-}
-
 /*
  * POLLING SCHEDULEER :: CALL BY MAIN.C
  * */
@@ -58,16 +41,50 @@ void td_Schedule(void)
 	if (HAL_GetTick() - schdule_tick >= TD_SCHED_HANDLE_PERIOD)
 	{
 #ifndef TD_GPIO_UNUSED
-		td_Sys_FSM_State_Handle();
 		td_Btn_Handle();
-		//td_Led_Handle();
 
 		/* STIM */
-		td_Stim_Param_Update_Handle();
+		td_Sys_Param_Update_Handle();
 		td_Stim_Timeout_Handle();
 #endif
 		schdule_tick = HAL_GetTick();
 	}
+}
+
+void td_Group_Pulse_Value_Setting(void)
+{
+	if (TD_MODE_SIZE == gp_sequence_pos)
+	{
+		gp_sequence_pos = 0;
+	}
+
+	/* MANUAL MODE PARAMETER SETTING */
+	if (TD_STIM_CUR_MODE == TD_MANUAL_MODE)
+	{
+		/* MANUAL GP ON TIME */
+		if (gp_sequence_pos == 0)
+		{
+			TD_CUR_MODE_FREQ = TD_MANUAL_PULSE_FREQ;
+			TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME;
+		}
+		/* MANUAL GP OFF TIME */
+		else if (gp_sequence_pos == 1)
+		{
+			TD_CUR_MODE_FREQ = 0;
+			TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_OFF_TIME;
+		}
+	}
+	/* NON MANUAL MODE */
+	else if (TD_STIM_CUR_MODE != TD_MANUAL_MODE)
+	{
+		TD_MODE_FREQ_UPDATE(TD_STIM_MODE_GET_FREQ(TD_STIM_CUR_MODE, gp_sequence_pos));
+		TD_MODE_FREQ_HOLDING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(TD_STIM_CUR_MODE, gp_sequence_pos));
+	}
+
+	ex_pulse_data.freq = TD_CUR_MODE_FREQ;
+	stimLib_stimParameterChange(&ex_pulse_data);
+
+	gp_sequence_pos++;
 }
 
 /*
@@ -76,41 +93,52 @@ void td_Schedule(void)
 void td_Group_Pulse_Mode_Control_Scheduler(void)
 {
 	/* TIME VALUE = 100ms * 10 >> 1ms * 1000 */
-	uint32_t pwm_disable_tim = (TD_RAW_GROUP_PULSE_DISABLE_TIME * 10) - 1;
-	uint32_t pwm_enable_tim = (TD_RAW_GROUP_PULSE_ENABLE_TIME * 10);
-
-#if 1
-	/* CHANGE Group Pulse MODE */
 	if (td_GP_Mode_Is_Ready())
 	{
-		/* STATUS TIME OUT */
-		if (td_Get_Current_GP_State() == td_gp_init)
+		/*
+		 * STIM PARAMETER UPDATE
+		 * STATUS TIME OUT
+		 * */
+		TD_DEBUG_PRINT(("FUCK\r\n"));
+		TD_DEBUG_PRINT(("TD_STIM_CUR_MODE : %d\r\n",TD_STIM_CUR_MODE));
+		if (GP_SYS_STATE != gp_cur_stat || gp_ctrl_cnt_tim16 == pwm_holding_tim)
 		{
-			//td_Stim_Stop();
+			td_Group_Pulse_Value_Setting();
+			if (TD_CUR_MODE_FREQ == 0)
+			{
+				pwm_holding_tim = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) + 2;
+				gp_cur_stat = TD_GP_SLEEP;
+			}
+			else if (TD_CUR_MODE_FREQ != 0)
+			{
+				pwm_holding_tim = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) - 2;
+				gp_cur_stat = TD_GP_AWAKE;
+			}
+
 			gp_ctrl_cnt_tim16 = 0;
-			gp_stat = td_gp_awake;
+
+			GP_SYS_STATE = gp_cur_stat;
 		}
 
-		/* IF :: STATUS SLEEP >> AWAKE */
-		if (td_Get_Current_GP_State() == td_gp_sleep && gp_ctrl_cnt_tim16 == pwm_disable_tim)
+		/*
+		 * STIM STOP
+		 * */
+		if (GP_SYS_STATE == TD_GP_SLEEP && gp_ctrl_cnt_tim16 == 0)
 		{
-			//TIM2->CCER = 0x1112;
-			stimLib_stimStart();
-			gp_stat = td_gp_awake;
-			gp_ctrl_cnt_tim16 = 0;
-		}
-
-		/* IF :: STATUS AWAKE >> SLEEP */
-		else if (td_Get_Current_GP_State() == td_gp_awake && gp_ctrl_cnt_tim16 == pwm_enable_tim)
-		{
-			//TIM2->CCER = 0x0000;
 			stimLib_stimPause();
-			gp_stat = td_gp_sleep;
+			gp_ctrl_cnt_tim16 = 0;
+		}
+
+		/*
+		 * STIM START
+		 * */
+		else if (GP_SYS_STATE == TD_GP_AWAKE && gp_ctrl_cnt_tim16 == 0)
+		{
+			stimLib_stimStart();
 			gp_ctrl_cnt_tim16 = 0;
 		}
 		gp_ctrl_cnt_tim16++;
 	}
-#endif
 }
 
 #if 0

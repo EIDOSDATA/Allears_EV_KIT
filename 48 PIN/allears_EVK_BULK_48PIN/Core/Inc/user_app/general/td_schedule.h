@@ -12,6 +12,11 @@
 
 #define TD_SCHED_HANDLE_PERIOD			10 /* 10 ms */
 
+typedef enum
+{
+	TD_GP_SLEEP = 0, TD_GP_AWAKE = 1, TD_GP_INIT = 2, TD_GP_STATE_MAX
+} td_stim_group_pulse_state_t;
+
 /*
  * POLLING SCHEDULEER :: CALL BY MAIN.C
  * */
@@ -24,10 +29,7 @@ void td_Schedule(void);
 /*
  * GP STATUS SETTING
  * */
-void td_Set_GP_State_Awake(void);
-void td_Set_GP_State_Sleep(void);
-uint8_t td_Get_Current_GP_State(void);
-
+void td_Group_Pulse_Value_Setting(void);
 void td_Group_Pulse_Mode_Control_Scheduler(void);
 
 #endif /* INC_APP_TD_SCHEDULE_H_ */

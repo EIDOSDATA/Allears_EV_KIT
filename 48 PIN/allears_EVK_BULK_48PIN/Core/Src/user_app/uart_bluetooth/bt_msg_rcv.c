@@ -1,12 +1,13 @@
 #include <string.h>
-#include "bt_msg_private.h"
 
-#include "td_stim_param_setting.h"
-#include "td_stim_param_table.h"
-
-#include "td_private.h"
 #include "stim_lib_type.h"
 
+#include "bt_msg_private.h"
+
+#include "td_system_manager.h"
+#include "td_stim_param_setting.h"
+#include "td_stim_param_table.h"
+#include "td_private.h"
 #include "td_debug.h"
 
 void bt_state_req(uint8 *msg)
@@ -91,7 +92,7 @@ void bt_stimul_req(uint8 *msg)
 
 	if (td_Stim_Cur_Mode_Get() == 0 && td_Stim_Cur_Detection_Level_Get() == 0)
 	{
-		td_Stim_FSM_Stop();
+		TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_IDLE);
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
 	}
 	else if (msg[BT_MSG_LEN_IX] == 1 && (AUL_BT_MSG_STIMUL_STOP == req || req == AUL_BT_MSG_STIMUL_START))
@@ -249,7 +250,7 @@ void bt_man_mode_req(uint8 *msg)
 #else
 	TD_DEBUG_PRINT(("TARGET DAC: %d\r\n", TD_MANUAL_TARGET_DAC));
 #endif
-	TD_DEBUG_PRINT(("GO IFF TIME: %d\r\n", TD_MANUAL_GP_OFF_TIME));
+	TD_DEBUG_PRINT(("GO OFF TIME: %d\r\n", TD_MANUAL_GP_OFF_TIME));
 	TD_DEBUG_PRINT(("GP ON TIME: %d\r\n", TD_MANUAL_GP_ON_TIME));
 
 	td_Stim_Manual_Mode_Start();

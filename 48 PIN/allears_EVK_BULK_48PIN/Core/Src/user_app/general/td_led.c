@@ -5,6 +5,7 @@
  *      Author: eidos
  */
 #include "stim_lib.h"
+#include "stim_lib_st_inc.h"
 #include "stim_lib_type.h"
 
 #include "td_led.h"

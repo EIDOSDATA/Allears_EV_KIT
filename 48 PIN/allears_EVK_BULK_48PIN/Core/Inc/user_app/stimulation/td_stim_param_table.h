@@ -9,43 +9,34 @@
 #define INC_USER_APP_STIMULATION_TD_STIM_PARAM_TABLE_H_
 
 #include "td_types.h"
-
-/*
- * MODE CONFIG STRUCT :: MODE FREQ
- * */
-typedef struct
-{
-	uint8_t mode_pulse_freq;
-} td_stim_mode_pulse_freq_t;
-#define TD_STIM_MODE_CFG_PULSE_FREQ_GET(param)					ex_stim_mode_pulse_freq_table[param].mode_pulse_freq
-
-/*
- * MODE CONFIG STRUCT :: GROUP PULSE
- * */
-typedef struct
-{
-	uint8_t gp_mode_enable;
-	uint8_t gp_off_time;
-	uint8_t gp_on_time;
-} td_stim_mode_cfg_group_pulse_t;
-#define TD_STIM_MODE_CFG_TABLE							ex_stim_mode_cfg_gp_table
-#define TD_STIM_MODE_CFG_GP_ENABLE_GET(param)			ex_stim_mode_cfg_gp_table[param].gp_mode_enable
-#define TD_STIM_MODE_CFG_GP_OFF_TIME_GET(param)			ex_stim_mode_cfg_gp_table[param].gp_off_time
-#define TD_STIM_MODE_CFG_GP_ON_TIME_GET(param)			ex_stim_mode_cfg_gp_table[param].gp_on_time
+#include "td_stim_param_setting.h"
 
 /*
  * CONST CURRENT STIMULATE LEVEL STRUCT
  * */
-typedef struct
-{
-	uint16_t puls_width; /* us */
-	uint8_t output_target_voltage; /* #setVOL */
-	uint8_t current_strength_step; /* #setDAC Select */
-} td_stim_level_cfg_t;
-#define TD_STIM_LEVEL_CFG_TABLE							ex_cc_stim_levelcfg_table
-#define TD_STIM_LEVEL_CFG_PW_GET(param)					ex_cc_stim_levelcfg_table[param].puls_width
-#define TD_STIM_LEVEL_CFG_VOLT_GET(param)				ex_cc_stim_levelcfg_table[param].output_target_voltage
-#define TD_STIM_LEVEL_CFG_DAC_GET(param)				ex_cc_stim_levelcfg_table[param].current_strength_step
+#define TD_STIM_LEVEL_CFG_TABLE						ex_cc_stim_levelcfg_table
+#define TD_STIM_LEVEL_PW_GET(param)					ex_cc_stim_levelcfg_table[param].puls_width
+#define TD_STIM_LEVEL_VOLT_GET(param)				ex_cc_stim_levelcfg_table[param].output_target_voltage
+#define TD_STIM_LEVEL_DAC_GET(param)				ex_cc_stim_levelcfg_table[param].current_strength_step
+
+/*
+ * MODE SETTING PARAMETER
+ * */
+#define TD_STOP_MODE_SEQUENCE_SIZE						1
+#define TD_NEEDLE_MODE_SEQUENCE_SIZE					1
+#define TD_TAPPING_L_MODE_SEQUENCE_SIZE					2
+#define TD_TAPPING_M_MODE_SEQUENCE_SIZE					10
+#define TD_TAPPING_H_MODE_SEQUENCE_SIZE					10
+#define TD_MASSAGE_L_MODE_SEQUENCE_SIZE					2
+#define TD_MASSAGE_H_MODE_SEQUENCE_SIZE					2
+
+#define TD_STIM_MODE_CFG_TABLE							ex_mode_config_table
+#define TD_STIM_MODE_GET_STATE(mode)					ex_mode_config_table[mode].cur_mode
+#define TD_STIM_MODE_GET_PULSE_PARAM(mode)				ex_mode_config_table[mode].pulse_param
+
+#define TD_STIM_MODE_GET_SIZE(mode)						ex_mode_config_table[mode].pulse_param.size
+#define TD_STIM_MODE_GET_FREQ(mode,addr)				ex_mode_config_table[mode].pulse_param.freq_and_time[addr].freq
+#define TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode,addr)	ex_mode_config_table[mode].pulse_param.freq_and_time[addr].freq_holding_time
 
 /*
  * STIMULATE MODE MAX SIZE
@@ -85,15 +76,59 @@ typedef struct
 
 /*
  * STEP UP Application Control Param
+ * file : td_btn.c
  * */
 extern int td_volt_ctrl_pulse;
-#define TD_VOLTAGE_CTRL_PULSE				td_volt_ctrl_pulse
+#define TD_VOLTAGE_CTRL_PULSE							td_volt_ctrl_pulse
 
 /*
- * PARAMETER TABLE
+ * TYPE DEFINITION
  * */
-extern td_stim_mode_pulse_freq_t ex_stim_mode_pulse_freq_table[TD_STIM_MODE_NUM_MAX];
-extern td_stim_mode_cfg_group_pulse_t ex_stim_mode_cfg_gp_table[TD_STIM_MODE_NUM_MAX];
+
+/*
+ * CONST CURRENT STIMULATE LEVEL STRUCT
+ * */
+typedef struct
+{
+	uint16_t puls_width; /* us */
+	uint8_t output_target_voltage; /* #setVOL */
+	uint8_t current_strength_step; /* #setDAC Select */
+} td_stim_level_cfg_t;
+
+/*
+ * STIM MODE STRUCT TABLE
+ * */
+typedef struct
+{
+	/* Stimualtion signal frequency */
+	uint8_t freq;
+	/* Stimualtion signal pulse on time */
+	uint16_t freq_holding_time;
+
+} td_pulse_freq_time_t;
+
+typedef struct
+{
+	/* Stimualtion Sequence Size */
+	uint8_t size;
+	/* Stimualtion signal frequency and time */
+	const td_pulse_freq_time_t *freq_and_time;
+
+} td_pulse_param_t;
+
+typedef struct
+{
+	/* STIM MODE */
+	td_stim_mode_t cur_mode;
+	/* Combo Pulse Parameter */
+	td_pulse_param_t pulse_param;
+
+} td_mode_set_t;
+
+/*
+ * EXTERN
+ * */
 extern td_stim_level_cfg_t ex_cc_stim_levelcfg_table[TD_STIM_LEVEL_NUM_MAX];
+extern const td_mode_set_t ex_mode_config_table[TD_STIM_MODE_NUM_MAX];
 
 #endif /* INC_USER_APP_STIMULATION_TD_STIM_PARAM_TABLE_H_ */

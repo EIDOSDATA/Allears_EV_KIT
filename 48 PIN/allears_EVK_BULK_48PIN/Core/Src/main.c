@@ -22,10 +22,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "stim_lib.h"
-#include "stim_lib_init.h"
-#include "stim_lib_private.h"
 #include "stim_lib_st_inc.h"
-#include "stim_lib_stim_cfg.h"
+#include "stim_lib_type.h"
 
 #if 1
 /* USER APPLICATION HEADER */
@@ -34,6 +32,7 @@
 #include "td_private.h"
 #include "td_uart1.h"
 #include "td_stim_param_setting.h"
+#include "td_system_manager.h"
 #endif
 
 #include "td_debug.h"
@@ -198,6 +197,7 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	 * TODO:
 	 * STIM TEST
 	 * */
+
 #if 1
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
@@ -213,18 +213,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim->Instance == TIM16)
 	{
 		td_tim16_cnt++;
-		/*
-		 if (td_tim16_cnt >= 10 && TD_RAW_PWM_CHANGE_F == 1)
-		 {
-		 TIM2->CCER = 0x1112;
-		 td_tim16_cnt = 0;
-		 TD_RAW_PWM_CHANGE_F = 0;
-		 }
-		 */
+		td_Group_Pulse_Mode_Control_Scheduler();
 
-		if (td_tim16_cnt >= 1 && TD_RAW_GROUP_PULSE_F == 1)
+		/* LEVEL UPDATE TIME DEBOUNCING */
+		if (td_tim16_cnt >= 10 && td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN)
 		{
-			td_Group_Pulse_Mode_Control_Scheduler();
+			TD_DEBUG_PRINT(("FUCK\r\n"));
+			TD_DEBUG_PRINT(("TD_STIM_CUR_MODE : %d\r\n",TD_STIM_CUR_MODE));
+			TD_DEBUG_PRINT(("TD_STIM_LEVEL_UPDATE_ENABLE : %d\n", TD_STIM_LEVEL_UPDATE_ENABLE));
+			TD_STIM_LEVEL_UPDATE_ENABLE = 1;
 			td_tim16_cnt = 0;
 		}
 
@@ -344,6 +341,7 @@ int main(void)
 
 	tdUart1_init();
 	btMsg_init();
+	HAL_TIM_Base_Start_IT(&htim16);
 
 	/* STIM LIB PULSE SETTING */
 #ifdef TD_STEPUP_ADC_TUNNING

@@ -4,11 +4,12 @@
  *  Created on: Oct 24, 2022
  *      Author: ECHO
  */
+#include <td_system_manager.h>
 #include "stim_lib.h"
+#include "stim_lib_st_inc.h"
 #include "stim_lib_type.h"
 
 #include "td_btn.h"
-#include "td_sys_fsm_state.h"
 #include "td_stim_param_setting.h"
 #include "td_stim_param_table.h"
 
