@@ -42,8 +42,6 @@ void td_Schedule(void)
 	{
 #ifndef TD_GPIO_UNUSED
 		td_Btn_Handle();
-
-		/* STIM */
 		td_Sys_Param_Update_Handle();
 		td_Stim_Timeout_Handle();
 #endif
@@ -99,8 +97,12 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		 * STIM PARAMETER UPDATE
 		 * STATUS TIME OUT
 		 * */
-		TD_DEBUG_PRINT(("FUCK\r\n"));
-		TD_DEBUG_PRINT(("TD_STIM_CUR_MODE : %d\r\n",TD_STIM_CUR_MODE));
+#ifdef DEBUG
+#if 0
+		TD_DEBUG_PRINT(("IN GP SCHEDULER : TD_STIM_CUR_MODE : %d\r\n",TD_STIM_CUR_MODE));
+		TD_DEBUG_PRINT(("\r\n"));
+#endif
+#endif
 		if (GP_SYS_STATE != gp_cur_stat || gp_ctrl_cnt_tim16 == pwm_holding_tim)
 		{
 			td_Group_Pulse_Value_Setting();

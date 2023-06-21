@@ -129,7 +129,12 @@ void bt_elect_detect_req(uint8 *msg)
 	else if (msg[BT_MSG_LEN_IX] == 1 && (TD_BT_MSG_STIM_DETECTION_LEVEL_MIN <= (int8) level && level <= TD_BT_MSG_STIM_DETECTION_LEVEL_MAX))
 	{
 		/* Handle MSG */
-		td_Stim_Detection_Check_Start(level);
+		/*
+		 * TODO:
+		 * ADD IN FUTURE
+		 * td_Stim_Detection_Check_Start(level);
+		 * */
+		rsp_code = BT_MSG_RES_CAN_NOT_HANDLE_MSG;
 	}
 	else
 	{

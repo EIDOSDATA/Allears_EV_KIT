@@ -197,10 +197,10 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	 * TODO:
 	 * STIM TEST
 	 * */
-
 #if 1
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
+	TD_DEBUG_PRINT(("\r\n"));
 #endif
 }
 
@@ -218,9 +218,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		/* LEVEL UPDATE TIME DEBOUNCING */
 		if (td_tim16_cnt >= 10 && td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN)
 		{
-			TD_DEBUG_PRINT(("FUCK\r\n"));
+#ifdef DEBUG
+#if 0
+			TD_DEBUG_PRINT(("IN LEVEL DEBOUNCING SCHEDULER\r\n"));
 			TD_DEBUG_PRINT(("TD_STIM_CUR_MODE : %d\r\n",TD_STIM_CUR_MODE));
 			TD_DEBUG_PRINT(("TD_STIM_LEVEL_UPDATE_ENABLE : %d\n", TD_STIM_LEVEL_UPDATE_ENABLE));
+			TD_DEBUG_PRINT(("\r\n"));
+#endif
+#endif
 			TD_STIM_LEVEL_UPDATE_ENABLE = 1;
 			td_tim16_cnt = 0;
 		}
@@ -336,12 +341,12 @@ int main(void)
 #else
 	TD_DEBUG_PRINT(("EVKIT MODE :: CV\n"));
 #endif
-
 	TD_DEBUG_PRINT(("main() starts\n"));
 
 	tdUart1_init();
 	btMsg_init();
-	HAL_TIM_Base_Start_IT(&htim16);
+
+	td_System_Manager_Init();
 
 	/* STIM LIB PULSE SETTING */
 #ifdef TD_STEPUP_ADC_TUNNING

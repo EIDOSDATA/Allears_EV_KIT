@@ -215,4 +215,21 @@ void td_Btn_Handle(void)
 	td_Start_Btn_Action();
 	td_StimUp_Btn_Action();
 	td_StimDown_Btn_Action();
+
+	/* BUTTON PRESSED FLAG */
+	if (td_Start_Btn_IsHandled() == true)
+	{
+		if (TD_NEXT_SYS_STATE == TD_SYS_STATE_IDLE)
+		{
+			TD_NEXT_SYS_STATE = TD_SYS_STATE_RUN;
+		}
+		else if (TD_NEXT_SYS_STATE == TD_SYS_STATE_RUN)
+		{
+			TD_NEXT_SYS_STATE = TD_SYS_STATE_IDLE;
+		}
+	}
+	if (TD_SYSTEM_UPDATE_F == 1)
+	{
+		td_Start_Btn_Handled_Clear();
+	}
 }

@@ -14,7 +14,7 @@
 
 #include "td_types.h"
 /*
- * CHECK PLS
+ * APP CONTROL PULSE PARAMETER STRUCT
  * */
 #define TD_RAW_STIM_MODE								ex_stim_ctrl_param.raw_stim_mode
 #define TD_RAW_STIM_LEVEL								ex_stim_ctrl_param.raw_stim_level
@@ -38,12 +38,6 @@
 #define TD_STIM_PREV_ELDET_LEVEL						ex_stim_ctrl_param.app_prev_detect_level
 #define TD_STIM_DETECTION_LEVEL							ex_stim_ctrl_param.app_detection_level
 
-/*
- * TODO:
- * REMOVE THIS
- * */
-//#define TD_STIM_ACTIVE								ex_stim_ctrl_param.app_active
-//#define TD_STIM_ACTIVE_CHNAGE(param)					{ex_stim_ctrl_param.app_active = param; td_Stim_Timeout_Ctrl(param);}
 /*
  * UPDATE PARAMETER
  * */
@@ -103,7 +97,7 @@ typedef enum
 } td_stim_mode_t;
 
 /*
- * APP CONTROL PULSE PARAMETER STRUCT :: RAW SETTING
+ * APP CONTROL PULSE PARAMETER STRUCT
  * */
 typedef struct
 {
@@ -135,8 +129,6 @@ typedef struct
 	uint8_t app_cur_detect_level;
 	uint8_t app_prev_detect_level;
 	uint8_t app_detection_level; // DETECTION LEVEL GET :: REQUEST
-
-	uint8_t app_active;
 } td_stim_app_ctrl_param_t;
 
 /*
@@ -186,10 +178,10 @@ extern stim_signal_cfg_t ex_pulse_data;
 extern stim_trg_cfg_t ex_trg_data;
 
 /*
- * FUNCTION
+ * STIM CONTROL FUNCTION
  * */
-/* INIT */
-void td_Stim_Mask_Init(void);
+/* STIM PARAMETER INIT */
+void td_Stim_Ctrk_Param_Init(void);
 
 /* PARAMETER CHECK FUNCTION */
 uint8_t td_Stim_Is_Started(void);

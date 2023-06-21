@@ -21,10 +21,13 @@ td_sys_state_t td_next_sys_fsm_state = TD_SYS_STATE_IDLE;
 td_stim_timout_state_t td_stim_timeout_state;
 
 /* while out code*/
-void td_Sys_FSM_State_Init(void)
+void td_System_Manager_Init(void)
 {
+	TD_SYSTEM_UPDATE_F = 0;
 	TD_CUR_SYS_STATE = TD_SYS_STATE_MAX;
 	td_Set_Sys_FSM_State(TD_SYS_STATE_INIT);
+
+	td_Stim_Ctrk_Param_Init();
 }
 
 td_sys_state_t td_Get_Sys_FSM_State(void)
@@ -94,32 +97,22 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
  * */
 void td_Sys_Param_Update_Handle(void)
 {
-	/* BUTTON PRESSED FLAG */
-	if (td_Start_Btn_IsHandled() == true)
-	{
-		if (TD_NEXT_SYS_STATE == TD_SYS_STATE_IDLE)
-		{
-			TD_NEXT_SYS_STATE = TD_SYS_STATE_RUN;
-		}
-		else if (TD_NEXT_SYS_STATE == TD_SYS_STATE_RUN)
-		{
-			TD_NEXT_SYS_STATE = TD_SYS_STATE_IDLE;
-		}
-	}
-
 	/* Send state change ind */
 	if (TD_CUR_SYS_STATE != TD_NEXT_SYS_STATE || TD_STIM_PREV_MODE != TD_STIM_CUR_MODE || TD_STIM_PREV_LEVEL != TD_STIM_CUR_LEVEL /*|| ElecDetEndFlag == 1*/)
 	{
+		TD_SYSTEM_UPDATE_F = 1;
+
 		TD_DEBUG_PRINT(("STIM STATE CHANGE\r\n"));
 		TD_DEBUG_PRINT(("START: %d >> %d\r\n", TD_CUR_SYS_STATE, TD_NEXT_SYS_STATE));
 		TD_DEBUG_PRINT(("MODE: %d >> %d\r\n", TD_STIM_PREV_MODE, TD_STIM_CUR_MODE));
 		TD_DEBUG_PRINT(("LEVLE: %d >> %d\r\n", TD_STIM_PREV_LEVEL, TD_STIM_CUR_LEVEL));
 		/* TD_DEBUG_PRINT(("El Det: %d\n", ElecDetFlag)); */
-
-		td_Set_Sys_FSM_State(TD_NEXT_SYS_STATE);
-		td_Start_Btn_Handled_Clear();
+		TD_DEBUG_PRINT(("TD_SYSTEM_UPDATE_F >> %d\r\n", TD_SYSTEM_UPDATE_F));
+		TD_DEBUG_PRINT(("\r\n"));
 
 		TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
+		td_Set_Sys_FSM_State(TD_NEXT_SYS_STATE);
+		td_Start_Btn_Handled_Clear();
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_STIM_CUR_LEVEL);
 
@@ -130,6 +123,10 @@ void td_Sys_Param_Update_Handle(void)
 		 }
 		 */
 		bt_state_ind();
+	}
+	else
+	{
+		TD_SYSTEM_UPDATE_F = 0;
 	}
 }
 

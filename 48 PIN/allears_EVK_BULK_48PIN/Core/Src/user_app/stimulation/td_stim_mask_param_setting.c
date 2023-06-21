@@ -37,16 +37,27 @@ td_stim_manual_param_t ex_manual_param;
 td_stim_trigger_param_t ex_man_trg_param;
 
 /*
- * INIT
+ * STIM PARAMETER INIT
  * */
-void td_Stim_Mask_Init(void)
+void td_Stim_Ctrk_Param_Init(void)
 {
+	TD_RAW_STIM_MODE = TD_STOP_MODE;
+	TD_RAW_STIM_LEVEL = 0;
+	TD_MODE_SIZE = 0;
 	TD_STIM_CUR_MODE = TD_STOP_MODE;
-	TD_STIM_PREV_MODE = 0;
-
+	TD_STIM_PREV_MODE = TD_STOP_MODE;
+	TD_CUR_MODE_FREQ = 0;
+	TD_PREV_MODE_FREQ = 0;
+	TD_CUR_MODE_FREQ_HOLDING_TIME = 0;
+	TD_PREV_MODE_FREQ_HOLDING_TIME = 0;
+	TD_STIM_LEVEL_UPDATE_ENABLE = 0;
 	TD_STIM_CUR_LEVEL = 0;
 	TD_STIM_PREV_LEVEL = 0;
-	td_Sys_FSM_State_Init();
+
+	/* CHECK THIS */
+	TD_STIM_CUR_DETECTOIN_LEVEL = 0;
+	TD_STIM_PREV_ELDET_LEVEL = 0;
+	TD_STIM_DETECTION_LEVEL = 0;
 }
 
 /*
