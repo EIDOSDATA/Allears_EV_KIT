@@ -112,7 +112,7 @@ void td_Sys_Param_Update_Handle(void)
 
 		TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
 		td_Set_Sys_FSM_State(TD_NEXT_SYS_STATE);
-		td_Start_Btn_Handled_Clear();
+		//td_Start_Btn_Handled_Clear();
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_STIM_CUR_LEVEL);
 
@@ -123,6 +123,10 @@ void td_Sys_Param_Update_Handle(void)
 		 }
 		 */
 		bt_state_ind();
+	}
+	if (TD_SYSTEM_UPDATE_F == 1)
+	{
+		td_Start_Btn_Handled_Clear();
 	}
 	else
 	{

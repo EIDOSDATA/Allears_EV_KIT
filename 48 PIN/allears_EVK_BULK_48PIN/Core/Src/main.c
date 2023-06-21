@@ -198,9 +198,11 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	 * STIM TEST
 	 * */
 #if 1
+
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
 	TD_DEBUG_PRINT(("\r\n"));
+
 #endif
 }
 

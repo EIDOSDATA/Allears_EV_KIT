@@ -91,8 +91,12 @@ typedef enum
 	TD_TAPPING_H_MODE = 4,
 	TD_MASSAGE_L_MODE = 5,
 	TD_MASSAGE_H_MODE = 6,
-	/* BY SSI */
+
+	/*
+	 * EXTENDED MODE
+	 * */
 	TD_MANUAL_MODE = 0x80,
+	TD_TRIGGER_MODE = 0xFF,
 	TD_STIM_MODE_MAX = 7
 } td_stim_mode_t;
 

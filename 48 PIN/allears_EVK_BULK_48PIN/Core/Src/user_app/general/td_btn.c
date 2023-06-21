@@ -228,8 +228,4 @@ void td_Btn_Handle(void)
 			TD_NEXT_SYS_STATE = TD_SYS_STATE_IDLE;
 		}
 	}
-	if (TD_SYSTEM_UPDATE_F == 1)
-	{
-		td_Start_Btn_Handled_Clear();
-	}
 }

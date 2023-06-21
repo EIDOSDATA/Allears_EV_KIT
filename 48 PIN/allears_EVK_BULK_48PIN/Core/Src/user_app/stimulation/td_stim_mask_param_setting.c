@@ -83,7 +83,8 @@ uint8_t td_GP_Mode_Is_Ready(void) // RETURN GROUP PULSE MODE FLAG
 {
 	uint8_t gp_ready_f = 0;
 
-	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN && TD_STIM_CUR_MODE != TD_NEEDLE_MODE && TD_STIM_CUR_MODE != TD_STOP_MODE)
+	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN && TD_STIM_CUR_MODE != TD_NEEDLE_MODE && TD_STIM_CUR_MODE != TD_STOP_MODE && TD_STIM_CUR_MODE !=
+			TD_TRIGGER_MODE)
 	{
 		gp_ready_f = 1;
 	}
@@ -357,6 +358,8 @@ void td_Stim_Manual_Mode_Start(void)
  * */
 void td_Stim_Trigger_Config_Update(void)
 {
+	TD_STIM_CUR_MODE = TD_TRIGGER_MODE;
+
 	/* MANUAL PULSE DATA SETTING */
 	if (TD_MANUAL_PULSE_FREQ == 0 || TD_MANUAL_PULSE_WIDTH == 0 || TD_MANUAL_TARGET_VOLTAGE == 0)
 	{
@@ -393,6 +396,15 @@ void td_Stim_Trigger_Config_Update(void)
 	ex_trg_data.trg_in_toggled = TD_MANUAL_TRG_IN_TOGGLED;
 
 	stimLib_stimTriggerConfig(&ex_trg_data);
+
+	/* SET MODE */
+	TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
+
+	/* RESET LEVEL */
+	TD_STIM_STATE_LEVEL_UPDATE(0);
+	TD_RAW_STIM_LEVEL = 0;
+
+	/* STIM START :: SYSTEM FSM */
 	TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 }
 
