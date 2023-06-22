@@ -24,17 +24,17 @@ td_btn_state_data_t td_start_btn_state;
 td_btn_state_data_t td_stim_up_btn_state;
 td_btn_state_data_t td_stim_down_btn_state;
 
-bool td_Start_Btn_IsHandled(void)
+bool td_isStartButtonHandled(void)
 {
 	return TD_START_BTN_STATE_HANDLED;
 }
 
-void td_Start_Btn_Handled_Clear(void)
+void td_clearStartButtonHandled(void)
 {
 	TD_START_BTN_STATE_HANDLED = false;
 }
 
-void td_Start_Btn_HandleEnable(bool enable)
+void td_enableStartButtonHandling(bool enable)
 {
 	TD_START_BTN_STATE_HANDLE_ENABLE = enable;
 }
@@ -42,7 +42,7 @@ void td_Start_Btn_HandleEnable(bool enable)
 /*
  * START BTN ACTION
  * */
-void td_Start_Btn_Action(void)
+void td_handleStartButtonAction(void)
 {
 	bool start_pressed;
 	start_pressed = TD_START_BTN_IS_PRESSED();
@@ -87,7 +87,8 @@ void td_Start_Btn_Action(void)
 /*
  * STIM UP BTN ACTION
  * */
-void td_StimUp_Btn_Action(void)
+
+void td_handleStimUpButtonAction(void)
 {
 	bool up_pressed;
 	up_pressed = TD_STIM_UP_BTN_IS_PRESSED();
@@ -119,7 +120,7 @@ void td_StimUp_Btn_Action(void)
 			{
 				TD_RAW_STIM_LEVEL = TD_STIM_LEVEL_MAX;
 			}
-			td_Stim_Level_Config_Update(TD_RAW_STIM_LEVEL);
+			td_configureStimLevels(TD_RAW_STIM_LEVEL);
 			TD_DEBUG_PRINT(("STIM LEVEL : %d\n", TD_RAW_STIM_LEVEL));
 #endif
 			TD_STIM_UP_BTN_STATE_HANDLED = true;
@@ -150,7 +151,8 @@ void td_StimUp_Btn_Action(void)
 /*
  * STIM DOWN BTN ACTION
  * */
-void td_StimDown_Btn_Action(void)
+
+void td_handleStimDownButtonAction(void)
 {
 	bool down_pressed;
 	down_pressed = TD_STIM_DOWN_BTN_IS_PRESSED();
@@ -182,7 +184,7 @@ void td_StimDown_Btn_Action(void)
 			{
 				TD_RAW_STIM_LEVEL = 0;
 			}
-			td_Stim_Level_Config_Update(TD_RAW_STIM_LEVEL);
+			td_configureStimLevels(TD_RAW_STIM_LEVEL);
 			TD_DEBUG_PRINT(("STIM LEVEL : %d\n", TD_RAW_STIM_LEVEL));
 #endif
 			TD_STIM_DOWN_BTN_STATE_HANDLED = true;
@@ -210,14 +212,14 @@ void td_StimDown_Btn_Action(void)
 	}
 }
 
-void td_Btn_Handle(void)
+void td_handleButton(void)
 {
-	td_Start_Btn_Action();
-	td_StimUp_Btn_Action();
-	td_StimDown_Btn_Action();
+	td_handleStartButtonAction();
+	td_handleStimUpButtonAction();
+	td_handleStimDownButtonAction();
 
 	/* BUTTON PRESSED FLAG */
-	if (td_Start_Btn_IsHandled() == true)
+	if (td_isStartButtonHandled() == true)
 	{
 		if (TD_NEXT_SYS_STATE == TD_SYS_STATE_IDLE)
 		{

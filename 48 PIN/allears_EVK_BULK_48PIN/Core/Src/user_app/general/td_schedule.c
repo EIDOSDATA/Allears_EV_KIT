@@ -20,53 +20,47 @@
 #include "td_private.h"
 #include "bt_msg_private.h"
 
-static uint8_t GP_SYS_STATE = TD_GP_STATE_MAX;
-uint8_t gp_cur_stat = TD_GP_INIT;
-
 /* TIMER COUNTER VALUE :: INTERRUPT SCHEDULER */
-uint16_t gp_ctrl_cnt_tim16 = 0;
-uint8_t gp_sequence_pos = 0;
-uint16_t pwm_holding_tim = 0; // = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) - 1;
+td_stim_sched_group_pulse_param_t exTd_stimGroupPulse_param;
 
 /* TIMER COUNTER VALUE :: POLLING SCHEDULER */
-static uint32_t schdule_tick = 0;
+static uint32_t gSchdule_tick = 0;
 /*
  * POLLING SCHEDULEER :: CALL BY MAIN.C
  * */
-void td_Schedule(void)
+void td_runMainSchedule(void)
 {
-
 	btMsg_rcvData_handle();
 
-	if (HAL_GetTick() - schdule_tick >= TD_SCHED_HANDLE_PERIOD)
+	if (HAL_GetTick() - gSchdule_tick >= TD_SCHED_HANDLE_PERIOD)
 	{
 #ifndef TD_GPIO_UNUSED
-		td_Btn_Handle();
-		td_Sys_Param_Update_Handle();
-		td_Stim_Timeout_Handle();
+		td_handleButton();
+		td_handleSystemParamUpdate();
+		td_handleStimulationTimeout();
 #endif
-		schdule_tick = HAL_GetTick();
+		gSchdule_tick = HAL_GetTick();
 	}
 }
 
-void td_Group_Pulse_Value_Setting(void)
+void td_setGroupPulseValue(void)
 {
-	if (TD_MODE_SIZE == gp_sequence_pos)
+	if (TD_MODE_SIZE == TD_GP_SEQUENCE_POS)
 	{
-		gp_sequence_pos = 0;
+		TD_GP_SEQUENCE_POS = 0;
 	}
 
 	/* MANUAL MODE PARAMETER SETTING */
 	if (TD_STIM_CUR_MODE == TD_MANUAL_MODE)
 	{
 		/* MANUAL GP ON TIME */
-		if (gp_sequence_pos == 0)
+		if (TD_GP_SEQUENCE_POS == 0)
 		{
 			TD_CUR_MODE_FREQ = TD_MANUAL_PULSE_FREQ;
 			TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME;
 		}
 		/* MANUAL GP OFF TIME */
-		else if (gp_sequence_pos == 1)
+		else if (TD_GP_SEQUENCE_POS == 1)
 		{
 			TD_CUR_MODE_FREQ = 0;
 			TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_OFF_TIME;
@@ -75,23 +69,23 @@ void td_Group_Pulse_Value_Setting(void)
 	/* NON MANUAL MODE */
 	else if (TD_STIM_CUR_MODE != TD_MANUAL_MODE)
 	{
-		TD_MODE_FREQ_UPDATE(TD_STIM_MODE_GET_FREQ(TD_STIM_CUR_MODE, gp_sequence_pos));
-		TD_MODE_FREQ_HOLDING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(TD_STIM_CUR_MODE, gp_sequence_pos));
+		TD_MODE_FREQ_UPDATE(TD_STIM_MODE_GET_FREQ(TD_STIM_CUR_MODE, TD_GP_SEQUENCE_POS));
+		TD_MODE_FREQ_KEEPING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(TD_STIM_CUR_MODE, TD_GP_SEQUENCE_POS));
 	}
 
-	ex_pulse_data.freq = TD_CUR_MODE_FREQ;
-	stimLib_stimParameterChange(&ex_pulse_data);
+	exTd_pulseCfg.freq = TD_CUR_MODE_FREQ;
+	stimLib_stimParameterChange(&exTd_pulseCfg);
 
-	gp_sequence_pos++;
+	TD_GP_SEQUENCE_POS++;
 }
 
 /*
  * GROUP PULSE CONTROL SCHEDULER :: CALL BY INTERRUPT SCHEDULER
  * */
-void td_Group_Pulse_Mode_Control_Scheduler(void)
+void td_controlGroupPulseModeScheduler(void)
 {
 	/* TIME VALUE = 100ms * 10 >> 1ms * 1000 */
-	if (td_GP_Mode_Is_Ready())
+	if (td_isGroupPulseModeReady())
 	{
 		/*
 		 * STIM PARAMETER UPDATE
@@ -103,44 +97,55 @@ void td_Group_Pulse_Mode_Control_Scheduler(void)
 		TD_DEBUG_PRINT(("\r\n"));
 #endif
 #endif
-		if (GP_SYS_STATE != gp_cur_stat || gp_ctrl_cnt_tim16 == pwm_holding_tim)
+		if (TD_GP_SYS_STATE != TD_GP_NEXT_STATE || TD_GP_CTRL_TIMER_CNT == TD_GP_KEEPING_TIM)
 		{
-			td_Group_Pulse_Value_Setting();
+			td_setGroupPulseValue();
 			if (TD_CUR_MODE_FREQ == 0)
 			{
-				pwm_holding_tim = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) + 2;
-				gp_cur_stat = TD_GP_SLEEP;
+				TD_GP_KEEPING_TIM = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) + 2;
+				TD_GP_NEXT_STATE = TD_GP_SLEEP;
 			}
 			else if (TD_CUR_MODE_FREQ != 0)
 			{
-				pwm_holding_tim = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) - 2;
-				gp_cur_stat = TD_GP_AWAKE;
+				TD_GP_KEEPING_TIM = (TD_CUR_MODE_FREQ_HOLDING_TIME * 10) - 2;
+				TD_GP_NEXT_STATE = TD_GP_AWAKE;
 			}
 
-			gp_ctrl_cnt_tim16 = 0;
+			TD_GP_CTRL_TIMER_CNT = 0;
 
-			GP_SYS_STATE = gp_cur_stat;
+			TD_GP_SYS_STATE = TD_GP_NEXT_STATE;
 		}
 
 		/*
 		 * STIM STOP
 		 * */
-		if (GP_SYS_STATE == TD_GP_SLEEP && gp_ctrl_cnt_tim16 == 0)
+		if (TD_GP_SYS_STATE == TD_GP_SLEEP && TD_GP_CTRL_TIMER_CNT == 0)
 		{
 			stimLib_stimPause();
-			gp_ctrl_cnt_tim16 = 0;
+			TD_GP_CTRL_TIMER_CNT = 0;
 		}
 
 		/*
 		 * STIM START
 		 * */
-		else if (GP_SYS_STATE == TD_GP_AWAKE && gp_ctrl_cnt_tim16 == 0)
+		else if (TD_GP_SYS_STATE == TD_GP_AWAKE && TD_GP_CTRL_TIMER_CNT == 0)
 		{
 			stimLib_stimStart();
-			gp_ctrl_cnt_tim16 = 0;
+			TD_GP_CTRL_TIMER_CNT = 0;
 		}
-		gp_ctrl_cnt_tim16++;
+		TD_GP_CTRL_TIMER_CNT++;
 	}
+}
+
+void td_resetGroupPulseSchedulerParameters(void)
+{
+	TD_GP_SYS_STATE = TD_GP_STATE_MAX;
+	TD_GP_NEXT_STATE = TD_GP_INIT;
+
+	/* TIMER COUNTER VALUE :: INTERRUPT SCHEDULER */
+	TD_GP_CTRL_TIMER_CNT = 0;
+	TD_GP_SEQUENCE_POS = 0;
+	TD_GP_KEEPING_TIM = 0;
 }
 
 #if 0

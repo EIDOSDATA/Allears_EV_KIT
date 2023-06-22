@@ -55,10 +55,10 @@ void bt_state_ind(void)
 #if 1
 	BT_MSG_SEND_BUF[BT_MSG_TYPE_IX] = BT_STATE_IND;
 	BT_MSG_SEND_BUF[BT_MSG_LEN_IX] = 4;
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX] = td_Stim_Is_Started(); /* stimul start */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 1] = td_Stim_Cur_Mode_Get(); /* mode */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 2] = td_Stim_Cur_Level_Get(); /* level */
-	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 3] = td_Stim_Detection_Level(); /* elect detect */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX] = td_isStimulationStarted(); /* stimul start */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 1] = td_getCurrentStimulationMode(); /* mode */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 2] = td_getCurrentStimulationLevel(); /* level */
+	BT_MSG_SEND_BUF[BT_MSG_DATA_IX + 3] = td_getStimDetectionLevel(); /* elect detect */
 #endif
 
 	BT_MSG_SEND();

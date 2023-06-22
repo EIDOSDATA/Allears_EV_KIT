@@ -215,10 +215,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if (htim->Instance == TIM16)
 	{
 		td_tim16_cnt++;
-		td_Group_Pulse_Mode_Control_Scheduler();
+		td_controlGroupPulseModeScheduler();
 
 		/* LEVEL UPDATE TIME DEBOUNCING */
-		if (td_tim16_cnt >= 10 && td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN)
+		if (td_tim16_cnt >= 10 && td_getSystemFSMState() == TD_SYS_STATE_RUN)
 		{
 #ifdef DEBUG
 #if 0
@@ -348,7 +348,7 @@ int main(void)
 	tdUart1_init();
 	btMsg_init();
 
-	td_System_Manager_Init();
+	td_clearSystemControlParameters();
 
 	/* STIM LIB PULSE SETTING */
 #ifdef TD_STEPUP_ADC_TUNNING
@@ -420,7 +420,7 @@ int main(void)
 		stimLib_stimSessionStop();
 #endif
 
-		td_Schedule();
+		td_runMainSchedule();
 
 	}
 	/* USER CODE END 3 */

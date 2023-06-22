@@ -23,8 +23,9 @@
  *
  * LIB CONTROL VALUE
  * */
-stim_signal_cfg_t ex_pulse_data;
-stim_trg_cfg_t ex_trg_data;
+
+stim_signal_cfg_t exTd_pulseCfg;
+stim_trg_cfg_t exTd_triggerCfg;
 
 /*
  * BLE MANUAL MODE
@@ -32,17 +33,19 @@ stim_trg_cfg_t ex_trg_data;
  * 2. MANUAL CONTROL PULSE PARAM
  * 3. MANUAL CONTROL TRIGGER PARAM
  * */
-td_stim_app_ctrl_param_t ex_stim_ctrl_param;
-td_stim_manual_param_t ex_manual_param;
-td_stim_trigger_param_t ex_man_trg_param;
+td_stim_app_ctrl_param_t exTd_stimControl_param;
+td_stim_manual_param_t exTd_manual_param;
+td_stim_trigger_param_t exTd_trg_param;
 
 /*
  * STIM PARAMETER INIT
  * */
-void td_Stim_Ctrk_Param_Init(void)
+void td_initStimulationControlParameters(void)
 {
-	TD_RAW_STIM_MODE = TD_STOP_MODE;
-	TD_RAW_STIM_LEVEL = 0;
+	/*
+	 TD_RAW_STIM_MODE = TD_STOP_MODE;
+	 TD_RAW_STIM_LEVEL = 0;
+	 */
 	TD_MODE_SIZE = 0;
 	TD_STIM_CUR_MODE = TD_STOP_MODE;
 	TD_STIM_PREV_MODE = TD_STOP_MODE;
@@ -63,28 +66,28 @@ void td_Stim_Ctrk_Param_Init(void)
 /*
  * PARAMETER CHECK FUNCTION :: PARAMETER
  * */
-uint8_t td_Stim_Is_Started(void)
+uint8_t td_isStimulationStarted(void)
 {
-	return td_Get_Sys_FSM_State();
+	return td_getSystemFSMState();
 }
-uint8_t td_Stim_Cur_Mode_Get(void) // RETURN STIM STATE
+uint8_t td_getCurrentStimulationMode(void) // RETURN STIM STATE
 {
 	return TD_STIM_CUR_MODE;
 }
-uint8_t td_Stim_Cur_Level_Get(void) // RETURN MODE LEVEL
+uint8_t td_getCurrentStimulationLevel(void) // RETURN MODE LEVEL
 {
 	return TD_STIM_CUR_LEVEL;
 }
-uint8_t td_Stim_Cur_Voltage_Get(void) // RETURN DAC LEVEL
+uint8_t td_getCurrentStimulationVoltage(void) // RETURN DAC LEVEL
 {
-	return ex_pulse_data.degree;
+	return exTd_pulseCfg.degree;
 }
-uint8_t td_GP_Mode_Is_Ready(void) // RETURN GROUP PULSE MODE FLAG
+uint8_t td_isGroupPulseModeReady(void) // RETURN GROUP PULSE MODE FLAG
 {
 	uint8_t gp_ready_f = 0;
 
-	if (td_Get_Sys_FSM_State() == TD_SYS_STATE_RUN && TD_STIM_CUR_MODE != TD_NEEDLE_MODE && TD_STIM_CUR_MODE != TD_STOP_MODE && TD_STIM_CUR_MODE !=
-			TD_TRIGGER_MODE)
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN && TD_STIM_CUR_MODE != TD_NEEDLE_MODE && TD_STIM_CUR_MODE != TD_STOP_MODE
+			&& TD_STIM_CUR_MODE != TD_TRIGGER_MODE && TD_MODE_SIZE != 1)
 	{
 		gp_ready_f = 1;
 	}
@@ -99,12 +102,12 @@ uint8_t td_GP_Mode_Is_Ready(void) // RETURN GROUP PULSE MODE FLAG
 /*
  * STIM DETECTION LEVEL CHECK :: PARAMETER
  * */
-uint8_t td_Stim_Cur_Detection_Level_Get(void)
+uint8_t td_getCurrentStimDetectionLevel(void)
 {
 	return TD_STIM_CUR_DETECTOIN_LEVEL;
 }
 
-uint8_t td_Stim_Cur_Detection_State_Get(void)
+uint8_t td_getCurrentStimDetectionState(void)
 {
 #ifdef STIMDETECTION
 	return ElecDetFlag;
@@ -112,12 +115,12 @@ uint8_t td_Stim_Cur_Detection_State_Get(void)
 	return 0;
 }
 
-uint8_t td_Stim_Detection_LV_Check_Is_Active(void)
+uint8_t td_isStimDetectionLevelActive(void)
 {
 	return (TD_STIM_CUR_DETECTOIN_LEVEL > 0);
 }
 
-uint8_t td_Stim_Detection_Level(void)
+uint8_t td_getStimDetectionLevel(void)
 {
 	return TD_STIM_DETECTION_LEVEL;
 }
@@ -125,7 +128,7 @@ uint8_t td_Stim_Detection_Level(void)
 /*
  * MODE CONFIG DATA GET FUNCTION
  * */
-void td_Stim_Mode_Config_Get(uint8_t mode)
+void td_getStimModeConfiguration(uint8_t mode)
 {
 	if (TD_STIM_MODE_CFG_TABLE == NULL)
 	{
@@ -147,7 +150,7 @@ void td_Stim_Mode_Config_Get(uint8_t mode)
 /*
  * MODE CONFIG FUNCTION :: Action : BT_MODE_SET_REQ
  * */
-void td_Stim_Mode_Config_Update(uint8_t mode)
+void td_configureStimulationMode(uint8_t mode)
 {
 	int addr = 0;
 
@@ -156,56 +159,63 @@ void td_Stim_Mode_Config_Update(uint8_t mode)
 		TD_DEBUG_PRINT(("STIM MODE SET IS IGNORED: %d\r\n", mode));
 		return;
 	}
-	/* CHANGE TO NEW MODE */
-	TD_RAW_STIM_MODE = mode;
-	/*
-	 * TODO:
-	 * 1. APPLY MODE STATE
-	 * 2. APPLY MODE SIZE
-	 * 3. UPDATE MODE FREQ and FREQ HOLDING TIME
-	 * 4. STIM LEVEL INIT
-	 * */
-	TD_STIM_CUR_MODE = TD_STIM_MODE_GET_STATE(mode);
-	TD_MODE_SIZE = TD_STIM_MODE_GET_SIZE(mode);
 
-	/*
-	 * UPDATE MODE FREQ and FREQ HOLDING TIME
-	 * */
-	TD_MODE_FREQ_UPDATE(TD_STIM_MODE_GET_FREQ(mode, addr));
-	TD_MODE_FREQ_HOLDING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode, addr));
-	ex_pulse_data.freq = TD_CUR_MODE_FREQ;
-
-	if (TD_MODE_SIZE > TD_NEEDLE_MODE_SEQUENCE_SIZE)
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
 	{
-		TD_DEBUG_PRINT(("GPMODE ENABL\r\n"));
-	}
+		/*
+		 * ALWAYS STIM STOP :: SYSTEM FSM
+		 * Whenever the mode setting is changed, the status is set to IDLE.
+		 * */
+		td_clearSystemControlParameters();
 
-	/*
-	 * RESET STIM LEVEL
-	 * */
-	TD_STIM_STATE_LEVEL_UPDATE(0);
-	ex_pulse_data.pulse_width = TD_STIM_LEVEL_PW_GET(0);
+		/* CHANGE TO NEW MODE */
+		TD_RAW_STIM_MODE = mode;
+		/*
+		 * TODO:
+		 * 1. APPLY MODE STATE
+		 * 2. APPLY MODE SIZE
+		 * 3. UPDATE MODE FREQ and FREQ HOLDING TIME
+		 * 4. STIM LEVEL INIT
+		 * */
+		TD_STIM_CUR_MODE = TD_STIM_MODE_GET_STATE(mode);
+		TD_MODE_SIZE = TD_STIM_MODE_GET_SIZE(mode);
+
+		/*
+		 * UPDATE MODE FREQ and FREQ HOLDING TIME
+		 * */
+		TD_MODE_FREQ_UPDATE(TD_STIM_MODE_GET_FREQ(mode, addr));
+		TD_MODE_FREQ_KEEPING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode, addr));
+		exTd_pulseCfg.freq = TD_CUR_MODE_FREQ;
+
+		if (TD_MODE_SIZE > TD_NEEDLE_MODE_SEQUENCE_SIZE)
+		{
+			TD_DEBUG_PRINT(("GPMODE ENABL\r\n"));
+		}
+
+		/*
+		 * RESET STIM LEVEL
+		 * */
+		TD_STIM_STATE_LEVEL_UPDATE(0);
+		exTd_pulseCfg.pulse_width = TD_STIM_LEVEL_PW_GET(0);
 
 #ifdef STIM_LIB_EVKIT_CV
-	ex_pulse_data.degree = TD_STIM_LEVEL_VOLT_GET(0);
+		exTd_pulseCfg.degree = TD_STIM_LEVEL_VOLT_GET(0);
 #endif
 #ifdef STIM_LIB_EVKIT_CC
-	ex_pulse_data.degree = TD_STIM_LEVEL_DAC_GET(0);
+		exTd_pulseCfg.degree = TD_STIM_LEVEL_DAC_GET(0);
 #endif
 
-	TD_RAW_STIM_LEVEL = 0;
+		TD_RAW_STIM_LEVEL = 0;
 
-	/* UPDATE MODE */
-	TD_STIM_STATE_MODE_UPDATE(mode);
-
-	/* STIM STOP :: SYSTEM FSM */
-	TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_IDLE);
+		/* UPDATE MODE */
+		TD_STIM_STATE_MODE_UPDATE(mode);
+	}
 }
 
 /*
  * LEVEL CONFIG GET FUNCTION
  * */
-void td_Stim_Level_Config_Get(uint8_t level)
+void td_getStimLevelConfiguration(uint8_t level)
 {
 	if (TD_STIM_LEVEL_CFG_TABLE == NULL)
 	{
@@ -225,7 +235,7 @@ void td_Stim_Level_Config_Get(uint8_t level)
 /*
  * LEVEL CONFIG FUNCTION :: Action : BT_LEVEL_SET_REQ
  * */
-void td_Stim_Level_Config_Update(uint8_t level)
+void td_configureStimLevels(uint8_t level)
 {
 	/* Level 0 means to activate stimulation voltage output */
 	if (level != 0 && (level > TD_STIM_LEVEL_MAX || TD_STIM_CUR_LEVEL == level))
@@ -234,25 +244,25 @@ void td_Stim_Level_Config_Update(uint8_t level)
 		return;
 	}
 
-	if (TD_STIM_LEVEL_UPDATE_ENABLE == 1 || td_Get_Sys_FSM_State() == TD_SYS_STATE_IDLE)
+	if (TD_STIM_LEVEL_UPDATE_ENABLE == 1 || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
 	{
 		TD_RAW_STIM_LEVEL = level;
 
-		ex_pulse_data.pulse_width = TD_STIM_LEVEL_PW_GET(level);
+		exTd_pulseCfg.pulse_width = TD_STIM_LEVEL_PW_GET(level);
 
 #ifdef STIM_LIB_EVKIT_CV
-		ex_pulse_data.degree = TD_STIM_LEVEL_VOLT_GET(level);
+		exTd_pulseCfg.degree = TD_STIM_LEVEL_VOLT_GET(level);
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	ex_pulse_data.degree = TD_STIM_LEVEL_DAC_GET(level);
+	exTd_pulseCfg.degree = TD_STIM_LEVEL_DAC_GET(level);
 #endif
 
 		/* UPDATE LEVEL */
 		TD_STIM_STATE_LEVEL_UPDATE(level);
 
 		/* Pulse Parameter Setting and Change */
-		stimLib_stimIntensiveChange(&ex_pulse_data);
+		stimLib_stimIntensiveChange(&exTd_pulseCfg);
 
 		TD_STIM_LEVEL_UPDATE_ENABLE = 0;
 	}
@@ -266,152 +276,190 @@ void td_Stim_Level_Config_Update(uint8_t level)
 /*
  * STIM DETECTION LEVEL CHECK START
  * */
-void td_Stim_Detection_Check_Start(uint8_t level)
+void td_startStimDetectionCheck(uint8_t level)
 {
-	TD_DEBUG_PRINT(("td_Stim_Detection_Check_Start: %d\r\n", level));
-
-	/* Level 0 means stop electeric detect or reset parameters */
-	if (level != 0 && (level > TD_STIM_ELDET_LEVEL_MAX || TD_STIM_CUR_DETECTOIN_LEVEL == level))
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
 	{
-		TD_DEBUG_PRINT(("STIM DETECTION IS IGNORED: %d\r\n", level));
-		return;
-	}
+		/*
+		 * ALWAYS STIM STOP :: SYSTEM FSM
+		 * Whenever the mode setting is changed, the status is set to IDLE.
+		 * */
+		td_clearSystemControlParameters();
 
-	if (level == 0)
-	{
-		td_Stim_Control(0);
+		TD_DEBUG_PRINT(("td_startStimDetectionCheck: %d\r\n", level));
 
-		if (TD_STIM_PREV_ELDET_LEVEL != 0)
+		/* Level 0 means stop electeric detect or reset parameters */
+		if (level != 0 && (level > TD_STIM_ELDET_LEVEL_MAX || TD_STIM_CUR_DETECTOIN_LEVEL == level))
 		{
-			TD_STIM_DETECTION_LEVEL = td_Stim_Cur_Voltage_Get();
+			TD_DEBUG_PRINT(("STIM DETECTION IS IGNORED: %d\r\n", level));
+			return;
 		}
+
+		if (level == 0)
+		{
+			td_controlStimulation(0);
+
+			if (TD_STIM_PREV_ELDET_LEVEL != 0)
+			{
+				TD_STIM_DETECTION_LEVEL = td_getCurrentStimulationVoltage();
+			}
+		}
+		else
+		{
+			TD_MANUAL_PULSE_FREQ = TD_STIM_ELDET_LEVEL_FREQ;
+			TD_MANUAL_PULSE_WIDTH = TD_STIM_ELDET_LEVEL_PW;
+			TD_MANUAL_TARGET_VOLTAGE = TD_STIM_ELDET_LEVEL_VOLT;
+			TD_MANUAL_TARGET_DAC = TD_STIM_ELDET_LEVEL_DAC;
+			TD_MANUAL_STIM_DECTION_F = 1;
+			TD_MANUAL_GP_OFF_TIME = 0;
+			TD_MANUAL_GP_ON_TIME = 0;
+			TD_MANUAL_STIM_DECTION_F = 1;
+
+			td_startManualStimMode();
+
+			TD_STIM_DETECTION_LEVEL = 0;
+		}
+
+		TD_STIM_STATE_ELDT_LEVEL_UPDATE(level);
+
+		TD_DEBUG_PRINT(("STIM DETECTION LV: %d\r\n", TD_STIM_CUR_DETECTOIN_LEVEL));
 	}
-	else
-	{
-		TD_MANUAL_PULSE_FREQ = TD_STIM_ELDET_LEVEL_FREQ;
-		TD_MANUAL_PULSE_WIDTH = TD_STIM_ELDET_LEVEL_PW;
-		TD_MANUAL_TARGET_VOLTAGE = TD_STIM_ELDET_LEVEL_VOLT;
-		TD_MANUAL_TARGET_DAC = TD_STIM_ELDET_LEVEL_DAC;
-		TD_MANUAL_GP_OFF_TIME = 0;
-		TD_MANUAL_GP_ON_TIME = 0;
-
-		td_Stim_Manual_Mode_Start();
-
-		TD_STIM_DETECTION_LEVEL = 0;
-	}
-
-	TD_STIM_STATE_ELDT_LEVEL_UPDATE(level);
-
-	TD_DEBUG_PRINT(("STIM DETECTION LV: %d\r\n", TD_STIM_CUR_DETECTOIN_LEVEL));
 }
 
 /*
  * MANUAL MODE START
  * */
-void td_Stim_Manual_Mode_Start(void)
+void td_startManualStimMode(void)
 {
-	/* CHANGE TO NEW MODE :: SET DEFAULT */
-	TD_STIM_CUR_MODE = TD_STOP_MODE;
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
+	{
 
-	/* APPLY GROUP PULSE */
-	if (TD_MANUAL_GP_OFF_TIME == 0 || TD_MANUAL_GP_ON_TIME == 0)
-	{
-		TD_STIM_CUR_MODE = TD_NEEDLE_MODE;
-		TD_MODE_SIZE = 1;
-	}
-	else
-	{
-		/* MANUAL MODE >> GROUP PULSE MODE */
+		if (TD_MANUAL_STIM_DECTION_F == 0)
+		{
+			/*
+			 * ALWAYS STIM STOP :: SYSTEM FSM
+			 * Whenever the mode setting is changed, the status is set to IDLE.
+			 * */
+			td_clearSystemControlParameters();
+		}
+		/* */
+		else
+		{
+			TD_DEBUG_PRINT(("STIMUALTION DETECTION CHECK SETTING :: MANUAL\r\n"));
+		}
+
+		/* MODE SETTING */
 		TD_STIM_CUR_MODE = TD_MANUAL_MODE;
-		TD_MODE_SIZE = 2;
-		TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME;
-	}
 
-	/* APPLY PWM FREQ, PULSE WIDTH, STEP UP TARGET VOLTAGE, TARGET CURRENT */
-	TD_MODE_FREQ_UPDATE(TD_MANUAL_PULSE_FREQ); /* TD_CUR_MODE_FREQ = TD_MANUAL_PULSE_FREQ */
-	TD_MODE_FREQ_HOLDING_TIME_UPDATE(TD_MANUAL_GP_ON_TIME); /* TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME */
+		/* APPLY GROUP PULSE */
+		if (TD_MANUAL_GP_OFF_TIME == 0 || TD_MANUAL_GP_ON_TIME == 0)
+		{
+			/* MANUAL MODE :: MANUAL NEEDLE MODE SETTING */
+			TD_MODE_SIZE = 1;
+		}
+		else
+		{
+			/* MANUAL MODE :: MANUAL GROUP PULSE SETTING */
+			TD_MODE_SIZE = 2;
+			TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME;
+		}
 
-	ex_pulse_data.freq = TD_MANUAL_PULSE_FREQ;
-	ex_pulse_data.pulse_width = TD_MANUAL_PULSE_WIDTH;
+		/* APPLY PWM FREQ, PULSE WIDTH, STEP UP TARGET VOLTAGE, TARGET CURRENT */
+		TD_MODE_FREQ_UPDATE(TD_MANUAL_PULSE_FREQ); /* TD_CUR_MODE_FREQ = TD_MANUAL_PULSE_FREQ */
+		TD_MODE_FREQ_KEEPING_TIME_UPDATE(TD_MANUAL_GP_ON_TIME); /* TD_CUR_MODE_FREQ_HOLDING_TIME = TD_MANUAL_GP_ON_TIME */
+
+		exTd_pulseCfg.freq = TD_MANUAL_PULSE_FREQ;
+		exTd_pulseCfg.pulse_width = TD_MANUAL_PULSE_WIDTH;
 #ifdef STIM_LIB_EVKIT_CV
-	ex_pulse_data.degree = TD_MANUAL_TARGET_VOLTAGE;
+		exTd_pulseCfg.degree = TD_MANUAL_TARGET_VOLTAGE;
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	ex_pulse_data.degree = TD_MANUAL_TARGET_DAC;
+	exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
 #endif
-	stimLib_stimSignalConfig(&ex_pulse_data);
+		stimLib_stimSignalConfig(&exTd_pulseCfg);
 
-	/* SET MODE */
-	TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
+		/* SET MODE */
+		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 
-	/* RESET LEVEL */
-	TD_STIM_STATE_LEVEL_UPDATE(0);
-	TD_RAW_STIM_LEVEL = 0;
-
-	/* STIM START :: SYSTEM FSM */
-	TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
+		/* RESET LEVEL */
+		TD_STIM_STATE_LEVEL_UPDATE(0);
+		TD_RAW_STIM_LEVEL = 0;
+	}
 }
 
 /*
  * Trigger MODE Setting
  * */
-void td_Stim_Trigger_Config_Update(void)
+void td_updateStimTriggerConfiguration(void)
 {
-	TD_STIM_CUR_MODE = TD_TRIGGER_MODE;
-
-	/* MANUAL PULSE DATA SETTING */
-	if (TD_MANUAL_PULSE_FREQ == 0 || TD_MANUAL_PULSE_WIDTH == 0 || TD_MANUAL_TARGET_VOLTAGE == 0)
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
 	{
-		ex_pulse_data.freq = 10;
-		ex_pulse_data.pulse_width = 1000;
+		/*
+		 * ALWAYS STIM STOP :: SYSTEM FSM
+		 * Whenever the mode setting is changed, the status is set to IDLE.
+		 * */
+		td_clearSystemControlParameters();
+
+		TD_STIM_CUR_MODE = TD_TRIGGER_MODE;
+
+		/* MANUAL PULSE DATA SETTING */
+		if (TD_MANUAL_PULSE_FREQ == 0 || TD_MANUAL_PULSE_WIDTH == 0 || TD_MANUAL_TARGET_VOLTAGE == 0)
+		{
+			exTd_pulseCfg.freq = 10;
+			exTd_pulseCfg.pulse_width = 1000;
 
 #ifdef STIM_LIB_EVKIT_CV
-		ex_pulse_data.degree = 15;
+			exTd_pulseCfg.degree = 15;
 #endif
 #ifdef STIM_LIB_EVKIT_CC
-		ex_pulse_data.degree = 1;
+		exTd_pulseCfg.degree = 1;
 #endif
-		stimLib_stimSignalConfig(&ex_pulse_data);
-	}
-	else
-	{
-		ex_pulse_data.freq = TD_MANUAL_PULSE_FREQ;
-		ex_pulse_data.pulse_width = TD_MANUAL_PULSE_WIDTH;
+			stimLib_stimSignalConfig(&exTd_pulseCfg);
+		}
+		else
+		{
+			exTd_pulseCfg.freq = TD_MANUAL_PULSE_FREQ;
+			exTd_pulseCfg.pulse_width = TD_MANUAL_PULSE_WIDTH;
 #ifdef STIM_LIB_EVKIT_CV
-		ex_pulse_data.degree = TD_MANUAL_TARGET_VOLTAGE;
+			exTd_pulseCfg.degree = TD_MANUAL_TARGET_VOLTAGE;
 #endif
 #ifdef STIM_LIB_EVKIT_CC
-			ex_pulse_data.degree = TD_MANUAL_TARGET_DAC;
+			exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
 #endif
+		}
+		stimLib_stimSignalConfig(&exTd_pulseCfg);
+
+		/* TRIGGER SETTING */
+		exTd_triggerCfg.volt_prestart = TD_MANUAL_VOLT_PRESTART;
+		exTd_triggerCfg.trg_out_enable = TD_MANUAL_TRG_OUT_ENA;
+		exTd_triggerCfg.trg_out_active_pol = TD_MANUAL_TRG_OUT_ACT_POL;
+		exTd_triggerCfg.trg_in_enable = TD_MANUAL_TRG_IN_ENA;
+		exTd_triggerCfg.trg_in_active_pol = TD_MANUAL_TRG_IN_ACT_POL;
+		exTd_triggerCfg.trg_in_toggled = TD_MANUAL_TRG_IN_TOGGLED;
+
+		stimLib_stimTriggerConfig(&exTd_triggerCfg);
+
+		/* SET MODE */
+		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
+
+		/* RESET LEVEL */
+		TD_STIM_STATE_LEVEL_UPDATE(0);
+		TD_RAW_STIM_LEVEL = 0;
+
+		/* STIM START :: SYSTEM FSM */
+		/*
+		 * Since the trigger mode is executed when an external trigger comes in,
+		 * it must be prepared in an execution state in advance.
+		 * */
+		TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 	}
-	stimLib_stimSignalConfig(&ex_pulse_data);
-
-	/* TRIGGER SETTING */
-	ex_trg_data.volt_prestart = TD_MANUAL_VOLT_PRESTART;
-	ex_trg_data.trg_out_enable = TD_MANUAL_TRG_OUT_ENA;
-	ex_trg_data.trg_out_active_pol = TD_MANUAL_TRG_OUT_ACT_POL;
-	ex_trg_data.trg_in_enable = TD_MANUAL_TRG_IN_ENA;
-	ex_trg_data.trg_in_active_pol = TD_MANUAL_TRG_IN_ACT_POL;
-	ex_trg_data.trg_in_toggled = TD_MANUAL_TRG_IN_TOGGLED;
-
-	stimLib_stimTriggerConfig(&ex_trg_data);
-
-	/* SET MODE */
-	TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
-
-	/* RESET LEVEL */
-	TD_STIM_STATE_LEVEL_UPDATE(0);
-	TD_RAW_STIM_LEVEL = 0;
-
-	/* STIM START :: SYSTEM FSM */
-	TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 }
 
 /*
  * BLE STIM PARAMETER CONTROL FUNCTION
  * */
-void td_Stim_Control(uint8_t start)
+void td_controlStimulation(uint8_t start)
 {
 	TD_DEBUG_PRINT(("td_Stim_Control: %d\r\n", start));
 
@@ -422,47 +470,55 @@ void td_Stim_Control(uint8_t start)
 		return;
 	}
 
-	if (start == 0)
+	if (td_getSystemFSMState() == TD_SYS_STATE_RUN || td_getSystemFSMState() == TD_SYS_STATE_IDLE)
 	{
-		/* STOP ALL ACTIVITIES */
-		TD_DEBUG_PRINT(("STOP\r\n"));
-
-		/* RESET ELECT DETECT */
-		TD_STIM_DETECTION_LEVEL = 0; /* RESET CURRENT STIM LEVEL ALWAYS */
-
-		if (td_Stim_Detection_LV_Check_Is_Active() == true)
+		if (start == 0)
 		{
-			TD_STIM_STATE_ELDT_LEVEL_UPDATE(0);
-		}
+			/*
+			 * ALWAYS STIM STOP :: SYSTEM FSM
+			 * Whenever the mode setting is changed, the status is set to IDLE.
+			 * */
+			td_clearSystemControlParameters();
 
-		/* RESET STIM LEVEL */
-		TD_STIM_STATE_LEVEL_UPDATE(0);
+			/* STOP ALL ACTIVITIES */
+			TD_DEBUG_PRINT(("STOP\r\n"));
 
-		/* PARAMETER LOAD */
-		ex_pulse_data.pulse_width = TD_STIM_LEVEL_PW_GET(0);
+			/* RESET ELECT DETECT */
+			TD_STIM_DETECTION_LEVEL = 0; /* RESET CURRENT STIM LEVEL ALWAYS */
+
+			if (td_isStimDetectionLevelActive() == true)
+			{
+				TD_STIM_STATE_ELDT_LEVEL_UPDATE(0);
+			}
+
+			/* RESET STIM LEVEL */
+			TD_STIM_STATE_LEVEL_UPDATE(0);
+
+			/* PARAMETER LOAD */
+			exTd_pulseCfg.pulse_width = TD_STIM_LEVEL_PW_GET(0);
 #ifdef STIM_LIB_EVKIT_CV
-		ex_pulse_data.degree = TD_STIM_LEVEL_VOLT_GET(0);
+			exTd_pulseCfg.degree = TD_STIM_LEVEL_VOLT_GET(0);
 #endif
 #ifdef STIM_LIB_EVKIT_CC
-		ex_pulse_data.degree = TD_STIM_LEVEL_DAC_GET(0);
+			exTd_pulseCfg.degree = TD_STIM_LEVEL_DAC_GET(0);
 #endif
-		TD_RAW_STIM_LEVEL = 0;
+			TD_RAW_STIM_LEVEL = 0;
 
-		/* STIM STOP :: SYSTEM FSM */
-		TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_IDLE);
-		stimLib_stimSignalConfig(&ex_pulse_data);
+			/* STIM STOP :: SYSTEM FSM */
+			TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_IDLE);
+			stimLib_stimSignalConfig(&exTd_pulseCfg);
 
-		/* MODE SETTING */
-		TD_STIM_CUR_MODE = TD_STOP_MODE;
-		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
-	}
+			/* MODE SETTING */
+			TD_STIM_CUR_MODE = TD_STOP_MODE;
+			TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
+		}
 
-	else if (start == 1)
-	{
-		TD_DEBUG_PRINT(("START\r\n"));
+		else if (start == 1)
+		{
+			TD_DEBUG_PRINT(("START\r\n"));
 
-		/* STIM START :: SYSTEM FSM */
-		TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
+			/* STIM START :: SYSTEM FSM */
+			TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
+		}
 	}
 }
-

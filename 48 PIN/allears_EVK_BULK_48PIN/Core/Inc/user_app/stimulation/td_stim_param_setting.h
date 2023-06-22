@@ -16,34 +16,34 @@
 /*
  * APP CONTROL PULSE PARAMETER STRUCT
  * */
-#define TD_RAW_STIM_MODE								ex_stim_ctrl_param.raw_stim_mode
-#define TD_RAW_STIM_LEVEL								ex_stim_ctrl_param.raw_stim_level
+#define TD_RAW_STIM_MODE								exTd_stimControl_param.raw_stim_mode
+#define TD_RAW_STIM_LEVEL								exTd_stimControl_param.raw_stim_level
 
-#define TD_MODE_SIZE									ex_stim_ctrl_param.app_mode_size
+#define TD_MODE_SIZE									exTd_stimControl_param.app_mode_size
 
-#define TD_STIM_CUR_MODE								ex_stim_ctrl_param.app_cur_mode
-#define TD_STIM_PREV_MODE								ex_stim_ctrl_param.app_prev_mode
+#define TD_STIM_CUR_MODE								exTd_stimControl_param.app_cur_mode
+#define TD_STIM_PREV_MODE								exTd_stimControl_param.app_prev_mode
 
-#define TD_CUR_MODE_FREQ								ex_stim_ctrl_param.app_cur_mode_freq
-#define TD_PREV_MODE_FREQ								ex_stim_ctrl_param.app_prev_mode_freq
+#define TD_CUR_MODE_FREQ								exTd_stimControl_param.app_cur_mode_freq
+#define TD_PREV_MODE_FREQ								exTd_stimControl_param.app_prev_mode_freq
 
-#define TD_CUR_MODE_FREQ_HOLDING_TIME					ex_stim_ctrl_param.app_cur_mode_freq_holding_time
-#define TD_PREV_MODE_FREQ_HOLDING_TIME					ex_stim_ctrl_param.app_prev_mode_freq_holding_time
+#define TD_CUR_MODE_FREQ_HOLDING_TIME					exTd_stimControl_param.app_cur_mode_freq_holding_time
+#define TD_PREV_MODE_FREQ_HOLDING_TIME					exTd_stimControl_param.app_prev_mode_freq_holding_time
 
-#define TD_STIM_LEVEL_UPDATE_ENABLE						ex_stim_ctrl_param.app_level_update_ena
-#define TD_STIM_CUR_LEVEL								ex_stim_ctrl_param.app_cur_level
-#define TD_STIM_PREV_LEVEL								ex_stim_ctrl_param.app_prev_level
+#define TD_STIM_LEVEL_UPDATE_ENABLE						exTd_stimControl_param.app_level_update_ena
+#define TD_STIM_CUR_LEVEL								exTd_stimControl_param.app_cur_level
+#define TD_STIM_PREV_LEVEL								exTd_stimControl_param.app_prev_level
 
-#define TD_STIM_CUR_DETECTOIN_LEVEL						ex_stim_ctrl_param.app_cur_detect_level
-#define TD_STIM_PREV_ELDET_LEVEL						ex_stim_ctrl_param.app_prev_detect_level
-#define TD_STIM_DETECTION_LEVEL							ex_stim_ctrl_param.app_detection_level
+#define TD_STIM_CUR_DETECTOIN_LEVEL						exTd_stimControl_param.app_cur_detect_level
+#define TD_STIM_PREV_ELDET_LEVEL						exTd_stimControl_param.app_prev_detect_level
+#define TD_STIM_DETECTION_LEVEL							exTd_stimControl_param.app_detection_level
 
 /*
  * UPDATE PARAMETER
  * */
 /* GROUP PULSE MODE PARAMETER */
 #define TD_MODE_FREQ_UPDATE(param)						TD_PREV_MODE_FREQ = TD_CUR_MODE_FREQ; TD_CUR_MODE_FREQ = param
-#define TD_MODE_FREQ_HOLDING_TIME_UPDATE(param)			TD_PREV_MODE_FREQ_HOLDING_TIME = TD_CUR_MODE_FREQ_HOLDING_TIME; TD_CUR_MODE_FREQ_HOLDING_TIME = param
+#define TD_MODE_FREQ_KEEPING_TIME_UPDATE(param)			TD_PREV_MODE_FREQ_HOLDING_TIME = TD_CUR_MODE_FREQ_HOLDING_TIME; TD_CUR_MODE_FREQ_HOLDING_TIME = param
 
 /* APPLICATION PARAMETER */
 #define TD_STIM_STATE_MODE_UPDATE(param)				TD_STIM_PREV_MODE = TD_STIM_CUR_MODE; TD_STIM_CUR_MODE = param
@@ -57,22 +57,23 @@
 /*
  * MANUAL MODE PULSE PARAMETER
  * */
-#define TD_MANUAL_PULSE_FREQ							ex_manual_param.freq
-#define TD_MANUAL_PULSE_WIDTH							ex_manual_param.pulse_width
-#define TD_MANUAL_TARGET_VOLTAGE						ex_manual_param.target_voltage
-#define TD_MANUAL_TARGET_DAC							ex_manual_param.target_dac
-#define TD_MANUAL_GP_OFF_TIME							ex_manual_param.gp_off_time
-#define TD_MANUAL_GP_ON_TIME							ex_manual_param.gp_on_time
+#define TD_MANUAL_PULSE_FREQ							exTd_manual_param.freq
+#define TD_MANUAL_PULSE_WIDTH							exTd_manual_param.pulse_width
+#define TD_MANUAL_TARGET_VOLTAGE						exTd_manual_param.target_voltage
+#define TD_MANUAL_TARGET_DAC							exTd_manual_param.target_dac
+#define TD_MANUAL_GP_OFF_TIME							exTd_manual_param.gp_off_time
+#define TD_MANUAL_GP_ON_TIME							exTd_manual_param.gp_on_time
+#define TD_MANUAL_STIM_DECTION_F						exTd_manual_param.stim_detection_f
 
 /*
  * MANUAL MODE TRIGGER PARAMETER
  * */
-#define TD_MANUAL_VOLT_PRESTART							ex_man_trg_param.volt_prestart
-#define TD_MANUAL_TRG_OUT_ENA							ex_man_trg_param.trg_out_enable
-#define TD_MANUAL_TRG_OUT_ACT_POL						ex_man_trg_param.trg_out_active_pol
-#define TD_MANUAL_TRG_IN_ENA							ex_man_trg_param.trg_in_enable
-#define TD_MANUAL_TRG_IN_ACT_POL						ex_man_trg_param.trg_in_active_pol
-#define TD_MANUAL_TRG_IN_TOGGLED						ex_man_trg_param.trg_in_toggled
+#define TD_MANUAL_VOLT_PRESTART							exTd_trg_param.volt_prestart
+#define TD_MANUAL_TRG_OUT_ENA							exTd_trg_param.trg_out_enable
+#define TD_MANUAL_TRG_OUT_ACT_POL						exTd_trg_param.trg_out_active_pol
+#define TD_MANUAL_TRG_IN_ENA							exTd_trg_param.trg_in_enable
+#define TD_MANUAL_TRG_IN_ACT_POL						exTd_trg_param.trg_in_active_pol
+#define TD_MANUAL_TRG_IN_TOGGLED						exTd_trg_param.trg_in_toggled
 
 typedef enum
 {
@@ -91,14 +92,14 @@ typedef enum
 	TD_TAPPING_H_MODE = 4,
 	TD_MASSAGE_L_MODE = 5,
 	TD_MASSAGE_H_MODE = 6,
+	TD_STIM_MODE_MAX = 7,
 
 	/*
 	 * EXTENDED MODE
 	 * */
 	TD_MANUAL_MODE = 0x80,
-	TD_TRIGGER_MODE = 0xFF,
-	TD_STIM_MODE_MAX = 7
-} td_stim_mode_t;
+	TD_TRIGGER_MODE = 0xFF
+} td_stim_mode_state_t;
 
 /*
  * APP CONTROL PULSE PARAMETER STRUCT
@@ -156,6 +157,8 @@ typedef struct
 	uint8_t target_dac; /* DAC Step */
 	uint8_t gp_off_time; /* s */
 	uint8_t gp_on_time; /* s */
+
+	uint8_t stim_detection_f;
 } td_stim_manual_param_t;
 
 /*
@@ -174,50 +177,50 @@ typedef struct
 /*
  * EXTERN
  * */
-extern td_stim_app_ctrl_param_t ex_stim_ctrl_param;
-extern td_stim_manual_param_t ex_manual_param;
-extern td_stim_trigger_param_t ex_man_trg_param;
+extern td_stim_app_ctrl_param_t exTd_stimControl_param;
+extern td_stim_manual_param_t exTd_manual_param;
+extern td_stim_trigger_param_t exTd_trg_param;
 
-extern stim_signal_cfg_t ex_pulse_data;
-extern stim_trg_cfg_t ex_trg_data;
+extern stim_signal_cfg_t exTd_pulseCfg;
+extern stim_trg_cfg_t exTd_triggerCfg;
 
 /*
  * STIM CONTROL FUNCTION
  * */
 /* STIM PARAMETER INIT */
-void td_Stim_Ctrk_Param_Init(void);
+void td_initStimulationControlParameters(void);
 
 /* PARAMETER CHECK FUNCTION */
-uint8_t td_Stim_Is_Started(void);
-uint8_t td_Stim_Cur_Mode_Get(void);
-uint8_t td_Stim_Cur_Level_Get(void);
-uint8_t td_Stim_Cur_Voltage_Get(void);
-uint8_t td_GP_Mode_Is_Ready(void);
+uint8_t td_isStimulationStarted(void);
+uint8_t td_getCurrentStimulationMode(void);
+uint8_t td_getCurrentStimulationLevel(void);
+uint8_t td_getCurrentStimulationVoltage(void);
+uint8_t td_isGroupPulseModeReady(void);
 
 /* STIM DETECTION LEVEL CHECK :: PARAMETER */
-uint8_t td_Stim_Cur_Detection_Level_Get(void);
-uint8_t td_Stim_Cur_Detection_State_Get(void);
-uint8_t td_Stim_Detection_LV_Check_Is_Active(void);
-uint8_t td_Stim_Detection_Level(void);
+uint8_t td_getCurrentStimDetectionLevel(void);
+uint8_t td_getCurrentStimDetectionState(void);
+uint8_t td_isStimDetectionLevelActive(void);
+uint8_t td_getStimDetectionLevel(void);
 
 /* MODE CONFIG FUNCTION :: Action : BT_MODE_SET_REQ */
-void td_Stim_Mode_Config_Get(uint8_t mode);
-void td_Stim_Mode_Config_Update(uint8_t mode);
+void td_getStimModeConfiguration(uint8_t mode);
+void td_configureStimulationMode(uint8_t mode);
 
 /* LEVEL CONFIG FUNCTION :: Action : BT_LEVEL_SET_REQ */
-void td_Stim_Level_Config_Get(uint8_t level);
-void td_Stim_Level_Config_Update(uint8_t level);
+void td_getStimLevelConfiguration(uint8_t level);
+void td_configureStimLevels(uint8_t level);
 
 /* STIM DETECTION LEVEL CHECK */
-void td_Stim_Detection_Check_Start(uint8_t level);
+void td_startStimDetectionCheck(uint8_t level);
 
 /* MANUAL MODE START */
-void td_Stim_Manual_Mode_Start(void);
+void td_startManualStimMode(void);
 
 /* Trigger Mode Setting */
-void td_Stim_Trigger_Config_Update(void);
+void td_updateStimTriggerConfiguration(void);
 
 /* BLE STIM PARAMETER CONTROL FUNCTION */
-void td_Stim_Control(uint8_t start);
+void td_controlStimulation(uint8_t start);
 
 #endif /* INC_USER_APP_STIMULATION_TD_STIM_PARAM_SETTING_H_ */

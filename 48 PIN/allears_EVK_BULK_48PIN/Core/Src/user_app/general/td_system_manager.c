@@ -2,6 +2,7 @@
 #include "stim_lib_st_inc.h"
 #include "stim_lib_type.h"
 
+#include "td_schedule.h"
 #include "td_system_manager.h"
 #include "td_stim_param_setting.h"
 #include "td_stim_param_table.h"
@@ -21,21 +22,23 @@ td_sys_state_t td_next_sys_fsm_state = TD_SYS_STATE_IDLE;
 td_stim_timout_state_t td_stim_timeout_state;
 
 /* while out code*/
-void td_System_Manager_Init(void)
+void td_clearSystemControlParameters(void)
 {
 	TD_SYSTEM_UPDATE_F = 0;
-	TD_CUR_SYS_STATE = TD_SYS_STATE_MAX;
-	td_Set_Sys_FSM_State(TD_SYS_STATE_INIT);
+	TD_CUR_SYS_STATE = TD_SYS_STATE_INIT;
+	TD_NEXT_SYS_STATE = TD_SYS_STATE_IDLE;
+	td_setSystemFSMState(TD_NEXT_SYS_STATE);
 
-	td_Stim_Ctrk_Param_Init();
+	td_resetGroupPulseSchedulerParameters();
+	td_initStimulationControlParameters();
 }
 
-td_sys_state_t td_Get_Sys_FSM_State(void)
+td_sys_state_t td_getSystemFSMState(void)
 {
 	return TD_CUR_SYS_STATE;
 }
 
-void td_Set_Sys_FSM_State(td_sys_state_t state)
+void td_setSystemFSMState(td_sys_state_t state)
 {
 	if (TD_CUR_SYS_STATE == state || state >= TD_SYS_STATE_MAX)
 	{
@@ -95,7 +98,7 @@ void td_Set_Sys_FSM_State(td_sys_state_t state)
 /*
  * PARAMETER CONTROL FUNCTION
  * */
-void td_Sys_Param_Update_Handle(void)
+void td_handleSystemParamUpdate(void)
 {
 	/* Send state change ind */
 	if (TD_CUR_SYS_STATE != TD_NEXT_SYS_STATE || TD_STIM_PREV_MODE != TD_STIM_CUR_MODE || TD_STIM_PREV_LEVEL != TD_STIM_CUR_LEVEL /*|| ElecDetEndFlag == 1*/)
@@ -111,7 +114,7 @@ void td_Sys_Param_Update_Handle(void)
 		TD_DEBUG_PRINT(("\r\n"));
 
 		TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
-		td_Set_Sys_FSM_State(TD_NEXT_SYS_STATE);
+		td_setSystemFSMState(TD_NEXT_SYS_STATE);
 		//td_Start_Btn_Handled_Clear();
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_STIM_CUR_LEVEL);
@@ -126,7 +129,7 @@ void td_Sys_Param_Update_Handle(void)
 	}
 	if (TD_SYSTEM_UPDATE_F == 1)
 	{
-		td_Start_Btn_Handled_Clear();
+		td_clearStartButtonHandled();
 	}
 	else
 	{
@@ -134,13 +137,13 @@ void td_Sys_Param_Update_Handle(void)
 	}
 }
 
-void td_Stim_Force_Stop(void)
+void td_forceStopStimulation(void)
 {
-	td_Stim_Control(0);
+	td_controlStimulation(0);
 	bt_state_ind();
 }
 
-void td_Stim_Timeout_Ctrl(uint8_t start)
+void td_startStimulationTimeoutControl(uint8_t start)
 {
 	if (TD_STIM_TIMEOUT_STARTED != start)
 	{
@@ -150,7 +153,7 @@ void td_Stim_Timeout_Ctrl(uint8_t start)
 	}
 }
 
-void td_Stim_Timeout_Handle(void)
+void td_handleStimulationTimeout(void)
 {
 	if (TD_STIM_TIMEOUT_STARTED == true && TD_STIM_TIMEOUT_CNT <= TD_STIM_TIMEOUT_THRESHOLD_VALUE)
 	{
@@ -159,7 +162,7 @@ void td_Stim_Timeout_Handle(void)
 		if (TD_STIM_TIMEOUT_CNT == TD_STIM_TIMEOUT_THRESHOLD_VALUE)
 		{
 			TD_DEBUG_PRINT(("STIM TIMEOUT: STOP\r\n"));
-			td_Stim_Force_Stop();
+			td_forceStopStimulation();
 		}
 	}
 }

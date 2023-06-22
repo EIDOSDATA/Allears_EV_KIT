@@ -53,14 +53,14 @@ typedef struct
 /*
  * START BTN FUNCTION
  * */
-bool td_Start_Btn_IsHandled(void);
-void td_Start_Btn_Handled_Clear(void);
-void td_Start_Btn_HandleEnable(bool enable);
+bool td_isStartButtonHandled(void);
+void td_clearStartButtonHandled(void);
+void td_enableStartButtonHandling(bool enable);
 
-void td_Start_Btn_Action(void);
-void td_StimUp_Btn_Action(void);
-void td_StimDown_Btn_Action(void);
+void td_handleStartButtonAction(void);
+void td_handleStimUpButtonAction(void);
+void td_handleStimDownButtonAction(void);
 
-void td_Btn_Handle(void);
+void td_handleButton(void);
 
 #endif /* INC_APP_TD_BTN_H_ */

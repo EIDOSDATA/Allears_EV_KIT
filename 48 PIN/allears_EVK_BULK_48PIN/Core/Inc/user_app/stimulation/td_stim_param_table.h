@@ -14,10 +14,10 @@
 /*
  * CONST CURRENT STIMULATE LEVEL STRUCT
  * */
-#define TD_STIM_LEVEL_CFG_TABLE						ex_cc_stim_levelcfg_table
-#define TD_STIM_LEVEL_PW_GET(param)					ex_cc_stim_levelcfg_table[param].puls_width
-#define TD_STIM_LEVEL_VOLT_GET(param)				ex_cc_stim_levelcfg_table[param].output_target_voltage
-#define TD_STIM_LEVEL_DAC_GET(param)				ex_cc_stim_levelcfg_table[param].current_strength_step
+#define TD_STIM_LEVEL_CFG_TABLE						exTd_StimLevelCfg_table
+#define TD_STIM_LEVEL_PW_GET(param)					exTd_StimLevelCfg_table[param].puls_width
+#define TD_STIM_LEVEL_VOLT_GET(param)				exTd_StimLevelCfg_table[param].output_target_voltage
+#define TD_STIM_LEVEL_DAC_GET(param)				exTd_StimLevelCfg_table[param].current_strength_step
 
 /*
  * MODE SETTING PARAMETER
@@ -30,13 +30,13 @@
 #define TD_MASSAGE_L_MODE_SEQUENCE_SIZE					2
 #define TD_MASSAGE_H_MODE_SEQUENCE_SIZE					2
 
-#define TD_STIM_MODE_CFG_TABLE							ex_mode_config_table
-#define TD_STIM_MODE_GET_STATE(mode)					ex_mode_config_table[mode].cur_mode
-#define TD_STIM_MODE_GET_PULSE_PARAM(mode)				ex_mode_config_table[mode].pulse_param
+#define TD_STIM_MODE_CFG_TABLE							exTdConst_StimModeCfg_table
+#define TD_STIM_MODE_GET_STATE(mode)					exTdConst_StimModeCfg_table[mode].cur_mode
+#define TD_STIM_MODE_GET_PULSE_PARAM(mode)				exTdConst_StimModeCfg_table[mode].pulse_param
 
-#define TD_STIM_MODE_GET_SIZE(mode)						ex_mode_config_table[mode].pulse_param.size
-#define TD_STIM_MODE_GET_FREQ(mode,addr)				ex_mode_config_table[mode].pulse_param.freq_and_time[addr].freq
-#define TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode,addr)	ex_mode_config_table[mode].pulse_param.freq_and_time[addr].freq_holding_time
+#define TD_STIM_MODE_GET_SIZE(mode)						exTdConst_StimModeCfg_table[mode].pulse_group.seq_num
+#define TD_STIM_MODE_GET_FREQ(mode,addr)				exTdConst_StimModeCfg_table[mode].pulse_group.freq_group[addr].freq
+#define TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode,addr)	exTdConst_StimModeCfg_table[mode].pulse_group.freq_group[addr].keeping_time
 
 /*
  * STIMULATE MODE MAX SIZE
@@ -98,37 +98,40 @@ typedef struct
 /*
  * STIM MODE STRUCT TABLE
  * */
+/* PULSE FREQUENCY PARAM :: STRUCT */
 typedef struct
 {
 	/* Stimualtion signal frequency */
 	uint8_t freq;
 	/* Stimualtion signal pulse on time */
-	uint16_t freq_holding_time;
+	uint16_t keeping_time;
 
-} td_pulse_freq_time_t;
+} td_stim_freq_t;
 
+/* PULSE FREQUENCY GROUP :: STRUCT */
 typedef struct
 {
 	/* Stimualtion Sequence Size */
-	uint8_t size;
+	uint8_t seq_num;
 	/* Stimualtion signal frequency and time */
-	const td_pulse_freq_time_t *freq_and_time;
+	const td_stim_freq_t *freq_group;
 
-} td_pulse_param_t;
+} td_stim_freq_group_t;
 
+/* PULSE MODE :: STRUCT */
 typedef struct
 {
 	/* STIM MODE */
-	td_stim_mode_t cur_mode;
-	/* Combo Pulse Parameter */
-	td_pulse_param_t pulse_param;
+	td_stim_mode_state_t cur_mode;
+	/* GROUP PULSE PARAMETER */
+	td_stim_freq_group_t pulse_group;
 
-} td_mode_set_t;
+} td_stim_mode_t;
 
 /*
  * EXTERN
  * */
-extern td_stim_level_cfg_t ex_cc_stim_levelcfg_table[TD_STIM_LEVEL_NUM_MAX];
-extern const td_mode_set_t ex_mode_config_table[TD_STIM_MODE_NUM_MAX];
+extern td_stim_level_cfg_t exTd_StimLevelCfg_table[TD_STIM_LEVEL_NUM_MAX];
+extern const td_stim_mode_t exTdConst_StimModeCfg_table[TD_STIM_MODE_NUM_MAX];
 
 #endif /* INC_USER_APP_STIMULATION_TD_STIM_PARAM_TABLE_H_ */

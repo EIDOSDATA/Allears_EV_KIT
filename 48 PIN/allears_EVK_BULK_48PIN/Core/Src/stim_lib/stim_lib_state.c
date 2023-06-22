@@ -4,14 +4,19 @@
 
 #include "td_debug.h"
 
+
 #define STIM_LIB_CUR_STATE				exStimLib_state.cur_state
 
+
 stim_lib_state_data_t exStimLib_state =
-{ stim_lib_state_uninitialized,
+{
+	stim_lib_state_uninitialized,
 
-{ 0, 0, 0, NULL }, /* 10Hz, Pulse Width 1ms, DAC 1, no callback */
+	{ 0, 0, 0, NULL }, /* 10Hz, Pulse Width 1ms, DAC 1, no callback */
 
-{ false, false, 0, false, 0, false } };
+	{ false, false, 0, false, 0, false }
+};
+
 
 stim_lib_state_t stimLib_stateGet()
 {

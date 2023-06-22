@@ -8,7 +8,7 @@
 #define TD_SYSTEM_UPDATE_F								td_cur_sys_fsm_state.system_update_f
 #define TD_CUR_SYS_STATE								td_cur_sys_fsm_state.state
 #define TD_NEXT_SYS_STATE								td_next_sys_fsm_state
-#define TD_SYS_STATE_ACTIVE_CHNAGE(param)				{td_next_sys_fsm_state = param; td_Stim_Timeout_Ctrl(param);}
+#define TD_SYS_STATE_ACTIVE_CHNAGE(param)				{td_next_sys_fsm_state = param; td_startStimulationTimeoutControl(param);}
 
 /*
  * TIME OUT
@@ -43,15 +43,15 @@ typedef struct
 /*
  * SYSTEM FSM STATE
  * */
-void td_System_Manager_Init(void);
-td_sys_state_t td_Get_Sys_FSM_State(void);
-void td_Set_Sys_FSM_State(td_sys_state_t state);
+void td_clearSystemControlParameters(void);
+td_sys_state_t td_getSystemFSMState(void);
+void td_setSystemFSMState(td_sys_state_t state);
 
 /* PARAMETER CONTROL FUNCTION :: SCHEDULER */
-void td_Sys_Param_Update_Handle(void);
-void td_Stim_Force_Stop(void);
-void td_Stim_Timeout_Ctrl(uint8_t start);
-void td_Stim_Timeout_Handle(void);
+void td_handleSystemParamUpdate(void);
+void td_forceStopStimulation(void);
+void td_startStimulationTimeoutControl(uint8_t start);
+void td_handleStimulationTimeout(void);
 
 /*
  * EXTERN
