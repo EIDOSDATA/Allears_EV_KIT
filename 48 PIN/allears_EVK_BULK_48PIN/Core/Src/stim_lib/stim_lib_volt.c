@@ -85,7 +85,7 @@ void stimLib_stepup_voltFeedback(void)
 	 *
 	 * FUNCTION : stimLib_voltCfg(stepup_fdbk_volt);
 	 * */
-	stimLib_voltCfg(stepup_fdbk_volt);
+	//stimLib_voltCfg(stepup_fdbk_volt);
 }
 
 /*

@@ -313,6 +313,10 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 			stimLib_stimStartRaw();
 		}
 #endif
+#ifdef STIM_LIB_EVKIT_CC
+		stimLib_dacctrl_Set();
+#endif
+
 		return stim_lib_stim_rsp_ok;
 	}
 	else
