@@ -68,6 +68,20 @@ void td_setSystemFSMState(td_sys_state_t state)
 		break;
 
 	case TD_SYS_STATE_RUN:
+#ifdef TD_LAB_MODE
+		exTd_pulseCfg.freq = 250;
+		exTd_pulseCfg.pulse_width = 100;
+		exTd_pulseCfg.degree = 1;
+		stimLib_stimSignalConfig(&exTd_pulseCfg);
+
+		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */
+		exTd_triggerCfg.trg_out_enable = true; /* TRIGGER OUTPUT ENABLE */
+		exTd_triggerCfg.trg_out_active_pol = 1; /* TRIGGER OUTPUT ACTIVE HIGH */
+		exTd_triggerCfg.trg_in_enable = true; /* TRIGGER INPUT ENABLE */
+		exTd_triggerCfg.trg_in_active_pol = 1; /* TRIGGER INPUT ACTIVE HIGH */
+		exTd_triggerCfg.trg_in_toggled = true; /* TRIGGER INPUT TOGGLED */
+		stimLib_stimTriggerConfig(&exTd_triggerCfg);
+#endif
 
 		TD_DEBUG_PRINT(("STIM START\r\n"));
 		TD_DEBUG_PRINT(("\r\n"));
@@ -76,7 +90,10 @@ void td_setSystemFSMState(td_sys_state_t state)
 		stimLib_stimSessionStart();
 
 		/* STIM START */
-		stimLib_stimStart();
+		if (exTd_triggerCfg.trg_in_enable == false)
+		{
+			stimLib_stimStart();
+		}
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
 		HAL_TIM_Base_Start_IT(&htim16);
@@ -113,9 +130,8 @@ void td_handleSystemParamUpdate(void)
 		TD_DEBUG_PRINT(("TD_SYSTEM_UPDATE_F >> %d\r\n", TD_SYSTEM_UPDATE_F));
 		TD_DEBUG_PRINT(("\r\n"));
 
-		TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
 		td_setSystemFSMState(TD_NEXT_SYS_STATE);
-		//td_Start_Btn_Handled_Clear();
+		//TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_STIM_CUR_LEVEL);
 

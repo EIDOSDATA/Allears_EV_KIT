@@ -223,6 +223,13 @@ void td_handleButton(void)
 	{
 		if (TD_NEXT_SYS_STATE == TD_SYS_STATE_IDLE)
 		{
+#ifdef TD_LAB_MODE
+			if (TD_CUR_SYS_STATE == TD_SYS_STATE_RUN)
+			{
+				NVIC_SystemReset();
+				return;
+			}
+#endif
 			TD_NEXT_SYS_STATE = TD_SYS_STATE_RUN;
 		}
 		else if (TD_NEXT_SYS_STATE == TD_SYS_STATE_RUN)

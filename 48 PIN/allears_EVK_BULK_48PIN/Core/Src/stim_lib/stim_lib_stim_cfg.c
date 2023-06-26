@@ -10,7 +10,13 @@
 #include "stim_lib_volt.h"
 
 #define STIM_LIB_SIGNAL_FREQ_MIN						1
+#ifdef	STIM_LIB_FREQ_LIMIT_60
 #define STIM_LIB_SIGNAL_FREQ_MAX						60
+#endif
+#ifdef	STIM_LIB_FREQ_LIMIT_LESS
+#define STIM_LIB_SIGNAL_FREQ_MAX						300
+#endif
+
 #define STIM_LIB_SIGNAL_FREQ_IS_VALID(param)			(STIM_LIB_SIGNAL_FREQ_MIN <= param && param <= STIM_LIB_SIGNAL_FREQ_MAX)
 
 #define STIM_LIB_SIGNAL_PW_MIN							100

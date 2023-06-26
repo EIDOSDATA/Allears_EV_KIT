@@ -24,7 +24,7 @@
  * >> R1 : 3.6 MΩ, R2 : 110 kΩ
  *
  * STEP UP CIRCUIT INPUT VOLTAGE
- * >> 5.3v
+ * >> 5.0v
  *
  * STEP UP PULSE TIMER
  * >> 4.0 kHz

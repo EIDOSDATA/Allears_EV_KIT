@@ -204,6 +204,7 @@ bool stimLib_stimStartRaw(void)
 	if (STIM_LIB_TRG_OUTPUT_IS_ENABLED() == true)
 	{
 		HAL_TIM_PWM_Start(&htim2, STIM_LIB_PULSE_TRG_OUT_TIM_CH);
+		__HAL_TIM_DISABLE_IT(&htim2, TIM_IT_CC1);
 	}
 
 	return stim_lib_stim_rsp_ok;
@@ -222,14 +223,18 @@ bool stimLib_stimStopRaw(void)
 	 * STIM ENDPOINT TEST
 	 * */
 #if 0
-	TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_OC2M);
-	TIM2->CCMR1 |= (TIM_OCMODE_PWM1) | (TIM_OCMODE_PWM1 << 8U);
+	if (STIM_LIB_STATE_TRG_IN_ENABLE == true)
+	{
+		TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_OC2M);
+		TIM2->CCMR1 |= (TIM_OCMODE_PWM1) | (TIM_OCMODE_PWM1 << 8U);
+	}
 #endif
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_TRG_OUT_TIM_CH);
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_ANODE_TIM_CH);
 
 	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_CATHODE_TIM_CH);
 	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH);
+	TIM2->CNT = 0;
 
 	return stim_lib_stim_rsp_ok;
 }

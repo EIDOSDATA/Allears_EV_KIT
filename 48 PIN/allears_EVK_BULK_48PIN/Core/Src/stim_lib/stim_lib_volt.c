@@ -13,6 +13,11 @@
 #include "stim_lib_stim_cfg.h"
 
 #include "td_debug.h"
+/*
+ * TODO:
+ * REMOVE THIS POINT
+ * */
+#include "td_stim_param_table.h"
 
 /* STEPUP VOLTAGE PARAMETER */
 #define R1_Vstup									3600 /* 3.6M Ohm */
@@ -280,7 +285,13 @@ void stimLib_stepup_dataPrint(void)
 
 		TD_DEBUG_PRINT(("MEAS Voltage : %ld.%d%d%d%d%d\n", n_number, dec_point[0], dec_point[1], dec_point[2], dec_point[3], dec_point[4]));
 		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", stepup_fdbk_adc_avg));
-		TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
+		/*
+		 * TODO:
+		 * ADC TUNNING
+		 *
+		 * TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
+		 * */
+		TD_DEBUG_PRINT(("TD_VOLTAGE_CTRL_PULSE : %d\n", TD_VOLTAGE_CTRL_PULSE));
 		TD_DEBUG_PRINT(("\r\n"));
 
 #ifdef STIM_LIB_EVKIT_CC

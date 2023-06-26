@@ -27,6 +27,7 @@
 
 #if 1
 /* USER APPLICATION HEADER */
+#include "td_stim_param_table.h"
 #include "bt_msg_private.h"
 #include "td_schedule.h"
 #include "td_private.h"
@@ -198,7 +199,6 @@ void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 	 * STIM TEST
 	 * */
 #if 1
-
 	stimLib_timPwmPluseFinished_callback(htim);
 	TD_DEBUG_PRINT(("HAL_TIM_PWM_PulseFinishedCallback\n"));
 	TD_DEBUG_PRINT(("\r\n"));
@@ -351,33 +351,36 @@ int main(void)
 	td_clearSystemControlParameters();
 
 	/* STIM LIB PULSE SETTING */
-#ifdef TD_STEPUP_ADC_TUNNING
-	stim_signal_cfg_t pulse_data;
+#ifdef TD_STIM_PULSE_TEST
+	/* extern stim_signal_cfg_t exTd_pulseCfg; */
+#endif
+#ifdef TD_STIM_TRIGGER_TEST
+	/* extern stim_trg_cfg_t exTd_triggerCfg; */
+
 #endif
 
 #ifdef TD_STIM_PULSE_TEST
-	stim_signal_cfg_t pulse_data;
-	pulse_data.freq = 10;
-	pulse_data.pulse_width = 1000;
-	pulse_data.degree = 40;
-	stimLib_stimSignalConfig(&pulse_data);
+#if 1
+	exTd_pulseCfg.freq = 10;
+	exTd_pulseCfg.pulse_width = 1000;
+	exTd_pulseCfg.degree = 1;
+	stimLib_stimSignalConfig(&exTd_pulseCfg);
+#endif
 #endif
 
 	/* STIM LIB TRIGGER SETTING */
-#ifdef TD_STIM_PULSE_TEST
 #ifdef TD_STIM_TRIGGER_TEST
-	stim_trg_cfg_t trg_data;
-
-	trg_data.volt_prestart = false;
-	trg_data.trg_out_enable = stim_lib_trg_output_enable;
-	trg_data.trg_out_active_pol = stim_lib_trg_output_active_high;
-	trg_data.trg_in_enable = stim_lib_trg_input_enable;
-	trg_data.trg_in_active_pol = stim_lib_trg_input_active_high;
-	trg_data.trg_in_toggled = stim_lib_trg_input_toggle_enable;
-	stimLib_stimTriggerConfig(&trg_data);
-#endif
-
+#if 0
+	/* Example */
+	exTd_triggerCfg.volt_prestart = false;
+	exTd_triggerCfg.trg_out_enable = stim_lib_trg_output_enable;
+	exTd_triggerCfg.trg_out_active_pol = stim_lib_trg_output_active_high;
+	exTd_triggerCfg.trg_in_enable = stim_lib_trg_input_enable;
+	exTd_triggerCfg.trg_in_active_pol = stim_lib_trg_input_active_high;
+	exTd_triggerCfg.trg_in_toggled = stim_lib_trg_input_toggle_enable;
+	stimLib_stimTriggerConfig(&exTd_triggerCfg);
 	stimLib_stimSessionStart();
+#endif
 #endif
 	/* USER CODE END 2 */
 
@@ -388,40 +391,43 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+#ifdef TD_STIM_PULSE_TEST
+#if 0
+		exTd_pulseCfg.freq = 10;
+		exTd_pulseCfg.pulse_width = 1000;
+		exTd_pulseCfg.degree = 1;
+		stimLib_stimSignalConfig(&exTd_pulseCfg);
+#endif
+#if 0
+		stimLib_stimSessionStart();
+		stimLib_stimStart();
+		HAL_Delay(1000);
+		stimLib_stimPause();
+		stimLib_stimSessionStop();
 
-#ifdef TD_STEPUP_ADC_TUNNING
-		pulse_data.freq = 10;
-		pulse_data.pulse_width = 1000;
-		pulse_data.degree = 45;
-		stimLib_stimSignalConfig(&pulse_data);
+#endif
 #endif
 
 #ifdef TD_STIM_TRIGGER_TEST
-		pulse_data.freq = 10;
-		pulse_data.pulse_width = 1000;
-		pulse_data.degree = 40;
-		stimLib_stimSignalConfig(&pulse_data);
+		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */
 
-		trg_data.volt_prestart = false;
-		trg_data.trg_out_enable = false;
-		trg_data.trg_out_active_pol = 1;
-		trg_data.trg_in_enable = false;
-		trg_data.trg_in_active_pol = 1;
-		trg_data.trg_in_toggled = true;
-		stimLib_stimTriggerConfig(&trg_data);
+		exTd_triggerCfg.trg_out_enable = true; /* TRIGGER OUTPUT ENABLE */
+		exTd_triggerCfg.trg_out_active_pol = 1; /* TRIGGER OUTPUT ACTIVE HIGH */
 
+		exTd_triggerCfg.trg_in_enable = true; /* TRIGGER INPUT ENABLE */
+		exTd_triggerCfg.trg_in_active_pol = 1; /* TRIGGER INPUT ACTIVE HIGH */
+		exTd_triggerCfg.trg_in_toggled = true; /* TRIGGER INPUT TOGGLED */
+		stimLib_stimTriggerConfig(&exTd_triggerCfg);
+
+#if 0
 		stimLib_stimSessionStart();
-
 		stimLib_stimStart();
 		HAL_Delay(1000);
-
 		stimLib_stimPause();
-		HAL_Delay(300);
-		stimLib_stimSessionStop();
+		stimLib_stimSessionStop();s
 #endif
-
+#endif
 		td_runMainSchedule();
-
 	}
 	/* USER CODE END 3 */
 }
@@ -1052,17 +1058,17 @@ void Error_Handler(void)
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+ * @brief  Reports the name of the source file and the source line number
+ *         where the assert_param error has occurred.
+ * @param  file: pointer to the source file name
+ * @param  line: assert_param error line source number
+ * @retval None
+ */
 void assert_failed(uint8_t *file, uint32_t line)
 {
-  /* USER CODE BEGIN 6 */
+/* USER CODE BEGIN 6 */
 /* User can add his own implementation to report the file name and line number,
  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
+/* USER CODE END 6 */
 }
 #endif /* USE_FULL_ASSERT */

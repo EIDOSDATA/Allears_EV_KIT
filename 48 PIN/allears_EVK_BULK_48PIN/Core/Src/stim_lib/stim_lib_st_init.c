@@ -98,14 +98,14 @@ bool stimLib_tim1_Init(void)
 #endif
 #ifdef STIM_LIB_EVKIT_CC
 	/*
-	 * STEP UP INPUT VOLTAGE : 5.3v
-	 * TIMER HZ : 4.0 kHz
-	 * Test End point Resistance : 50 kΩ
+	 * STEP UP INPUT VOLTAGE : 5.0v
+	 * TIMER HZ : 25.0 kHz
+	 * Test End point Resistance : VENUS CHIP ::  50 kΩ
 	 * */
 	htim1.Instance = TIM1;
 	htim1.Init.Prescaler = 0;
 	htim1.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-	htim1.Init.Period = 19999;
+	htim1.Init.Period = 3199;
 	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim1.Init.RepetitionCounter = 0;
 	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -244,7 +244,6 @@ bool stimLib_tim2_Init(void)
 
 	/* MSP :: TIMER GPIO */
 	stimLib_tim_msppostInit(&htim2);
-
 	return STIM_LIB_RESOURCE_INIT_OK;
 }
 
@@ -333,7 +332,7 @@ bool stimLib_adc1_Init(void)
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	AnalogWDGConfig.HighThreshold = 2800; /* STEP UP LIMIT : 43V */
+	AnalogWDGConfig.HighThreshold = 2900; /* STEP UP LIMIT : 43V */
 #endif
 
 	AnalogWDGConfig.LowThreshold = 0;
