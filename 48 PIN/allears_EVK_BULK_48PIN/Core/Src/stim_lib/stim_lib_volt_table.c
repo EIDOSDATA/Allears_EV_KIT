@@ -27,13 +27,13 @@
  * >> 5.0v
  *
  * STEP UP PULSE TIMER
- * >> 4.0 kHz
+ * >> 25.0 kHz
  *
  * Load Test :: End Point Resistance / Max Voltage / Pulse Step
- * >> 50 kΩ / 35.31v / 29(max)
+ * >> VENUS CHIP (Ω) / 42.59v / 29(max)
  *
  * No Load Test :: End Point Resistance / Max Voltage / Pulse Step
- * >> In-Ear 0 Ω / 42.47v / 29(max)
+ * >> VENUS CHIP (Ω) / 42.59v / 29(max)s
  *
  * Circuit Inductor Capacity
  * >> 6.8uH
@@ -44,50 +44,50 @@ const stim_lib_stepup_ref_value_t exStimLib_stepup_table[STIM_LIB_STEPUP_TABLE_S
 {
 /* Output Voltage, Feed Back ADC, Feed Back Voltage */
 /* Pulse Step Value : 0 ~ 4 */
-{ 53630, 287, 1358 },
-{ 53730, 288, 1362 },
-{ 53800, 290, 1378 },
-{ 59650, 331, 1534 },
-{ 118300, 725, 3244 },
+{ 47910, 243, 1193 },
+{ 48190, 245, 1194 },
+{ 48530, 247, 1195 },
+{ 48910, 248, 1198 },
+{ 109400, 648, 2924 },
 
 /* Pulse Step Value : 5 ~ 9 */
-{ 134300, 825, 3696 },
-{ 147000, 909, 4049 },
-{ 159300, 993, 4403 },
-{ 171500, 1077, 4752 },
-{ 185400, 1164, 5144 },
+{ 126900, 764, 3417 },
+{ 138800, 847, 3764 },
+{ 151800, 933, 4118 },
+{ 165700, 1015, 4465 },
+{ 178700, 1101, 4816 },
 
 /* Pulse Step Value : 10 ~ 14 */
-{ 197600, 1248, 5492 },
-{ 209700, 1333, 5860 },
-{ 222100, 1416, 6203 },
-{ 234200, 1502, 6560 },
-{ 247100, 1583, 6915 },
+{ 191000, 1185, 5181 },
+{ 203000, 1268, 5461 },
+{ 215300, 1351, 5864 },
+{ 227600, 1436, 6228 },
+{ 239700, 1518, 6578 },
 
 /* Pulse Step Value : 15 ~ 19 */
-{ 259700, 1671, 7275 },
-{ 271400, 1750, 7612 },
-{ 283900, 1834, 7975 },
-{ 296200, 1913, 8335 },
-{ 308400, 1994, 8674 },
+{ 251600, 1604, 6915 },
+{ 264500, 1685, 7267 },
+{ 277600, 1769, 7614 },
+{ 289700, 1849, 7954 },
+{ 301800, 1931, 8314 },
 
 /* Pulse Step Value : 20 ~ 24 */
-{ 320500, 2080, 9162 },
-{ 333300, 2163, 9604 },
-{ 345600, 2242, 9948 },
-{ 357200, 2325, 10290 },
-{ 369600, 2406, 10630 },
+{ 314600, 2015, 8576 },
+{ 327400, 2125, 9443 },
+{ 339400, 2203, 9781 },
+{ 351200, 2284, 10030 },
+{ 363700, 2366, 10450 },
 
 /* Pulse Step Value : 25 ~ 29 */
-{ 382000, 2484, 10970 },
-{ 394000, 2564, 11310 },
-{ 406000, 2643, 11680 },
-{ 417700, 2726, 12000 },
-{ 424700, 2762, 12190 } };
+{ 375700, 2450, 10790 },
+{ 387600, 2533, 11120 },
+{ 399600, 2612, 11480 },
+{ 411500, 2691, 11820 },
+{ 424100, 2746, 12070 }, };
 #endif
 
 #ifdef STIM_LIB_EVKIT_CV
-#if 1
+#if 0
 /*
  * -----------------------------
  * Measurement Environment
@@ -165,6 +165,88 @@ const stim_lib_stepup_ref_value_t exStimLib_stepup_table[STIM_LIB_STEPUP_TABLE_S
 { 461800, 3033, 13300 },
 { 461000, 3030, 13270 },
 { 457700, 3004, 13170 }, };
+#endif
+
+#if 1
+
+/*
+ * -----------------------------
+ * Measurement Environment
+ * >> Measurement with 50 kΩ Termination Resistance.
+ * -----------------------------
+ * */
+/*
+ * SYSTEM CLOCK : 80MHz
+ *
+ * ADC SAMPLING TIME
+ * >> hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
+ * >> sConfig.SamplingTime = ADC_SAMPLETIME_640CYCLES_5;
+ *
+ *  VOLTAGE DIV CIRCUIT RESISTANCE
+ * >> R1 : 3.6 MΩ, R2 : 110 kΩ
+ *
+ * STEP UP CIRCUIT INPUT VOLTAGE
+ * >> 5.3v
+ *
+ * STEP UP PULSE TIMER
+ * >> 9.0 kHz
+ *
+ * Load Test :: End Point Resistance / Max Voltage / Pulse Step
+ * >> 50 kΩ / 45.24v / 29(max)
+ *
+ * No Load Test :: End Point Resistance / Max Voltage / Pulse Step
+ * >> In-Ear 0 Ω / 46.54v / 29(max)
+ *
+ * Circuit Inductor Capacity
+ * >> 6.8uH and 10.0uH
+ *
+ * Maximum Pulse Step : 30 Step (0 ~ 29)
+ * */
+const stim_lib_stepup_ref_value_t exStimLib_stepup_table[STIM_LIB_STEPUP_TABLE_SIZE] =
+{
+/* Output Voltage, Feed Back ADC, Feed Back Voltage */
+/* Pulse Step Value : 0 ~ 4 */
+{ 53780, 287, 1450 },
+{ 53830, 288, 1454 },
+{ 53850, 289, 1456 },
+{ 53850, 289, 1462 },
+{ 125700, 760, 3497 },
+
+/* Pulse Step Value : 5 ~ 9 */
+{ 147600, 907, 4109 },
+{ 163100, 1010, 4541 },
+{ 177800, 1111, 4981 },
+{ 194100, 1214, 5436 },
+{ 209300, 1318, 5865 },
+
+/* Pulse Step Value : 10 ~ 14 */
+{ 224900, 1419, 6289 },
+{ 239700, 1522, 6720 },
+{ 254100, 1623, 7150 },
+{ 269500, 1726, 7596 },
+{ 285400, 1826, 8033 },
+
+/* Pulse Step Value : 15 ~ 19 */
+{ 299600, 1927, 8452 },
+{ 315800, 2028, 8889 },
+{ 331500, 2133, 9525 },
+{ 344600, 2226, 9918 },
+{ 359700, 2323, 10330 },
+
+/* Pulse Step Value : 20 ~ 24 */
+{ 374800, 2425, 10760 },
+{ 390200, 2522, 11180 },
+{ 404900, 2622, 11620 },
+{ 419600, 2718, 12040 },
+{ 426000, 2768, 12220 },
+
+/* Pulse Step Value : 25 ~ 29 */
+{ 423400, 2746, 12150 },
+{ 422400, 2743, 12120 },
+{ 423700, 2754, 12150 },
+{ 437500, 2838, 12550 },
+{ 452400, 2939, 12980 }, };
+
 #endif
 
 #if 0

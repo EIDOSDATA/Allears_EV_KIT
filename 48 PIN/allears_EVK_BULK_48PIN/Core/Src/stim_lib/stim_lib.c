@@ -232,7 +232,6 @@ stim_lib_rsp_t stimLib_stimSessionStop(void)
  */
 stim_lib_rsp_t stimLib_stimStart(void)
 {
-
 	if (stimLib_stateGet() == stim_lib_state_session_idle)
 	{
 		stimLib_stimPulseStart();
@@ -291,6 +290,7 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
 			|| stimLib_stateGet() == stim_lib_state_stimulating)
 	{
+#ifdef STIM_LIB_EVKIT_CC
 		stimLib_stateSigParamSet(signal_cfg);
 #if 1
 		if (stimLib_stateGet() == stim_lib_state_stimulating)
@@ -301,7 +301,6 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 #endif
 		stimLib_pulseConfigRaw();
 		HAL_Delay(20);
-
 #if 1
 		if (stimLib_stateGet() == stim_lib_state_stimulating)
 		{
@@ -313,10 +312,33 @@ stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
 			stimLib_stimStartRaw();
 		}
 #endif
-#ifdef STIM_LIB_EVKIT_CC
 		stimLib_dacctrl_Set();
 #endif
 
+#ifdef STIM_LIB_EVKIT_CV
+#if 1
+		stimLib_stateSigParamSet(signal_cfg);
+
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStopRaw();
+		}
+		stimLib_stimPulseSetiing();
+#endif
+		stimLib_pulseConfigRaw();
+		HAL_Delay(20);
+#if 1
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			/*
+			 * stimLib_stimPulseStart();
+			 * >> stimLib_pulseConfigRaw();
+			 * >> stimLib_stimStartRaw();
+			 * */
+			stimLib_stimStartRaw();
+		}
+#endif
+#endif
 		return stim_lib_stim_rsp_ok;
 	}
 	else

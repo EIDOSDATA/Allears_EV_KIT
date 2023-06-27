@@ -85,13 +85,13 @@ bool stimLib_tim1_Init(void)
 #ifdef STIM_LIB_EVKIT_CV
 	/*
 	 * STEP UP INPUT VOLTAGE : 5.3v
-	 * TIMER HZ : 10.0 kHz
+	 * TIMER HZ : 9.0 kHz
 	 * Test End point Resistance : 50 kΩ
 	 * */
 	htim1.Instance = TIM1;
 	htim1.Init.Prescaler = 0;
 	htim1.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-	htim1.Init.Period = 7999;
+	htim1.Init.Period = 8887;
 	htim1.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim1.Init.RepetitionCounter = 0;
 	htim1.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
@@ -332,7 +332,7 @@ bool stimLib_adc1_Init(void)
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	AnalogWDGConfig.HighThreshold = 2900; /* STEP UP LIMIT : 43V */
+	AnalogWDGConfig.HighThreshold = 2800; /* STEP UP LIMIT : 43V */
 #endif
 
 	AnalogWDGConfig.LowThreshold = 0;

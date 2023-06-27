@@ -344,44 +344,13 @@ int main(void)
 	TD_DEBUG_PRINT(("EVKIT MODE :: CV\n"));
 #endif
 	TD_DEBUG_PRINT(("main() starts\n"));
+	TD_DEBUG_PRINT(("\r\n"));
 
 	tdUart1_init();
 	btMsg_init();
 
 	td_clearSystemControlParameters();
 
-	/* STIM LIB PULSE SETTING */
-#ifdef TD_STIM_PULSE_TEST
-	/* extern stim_signal_cfg_t exTd_pulseCfg; */
-#endif
-#ifdef TD_STIM_TRIGGER_TEST
-	/* extern stim_trg_cfg_t exTd_triggerCfg; */
-
-#endif
-
-#ifdef TD_STIM_PULSE_TEST
-#if 1
-	exTd_pulseCfg.freq = 10;
-	exTd_pulseCfg.pulse_width = 1000;
-	exTd_pulseCfg.degree = 1;
-	stimLib_stimSignalConfig(&exTd_pulseCfg);
-#endif
-#endif
-
-	/* STIM LIB TRIGGER SETTING */
-#ifdef TD_STIM_TRIGGER_TEST
-#if 0
-	/* Example */
-	exTd_triggerCfg.volt_prestart = false;
-	exTd_triggerCfg.trg_out_enable = stim_lib_trg_output_enable;
-	exTd_triggerCfg.trg_out_active_pol = stim_lib_trg_output_active_high;
-	exTd_triggerCfg.trg_in_enable = stim_lib_trg_input_enable;
-	exTd_triggerCfg.trg_in_active_pol = stim_lib_trg_input_active_high;
-	exTd_triggerCfg.trg_in_toggled = stim_lib_trg_input_toggle_enable;
-	stimLib_stimTriggerConfig(&exTd_triggerCfg);
-	stimLib_stimSessionStart();
-#endif
-#endif
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -391,42 +360,6 @@ int main(void)
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
-#ifdef TD_STIM_PULSE_TEST
-#if 0
-		exTd_pulseCfg.freq = 10;
-		exTd_pulseCfg.pulse_width = 1000;
-		exTd_pulseCfg.degree = 1;
-		stimLib_stimSignalConfig(&exTd_pulseCfg);
-#endif
-#if 0
-		stimLib_stimSessionStart();
-		stimLib_stimStart();
-		HAL_Delay(1000);
-		stimLib_stimPause();
-		stimLib_stimSessionStop();
-
-#endif
-#endif
-
-#ifdef TD_STIM_TRIGGER_TEST
-		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */
-
-		exTd_triggerCfg.trg_out_enable = true; /* TRIGGER OUTPUT ENABLE */
-		exTd_triggerCfg.trg_out_active_pol = 1; /* TRIGGER OUTPUT ACTIVE HIGH */
-
-		exTd_triggerCfg.trg_in_enable = true; /* TRIGGER INPUT ENABLE */
-		exTd_triggerCfg.trg_in_active_pol = 1; /* TRIGGER INPUT ACTIVE HIGH */
-		exTd_triggerCfg.trg_in_toggled = true; /* TRIGGER INPUT TOGGLED */
-		stimLib_stimTriggerConfig(&exTd_triggerCfg);
-
-#if 0
-		stimLib_stimSessionStart();
-		stimLib_stimStart();
-		HAL_Delay(1000);
-		stimLib_stimPause();
-		stimLib_stimSessionStop();s
-#endif
-#endif
 		td_runMainSchedule();
 	}
 	/* USER CODE END 3 */

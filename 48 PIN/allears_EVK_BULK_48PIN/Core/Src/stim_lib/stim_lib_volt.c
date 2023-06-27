@@ -13,18 +13,18 @@
 #include "stim_lib_stim_cfg.h"
 
 #include "td_debug.h"
-/*
- * TODO:
- * REMOVE THIS POINT
- * */
-#include "td_stim_param_table.h"
 
 /* STEPUP VOLTAGE PARAMETER */
 #define R1_Vstup									3600 /* 3.6M Ohm */
 #define R2_Vstup									110 /* 110K Ohm */
 #define STEPUP_VOLTAGE_SCALE_SIZE					10000
 #define STEPUP_DEC_PLACES							4
+#ifdef STIM_LIB_EVKIT_CV
+#define STEPUP_FDBK_VOLT_RANGE						(int)(1.5 * STEPUP_VOLTAGE_SCALE_SIZE)
+#endif
+#ifdef STIM_LIB_EVKIT_CC
 #define STEPUP_FDBK_VOLT_RANGE						(int)(1.8 * STEPUP_VOLTAGE_SCALE_SIZE)
+#endif
 
 /* STEPUP REFERENCE VALUE :: EXTERN */
 #define STEPUP_REF_VALUE							exStimLib_stepup_table
@@ -69,9 +69,10 @@ void stimLib_stepup_ctrlScheduler(void)
 		STEPUP_DATA_PRINT_FLAG = true;
 	}
 	/* STEP UP DATA PRINT */
-#ifdef TD_STEPUP_ADC_TUNNING
+#ifdef STIM_LIB_STEPUP_DATA_PRINT
 	stimLib_stepup_dataPrint();
 #endif
+
 }
 
 /*
@@ -83,14 +84,10 @@ void stimLib_stepup_voltFeedback(void)
 	stepup_fdbk_adc_avg = stimLib_stepup_adcAVG(setpup_buff, STIM_LIB_ADC1_TOTAL_SIZE);
 	stepup_fdbk_volt = stimLib_stepup_voltCalc(stepup_fdbk_adc_avg, R1_Vstup, R2_Vstup);
 
-	/* STEPUP VOLTAGE CONFIG */
-	/*
-	 * TODO:
-	 * Testing voltage control... Need to activate that function later.
-	 *
-	 * FUNCTION : stimLib_voltCfg(stepup_fdbk_volt);
-	 * */
-	//stimLib_voltCfg(stepup_fdbk_volt);
+	/* STEPUP VOLTAGE CONFIG and FEEDBACK */
+#ifndef STIM_LIB_STEPUP_TUNING
+	stimLib_voltCfg(stepup_fdbk_volt);
+#endif
 }
 
 /*
@@ -101,12 +98,12 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 	uint32_t voltage_scaleup_val = STEPUP_TARGET_VOLTAGE * STEPUP_VOLTAGE_SCALE_SIZE;
 
 #define VOLTAGE_DIFFERENCE_ABS		abs(voltage_scaleup_val - stepup_voltage)
-#define FAST_STEPUP_VOLTAGE			4 * STEPUP_VOLTAGE_SCALE_SIZE /* 4 V(voltage) */
+#define FAST_STEPUP_VOLTAGE			6 * STEPUP_VOLTAGE_SCALE_SIZE /* 6 V(voltage) */
 #define FAST_STEPUP_INC_ENABLE		VOLTAGE_DIFFERENCE_ABS > FAST_STEPUP_VOLTAGE
 #define FAST_STEPUP_DEC_ENABLE		VOLTAGE_DIFFERENCE_ABS < FAST_STEPUP_VOLTAGE
 
-#define OUTPUT_VOLTAGE_IS_LOW		voltage_scaleup_val - STEPUP_FDBK_VOLT_RANGE > stepup_voltage
-#define OUTPUT_VOLTAGE_IS_HIGH		voltage_scaleup_val + STEPUP_FDBK_VOLT_RANGE < stepup_voltage
+#define OUTPUT_VOLTAGE_IS_LOW		abs(voltage_scaleup_val - STEPUP_FDBK_VOLT_RANGE) > stepup_voltage
+#define OUTPUT_VOLTAGE_IS_HIGH		abs(voltage_scaleup_val + STEPUP_FDBK_VOLT_RANGE) < stepup_voltage
 #define OUTPUT_VOLTAGE_IS_SAME		(voltage_scaleup_val - STEPUP_FDBK_VOLT_RANGE < stepup_voltage) && (voltage_scaleup_val + STEPUP_FDBK_VOLT_RANGE > stepup_voltage)
 
 #if 0
@@ -115,8 +112,8 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 #define OUTPUT_VOLTAGE_IS_SAME		voltage_scaleup_val == stepup_voltage
 #endif
 
-#ifdef TD_STEPUP_ADC_TUNNING
-	TD_DEBUG_PRINT(("-----FEED BACK-----\n"));
+#ifdef STIM_LIB_STEPUP_DATA_PRINT
+	TD_DEBUG_PRINT(("----- FEEDBACK DATA -----\n"));
 	TD_DEBUG_PRINT(("VOLTAGE_DIFFERENCE_ABS : %d\n", VOLTAGE_DIFFERENCE_ABS));
 	TD_DEBUG_PRINT(("STEPUP_FDBK_VOLT_RANGE : %d\n", STEPUP_FDBK_VOLT_RANGE));
 	TD_DEBUG_PRINT(("\r\n"));
@@ -160,7 +157,12 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 		{
 			if (FAST_STEPUP_INC_ENABLE)
 			{
+#ifdef STIM_LIB_EVKIT_CC
+				STIM_LIB_VOLTAGE_CTRL_PULSE += 5;
+#endif
+#ifdef STIM_LIB_EVKIT_CV
 				STIM_LIB_VOLTAGE_CTRL_PULSE += 1;
+#endif
 			}
 			else
 			{
@@ -227,7 +229,7 @@ void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff, ui
 			stepup_buff[i] = adc1_conv_buff[i + 1];
 		}
 #else
-		stepup_buff[i] = adc1_conv_buff[i];
+	stepup_buff[i] = adc1_conv_buff[i];
 #endif
 	}
 }
@@ -272,6 +274,8 @@ void stimLib_stepup_dataPrint(void)
 		uint32_t mode_val = STEPUP_VOLTAGE_SCALE_SIZE;
 		uint32_t n_number = stepup_fdbk_volt / STEPUP_VOLTAGE_SCALE_SIZE;
 
+		STIM_LIB_VOLTAGE_CTRL_PULSE = TIM1->CCR1;
+
 		for (i = 0; i < STEPUP_DEC_PLACES; i++)
 		{
 			dec_point[i] = (stepup_fdbk_volt % mode_val) / (mode_val / 10);
@@ -280,18 +284,10 @@ void stimLib_stepup_dataPrint(void)
 
 		/* dec_point[0] = fdbk_adc_voltage % STEPUP_VOLTAGE_SCALE; */
 		TD_DEBUG_PRINT(("----- STEP-UP -----\n"));
-
 		TD_DEBUG_PRINT(("TARGET VOLTAGE : %d\n", STEPUP_TARGET_VOLTAGE));
-
 		TD_DEBUG_PRINT(("MEAS Voltage : %ld.%d%d%d%d%d\n", n_number, dec_point[0], dec_point[1], dec_point[2], dec_point[3], dec_point[4]));
 		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", stepup_fdbk_adc_avg));
-		/*
-		 * TODO:
-		 * ADC TUNNING
-		 *
-		 * TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
-		 * */
-		TD_DEBUG_PRINT(("TD_VOLTAGE_CTRL_PULSE : %d\n", TD_VOLTAGE_CTRL_PULSE));
+		TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
 		TD_DEBUG_PRINT(("\r\n"));
 
 #ifdef STIM_LIB_EVKIT_CC

@@ -99,7 +99,9 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
 	if (huart->Instance == USART1)
 	{
+#ifdef TD_UART_DEBUG
 		TD_DEBUG_PRINT(("USART1 Rx event\n"));
+#endif
 		memcpy(TD_UART1_DMA_RX_BUF, huart->pRxBuffPtr, Size);
 
 		HAL_UARTEx_ReceiveToIdle_DMA(huart, TD_UART1_DMA_RX_BUF, TD_UART1_DMA_RX_BUF_SIZE);
@@ -113,44 +115,54 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+#ifdef TD_UART_DEBUG
 	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Rx comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
 	}
+#endif
 }
 
 void HAL_UART_RxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
+#ifdef TD_UART_DEBUG
 	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Rx Half comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
 	}
+#endif
 }
 
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
 {
+#ifdef TD_UART_DEBUG
 	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Tx comlete\n"));
 	}
+#endif
 }
 
 void HAL_UART_TxHalfCpltCallback(UART_HandleTypeDef *huart)
 {
+#ifdef TD_UART_DEBUG
 	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Tx Half comlete\n"));
 		TD_DEBUG_PRINT(("Something wrong\n"));
 	}
+#endif
 }
 
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 {
+#ifdef TD_UART_DEBUG
 	if (huart->Instance == USART1)
 	{
 		TD_DEBUG_PRINT(("USART1 Error: %lx\n", huart->ErrorCode));
 	}
+#endif
 }
 

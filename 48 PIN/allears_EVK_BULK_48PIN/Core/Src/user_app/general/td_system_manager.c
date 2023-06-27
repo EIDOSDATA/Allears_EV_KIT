@@ -40,6 +40,8 @@ td_sys_state_t td_getSystemFSMState(void)
 
 void td_setSystemFSMState(td_sys_state_t state)
 {
+	uint8_t sys_param_check;
+
 	if (TD_CUR_SYS_STATE == state || state >= TD_SYS_STATE_MAX)
 	{
 		return;
@@ -51,12 +53,13 @@ void td_setSystemFSMState(td_sys_state_t state)
 		break;
 	case TD_SYS_STATE_IDLE:
 
-		TD_DEBUG_PRINT(("STIM STOP\r\n"));
+		TD_DEBUG_PRINT(("SYSTEN STATE :: IDLE\r\n"));
 		TD_DEBUG_PRINT(("\r\n"));
 
+		/* SYSTEM INDICATION LED OFF */
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
 
-		/* GROUP PULSE SCHEDULER TIMER */
+		/* PARAMETER UPDATE SCHDULER STOP */
 		HAL_TIM_Base_Stop_IT(&htim16);
 
 		/* STIM PAUSE */
@@ -71,7 +74,7 @@ void td_setSystemFSMState(td_sys_state_t state)
 #ifdef TD_LAB_MODE
 		exTd_pulseCfg.freq = 250;
 		exTd_pulseCfg.pulse_width = 100;
-		exTd_pulseCfg.degree = 1;
+		exTd_pulseCfg.degree = 0;
 		stimLib_stimSignalConfig(&exTd_pulseCfg);
 
 		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */
@@ -83,19 +86,56 @@ void td_setSystemFSMState(td_sys_state_t state)
 		stimLib_stimTriggerConfig(&exTd_triggerCfg);
 #endif
 
-		TD_DEBUG_PRINT(("STIM START\r\n"));
+#ifdef TD_STIM_PULSE_TEST
+		exTd_pulseCfg.freq = 10;
+		exTd_pulseCfg.pulse_width = 100;
+		exTd_pulseCfg.degree = 1;
+		stimLib_stimSignalConfig(&exTd_pulseCfg);
+#endif
+
+#ifdef TD_STIM_TRIGGER_TEST
+#if 0
+		/* Example */
+		exTd_triggerCfg.volt_prestart = false;
+		exTd_triggerCfg.trg_out_enable = stim_lib_trg_output_enable;
+		exTd_triggerCfg.trg_out_active_pol = stim_lib_trg_output_active_high;
+		exTd_triggerCfg.trg_in_enable = stim_lib_trg_input_enable;
+		exTd_triggerCfg.trg_in_active_pol = stim_lib_trg_input_active_high;
+		exTd_triggerCfg.trg_in_toggled = stim_lib_trg_input_toggle_enable;
+		stimLib_stimTriggerConfig(&exTd_triggerCfg);
+		stimLib_stimSessionStart();
+#endif
+		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */
+		exTd_triggerCfg.trg_out_enable = true; /* TRIGGER OUTPUT ENABLE */
+		exTd_triggerCfg.trg_out_active_pol = 1; /* TRIGGER OUTPUT ACTIVE HIGH */
+		exTd_triggerCfg.trg_in_enable = true; /* TRIGGER INPUT ENABLE */
+		exTd_triggerCfg.trg_in_active_pol = 1; /* TRIGGER INPUT ACTIVE HIGH */
+		exTd_triggerCfg.trg_in_toggled = true; /* TRIGGER INPUT TOGGLED */
+		stimLib_stimTriggerConfig(&exTd_triggerCfg);
+#endif
+
+		TD_DEBUG_PRINT(("SYSTEN STATE :: RUN\r\n"));
 		TD_DEBUG_PRINT(("\r\n"));
 
+		sys_param_check = stimLib_stimSessionStart();
+
 		/* SESSION START */
-		stimLib_stimSessionStart();
+		if (sys_param_check == stim_lib_stim_rsp_invalid_parameter || sys_param_check == stim_lib_stim_rsp_invalid_status)
+		{
+			TD_NEXT_SYS_STATE = TD_SYS_STATE_IDLE;
+			break;
+		}
 
 		/* STIM START */
 		if (exTd_triggerCfg.trg_in_enable == false)
 		{
 			stimLib_stimStart();
 		}
+
+		/* SYSTEM INDICATION LED ON */
 		HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
 
+		/* PARAMETER UPDATE SCHDULER START */
 		HAL_TIM_Base_Start_IT(&htim16);
 
 		break;
@@ -122,16 +162,14 @@ void td_handleSystemParamUpdate(void)
 	{
 		TD_SYSTEM_UPDATE_F = 1;
 
-		TD_DEBUG_PRINT(("STIM STATE CHANGE\r\n"));
+		TD_DEBUG_PRINT(("------STIM STATE CHANGE------\r\n"));
 		TD_DEBUG_PRINT(("START: %d >> %d\r\n", TD_CUR_SYS_STATE, TD_NEXT_SYS_STATE));
 		TD_DEBUG_PRINT(("MODE: %d >> %d\r\n", TD_STIM_PREV_MODE, TD_STIM_CUR_MODE));
 		TD_DEBUG_PRINT(("LEVLE: %d >> %d\r\n", TD_STIM_PREV_LEVEL, TD_STIM_CUR_LEVEL));
 		/* TD_DEBUG_PRINT(("El Det: %d\n", ElecDetFlag)); */
-		TD_DEBUG_PRINT(("TD_SYSTEM_UPDATE_F >> %d\r\n", TD_SYSTEM_UPDATE_F));
 		TD_DEBUG_PRINT(("\r\n"));
 
-		td_setSystemFSMState(TD_NEXT_SYS_STATE);
-		//TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE);
+		td_setSystemFSMState(TD_NEXT_SYS_STATE); /* TD_SYS_STATE_ACTIVE_CHNAGE(TD_NEXT_SYS_STATE); */
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
 		TD_STIM_STATE_LEVEL_UPDATE(TD_STIM_CUR_LEVEL);
 
@@ -146,6 +184,9 @@ void td_handleSystemParamUpdate(void)
 	if (TD_SYSTEM_UPDATE_F == 1)
 	{
 		td_clearStartButtonHandled();
+		TD_DEBUG_PRINT(("SYSTEM PARAMETER UPDATE\r\n"));
+		TD_DEBUG_PRINT(("\r\n"));
+		TD_SYSTEM_UPDATE_F = 0;
 	}
 	else
 	{

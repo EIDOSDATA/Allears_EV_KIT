@@ -166,6 +166,11 @@ bool stimLib_pulseConfigRaw(void)
 
 	/* DAC_ON_N Control Time */
 #ifdef STIM_LIB_EVKIT_CC
+	if (STIM_LIB_STATE_TRG_IN_ENABLE == false)
+	{
+		for (int i = 0; i < 0xffff; i++)
+			;
+	}
 	STIM_LIB_DMA_DAC_ON_BUF[0] = STIM_LIB_DAC_CTRL_TIME0;
 	STIM_LIB_DMA_DAC_ON_BUF[1] = STIM_LIB_DAC_CTRL_TIME1;
 	STIM_LIB_DMA_DAC_ON_BUF[2] = STIM_LIB_DAC_CTRL_TIME2;
@@ -174,6 +179,10 @@ bool stimLib_pulseConfigRaw(void)
 
 	/* DISCHARGE PULSE Control Time */
 #ifdef STIM_LIB_EVKIT_CV
+	if (STIM_LIB_STATE_TRG_IN_ENABLE == false)
+	{
+		for (int i = 0; i < 0xffff; i++);
+	}
 	STIM_LIB_DMA_DISCHG_BUF[0] = STIM_LIB_DISCHARGE_PULSE_TIME0;
 	STIM_LIB_DMA_DISCHG_BUF[1] = STIM_LIB_DISCHARGE_PULSE_TIME1;
 #endif
@@ -186,12 +195,12 @@ bool stimLib_stimStartRaw(void)
 	/* START PULSE TIMER CH4 :: DAC_ON_N or STIM_DISCHARGE :: GPIOA PIN 3 */
 #ifdef STIM_LIB_EVKIT_CC
 	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DAC_ON_BUF, 4);
-#else
+	__HAL_DMA_DISABLE_IT(&hdma_tim2_ch2_ch4, (DMA_IT_TC | DMA_IT_HT));
+#endif
 #ifdef STIM_LIB_EVKIT_CV
 	HAL_TIM_OC_Start_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH, (const uint32_t*) STIM_LIB_DMA_DISCHG_BUF, 2);
-#endif
-#endif
 	__HAL_DMA_DISABLE_IT(&hdma_tim2_ch2_ch4, (DMA_IT_TC | DMA_IT_HT));
+#endif
 
 	/* START PULSE TIMER CH2 :: ANODE :: GPIOA PIN 1 */
 	HAL_TIM_PWM_Start(&htim2, STIM_LIB_PULSE_ANODE_TIM_CH);
@@ -229,11 +238,22 @@ bool stimLib_stimStopRaw(void)
 		TIM2->CCMR1 |= (TIM_OCMODE_PWM1) | (TIM_OCMODE_PWM1 << 8U);
 	}
 #endif
+#ifdef STIM_LIB_EVKIT_CV
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_TRG_OUT_TIM_CH);
 	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_ANODE_TIM_CH);
 
 	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_CATHODE_TIM_CH);
 	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH);
+#endif
+
+#ifdef STIM_LIB_EVKIT_CC
+	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_TRG_OUT_TIM_CH);
+	HAL_TIM_PWM_Stop(&htim2, STIM_LIB_PULSE_ANODE_TIM_CH);
+
+	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_DAC_ON_TIM_CH);
+	HAL_TIM_OC_Stop_DMA(&htim2, STIM_LIB_PULSE_CATHODE_TIM_CH);
+#endif
+
 	TIM2->CNT = 0;
 
 	return stim_lib_stim_rsp_ok;
