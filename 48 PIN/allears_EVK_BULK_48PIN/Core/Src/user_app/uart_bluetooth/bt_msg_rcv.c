@@ -1,6 +1,7 @@
 #include <string.h>
 
 #include "stim_lib_type.h"
+#include "stim_lib_volt.h"
 
 #include "bt_msg_private.h"
 
@@ -177,6 +178,7 @@ void bt_man_mode_req(uint8 *msg)
 
 		i = BT_MSG_DATA_IX;
 
+#if 0
 		/* Frequency: 1byt. Range: 1 ~ 50.  Step: 1, 10, 20, ... 50 */
 		TD_MANUAL_PULSE_FREQ = msg[i];
 
@@ -202,7 +204,7 @@ void bt_man_mode_req(uint8 *msg)
 		TD_MANUAL_PULSE_WIDTH = (TD_MANUAL_PULSE_WIDTH / 100) * 100;
 
 		i += 2;
-
+#endif
 		/* Level: size 1. Range: 0 ~ 50. Step: 5 */
 #ifdef STIM_LIB_EVKIT_CV
 		TD_MANUAL_TARGET_VOLTAGE = msg[i];
@@ -214,12 +216,14 @@ void bt_man_mode_req(uint8 *msg)
 		TD_MANUAL_TARGET_VOLTAGE = (TD_MANUAL_TARGET_VOLTAGE / 5) * 5;
 #endif
 #ifdef STIM_LIB_EVKIT_CC
+		i = 6;
 		TD_MANUAL_TARGET_DAC = msg[i];
 		if (TD_MANUAL_TARGET_DAC > 255)
 		{
 			break;
 		}
 #endif
+#if 0
 		i++;
 
 		/* Group pulse: on/off each 1 size. Range: 1 ~ 60. Step: 1 */
@@ -238,7 +242,7 @@ void bt_man_mode_req(uint8 *msg)
 			TD_MANUAL_GP_OFF_TIME = 0;
 			TD_MANUAL_GP_ON_TIME = 0;
 		}
-
+#endif
 		rsp_code = BT_MSG_RES_OK;
 
 	} while (false);
@@ -259,7 +263,15 @@ void bt_man_mode_req(uint8 *msg)
 	TD_DEBUG_PRINT(("GP ON TIME: %d\r\n", TD_MANUAL_GP_ON_TIME));
 	TD_MANUAL_STIM_DECTION_F = 0;
 
+#if 0
 	td_startManualStimMode();
+#else
+	exTd_pulseCfg.freq = 250;
+	exTd_pulseCfg.pulse_width = 100;
+	exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
+	stimLib_stateSigParamSet(&exTd_pulseCfg);
+	stimLib_dacctrl_Set();
+#endif
 }
 
 void bt_fw_ver_req(void)

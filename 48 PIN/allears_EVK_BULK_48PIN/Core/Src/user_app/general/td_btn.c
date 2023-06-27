@@ -110,7 +110,7 @@ void td_handleStimUpButtonAction(void)
 			TD_VOLTAGE_CTRL_PULSE++;
 			if (TD_VOLTAGE_CTRL_PULSE == 0)
 			{
-				TD_VOLTAGE_CTRL_PULSE = 65535;
+				TD_VOLTAGE_CTRL_PULSE = 255;
 			}
 			TIM1->CCR1 = TD_VOLTAGE_CTRL_PULSE;
 			TD_DEBUG_PRINT(("STEP UP VPW : %d\n", TD_VOLTAGE_CTRL_PULSE));
@@ -121,7 +121,6 @@ void td_handleStimUpButtonAction(void)
 				TD_RAW_STIM_LEVEL = TD_STIM_LEVEL_MAX;
 			}
 			td_configureStimLevels(TD_RAW_STIM_LEVEL);
-			TD_DEBUG_PRINT(("STIM LEVEL : %d\n", TD_RAW_STIM_LEVEL));
 #endif
 			TD_STIM_UP_BTN_STATE_HANDLED = true;
 			TD_STIM_UP_BTN_STATE_HELD_TICK = 0;
@@ -172,7 +171,7 @@ void td_handleStimDownButtonAction(void)
 #ifdef TD_STEPUP_ADC_TUNNING
 			/* BUTTON PRESSED, Send Signal >> STEP UP PULSE WIDTH CONTROL */
 			TD_VOLTAGE_CTRL_PULSE--;
-			if (TD_VOLTAGE_CTRL_PULSE == 65535)
+			if (TD_VOLTAGE_CTRL_PULSE == 255)
 			{
 				TD_VOLTAGE_CTRL_PULSE = 0;
 			}
@@ -185,7 +184,6 @@ void td_handleStimDownButtonAction(void)
 				TD_RAW_STIM_LEVEL = 0;
 			}
 			td_configureStimLevels(TD_RAW_STIM_LEVEL);
-			TD_DEBUG_PRINT(("STIM LEVEL : %d\n", TD_RAW_STIM_LEVEL));
 #endif
 			TD_STIM_DOWN_BTN_STATE_HANDLED = true;
 			TD_STIM_DOWN_BTN_STATE_HELD_TICK = 0;
@@ -215,8 +213,10 @@ void td_handleStimDownButtonAction(void)
 void td_handleButton(void)
 {
 	td_handleStartButtonAction();
+#ifndef TD_LAB_MODE
 	td_handleStimUpButtonAction();
 	td_handleStimDownButtonAction();
+#endif
 
 	/* BUTTON PRESSED FLAG */
 	if (td_isStartButtonHandled() == true)

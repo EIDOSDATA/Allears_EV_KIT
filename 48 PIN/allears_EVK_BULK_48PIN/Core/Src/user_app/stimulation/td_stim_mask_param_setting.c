@@ -187,11 +187,6 @@ void td_configureStimulationMode(uint8_t mode)
 		TD_MODE_FREQ_KEEPING_TIME_UPDATE(TD_STIM_MODE_GET_FREQ_HOLDING_TIME(mode, addr));
 		exTd_pulseCfg.freq = TD_CUR_MODE_FREQ;
 
-		if (TD_MODE_SIZE > TD_NEEDLE_MODE_SEQUENCE_SIZE)
-		{
-			TD_DEBUG_PRINT(("GPMODE ENABL\r\n"));
-		}
-
 		/*
 		 * RESET STIM LEVEL
 		 * */
@@ -255,7 +250,7 @@ void td_configureStimLevels(uint8_t level)
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	exTd_pulseCfg.degree = TD_STIM_LEVEL_DAC_GET(level);
+		exTd_pulseCfg.degree = TD_STIM_LEVEL_DAC_GET(level);
 #endif
 
 		/* UPDATE LEVEL */
@@ -375,7 +370,7 @@ void td_startManualStimMode(void)
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-	exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
+		exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
 #endif
 		stimLib_stimSignalConfig(&exTd_pulseCfg);
 
@@ -406,14 +401,14 @@ void td_updateStimTriggerConfiguration(void)
 		/* MANUAL PULSE DATA SETTING */
 		if (TD_MANUAL_PULSE_FREQ == 0 || TD_MANUAL_PULSE_WIDTH == 0 || TD_MANUAL_TARGET_VOLTAGE == 0)
 		{
-			exTd_pulseCfg.freq = 10;
-			exTd_pulseCfg.pulse_width = 1000;
+			exTd_pulseCfg.freq = TD_STIM_ELDET_LEVEL_FREQ;
+			exTd_pulseCfg.pulse_width = TD_STIM_ELDET_LEVEL_PW;
 
 #ifdef STIM_LIB_EVKIT_CV
-			exTd_pulseCfg.degree = 15;
+			exTd_pulseCfg.degree = TD_STIM_ELDET_LEVEL_VOLT;
 #endif
 #ifdef STIM_LIB_EVKIT_CC
-		exTd_pulseCfg.degree = 1;
+			exTd_pulseCfg.degree = TD_STIM_ELDET_LEVEL_DAC;
 #endif
 			stimLib_stimSignalConfig(&exTd_pulseCfg);
 		}
@@ -481,7 +476,8 @@ void td_controlStimulation(uint8_t start)
 			td_clearSystemControlParameters();
 
 			/* STOP ALL ACTIVITIES */
-			TD_DEBUG_PRINT(("STOP\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: STOP\r\n"));
+			TD_DEBUG_PRINT(("\r\n"));
 
 			/* RESET ELECT DETECT */
 			TD_STIM_DETECTION_LEVEL = 0; /* RESET CURRENT STIM LEVEL ALWAYS */
@@ -515,7 +511,8 @@ void td_controlStimulation(uint8_t start)
 
 		else if (start == 1)
 		{
-			TD_DEBUG_PRINT(("START\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: START\r\n"));
+			TD_DEBUG_PRINT(("\r\n"));
 
 			/* STIM START :: SYSTEM FSM */
 			TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
