@@ -22,12 +22,17 @@ typedef struct
 #ifdef STIM_LIB_EVKIT_CC
 #define STEPUP_TARGET_VOLTAGE						40
 #define DAC_CONTROL_VALUE							STIM_LIB_STATE_SIG_DEGREE
-
-#else
+#endif
 #ifdef STIM_LIB_EVKIT_CV
 #define STEPUP_TARGET_VOLTAGE						STIM_LIB_STATE_SIG_DEGREE
 #define DAC_CONTROL_VALUE							0
 #endif
+
+#ifdef STIM_LIB_EVKIT_CC
+#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				40
+#endif
+#ifdef STIM_LIB_EVKIT_CV
+#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				45
 #endif
 
 #define STIM_LIB_STEPUP_TABLE_SIZE					30
@@ -53,14 +58,12 @@ void stimLib_stepup_ctrlScheduler(void);
 void stimLib_stepup_voltFeedback(void);
 
 /* STEPUP VOLTAGE CONTROL AND CONTROL :: RAW */
-void stimLib_voltCfg(uint64_t stepup_voltage);
+void stimLib_voltCfg(uint32_t stepup_voltage);
 
 /* DATA READ AND CLAC */
-void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff,
-		uint8_t conv_length);
+void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff, uint8_t conv_length);
 uint32_t stimLib_stepup_adcAVG(uint16_t *stepup_buff, uint8_t conv_length);
-uint64_t stimLib_stepup_voltCalc(uint32_t stepup_adc_avg, uint32_t r1,
-		uint32_t r2);
+uint64_t stimLib_stepup_voltCalc(uint32_t stepup_adc_avg, uint32_t r1, uint32_t r2);
 
 /* STEPUP DATA PRINT */
 void stimLib_stepup_dataPrint(void);

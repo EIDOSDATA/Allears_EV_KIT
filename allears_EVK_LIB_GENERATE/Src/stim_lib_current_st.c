@@ -8,12 +8,6 @@
 #include "stim_lib_st_init.h"
 #include "stim_lib_volt.h"
 
-/*
- * TODO:
- * Add in Future
- * Need to create a DAC Control GPIO Function
- * */
-
 void stimLib_dacctrl_setRaw(void)
 {
 	/* GPIO DAC CONTROL CLEAR */

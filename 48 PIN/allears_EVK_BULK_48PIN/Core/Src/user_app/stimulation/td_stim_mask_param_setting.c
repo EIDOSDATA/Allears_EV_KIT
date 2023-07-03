@@ -446,8 +446,8 @@ void td_updateStimTriggerConfiguration(void)
 		/*
 		 * Since the trigger mode is executed when an external trigger comes in,
 		 * it must be prepared in an execution state in advance.
+		 * TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 		 * */
-		TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
 	}
 }
 
@@ -476,8 +476,7 @@ void td_controlStimulation(uint8_t start)
 			td_clearSystemControlParameters();
 
 			/* STOP ALL ACTIVITIES */
-			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: STOP\r\n"));
-			TD_DEBUG_PRINT(("\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: STOP\r\n")); TD_DEBUG_PRINT(("\r\n"));
 
 			/* RESET ELECT DETECT */
 			TD_STIM_DETECTION_LEVEL = 0; /* RESET CURRENT STIM LEVEL ALWAYS */
@@ -511,8 +510,7 @@ void td_controlStimulation(uint8_t start)
 
 		else if (start == 1)
 		{
-			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: START\r\n"));
-			TD_DEBUG_PRINT(("\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: START\r\n")); TD_DEBUG_PRINT(("\r\n"));
 
 			/* STIM START :: SYSTEM FSM */
 			TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);

@@ -128,6 +128,26 @@ stim_lib_rsp_t stimLib_stimStart(void);
 */
 stim_lib_rsp_t stimLib_stimPause(void);
 
+/*
+	BRIEF
+		- Change the stimulus parameter, and if the stimulus waveform is being exported, pause for a while and then send the stimulus again.
+	PARAM:
+		- void
+	RETRUN:
+		- Result of Pausing stimulation signal output in a session
+*/
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg);
+
+/*
+	BRIEF
+		- The stimulus parameters are updated and the running stimulus output is stopped.
+	PARAM:
+		- void
+	RETRUN:
+		- Result of Pausing stimulation signal output in a session
+*/
+stim_lib_rsp_t stimLib_stimParameterChange(stim_signal_cfg_t *signal_cfg);
+
 
 /*
 	Definition in application area

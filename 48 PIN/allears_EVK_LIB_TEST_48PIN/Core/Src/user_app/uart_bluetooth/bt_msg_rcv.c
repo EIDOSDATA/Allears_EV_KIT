@@ -1,12 +1,13 @@
 #include <string.h>
-#include "bt_msg_private.h"
 
-#include "td_stim_param_setting.h"
-#include "td_stim_param_table.h"
-
-#include "td_private.h"
 #include "stim_lib_type.h"
 
+#include "bt_msg_private.h"
+
+#include "td_system_manager.h"
+#include "td_stim_param_setting.h"
+#include "td_stim_param_table.h"
+#include "td_private.h"
 #include "td_debug.h"
 
 void bt_state_req(uint8 *msg)
@@ -33,7 +34,7 @@ void bt_mode_set_req(uint8 *msg)
 	if (msg[BT_MSG_LEN_IX] == 1)
 	{
 		/* Handle MSG */
-		td_Stim_Mode_Config_Update(mode);
+		td_configureStimulationMode(mode);
 	}
 	else
 	{
@@ -57,14 +58,14 @@ void bt_level_set_req(uint8 *msg)
 
 	TD_DEBUG_PRINT(("level = %d\n", level));
 
-	if (td_Stim_Cur_Mode_Get() == 0)
+	if (td_getCurrentStimulationMode() == 0)
 	{
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
 	}
 	else if (msg[BT_MSG_LEN_IX] == 1 && (TD_BT_MSG_LEVEL_MIN <= (int8) level && level <= TD_BT_MSG_LEVEL_MAX))
 	{
 		/* Handle MSG */
-		td_Stim_Level_Config_Update(level);
+		td_configureStimLevels(level);
 	}
 	else
 	{
@@ -89,15 +90,15 @@ void bt_stimul_req(uint8 *msg)
 
 	TD_DEBUG_PRINT(("req = %d\n", req));
 
-	if (td_Stim_Cur_Mode_Get() == 0 && td_Stim_Cur_Detection_Level_Get() == 0)
+	if (td_getCurrentStimulationMode() == 0 && td_getCurrentStimDetectionLevel() == 0)
 	{
-		td_Stim_FSM_Stop();
+		td_controlStimulation(0);
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
 	}
 	else if (msg[BT_MSG_LEN_IX] == 1 && (AUL_BT_MSG_STIMUL_STOP == req || req == AUL_BT_MSG_STIMUL_START))
 	{
 		/* Handle MSG */
-		td_Stim_Control(req);
+		td_controlStimulation(req);
 	}
 	else
 	{
@@ -121,14 +122,19 @@ void bt_elect_detect_req(uint8 *msg)
 	level = msg[BT_MSG_DATA_IX];
 	(void) level;
 
-	if (td_Stim_Detection_LV_Check_Is_Active() == false && td_Stim_Is_Started())
+	if (td_isStimDetectionLevelActive() == false && td_isStimulationStarted())
 	{
 		rsp_code = BT_MSG_RES_INVALID_STATUS;
 	}
 	else if (msg[BT_MSG_LEN_IX] == 1 && (TD_BT_MSG_STIM_DETECTION_LEVEL_MIN <= (int8) level && level <= TD_BT_MSG_STIM_DETECTION_LEVEL_MAX))
 	{
 		/* Handle MSG */
-		td_Stim_Detection_Check_Start(level);
+		/*
+		 * TODO:
+		 * ADD IN FUTURE
+		 * td_Stim_Detection_Check_Start(level);
+		 * */
+		rsp_code = BT_MSG_RES_CAN_NOT_HANDLE_MSG;
 	}
 	else
 	{
@@ -249,10 +255,11 @@ void bt_man_mode_req(uint8 *msg)
 #else
 	TD_DEBUG_PRINT(("TARGET DAC: %d\r\n", TD_MANUAL_TARGET_DAC));
 #endif
-	TD_DEBUG_PRINT(("GO IFF TIME: %d\r\n", TD_MANUAL_GP_OFF_TIME));
+	TD_DEBUG_PRINT(("GO OFF TIME: %d\r\n", TD_MANUAL_GP_OFF_TIME));
 	TD_DEBUG_PRINT(("GP ON TIME: %d\r\n", TD_MANUAL_GP_ON_TIME));
+	TD_MANUAL_STIM_DECTION_F = 0;
 
-	td_Stim_Manual_Mode_Start();
+	td_startManualStimMode();
 }
 
 void bt_fw_ver_req(void)
@@ -286,10 +293,6 @@ void bt_stim_trg_cfg_req(uint8 *msg)
 {
 	(void) msg;
 
-	/*
-	 * TODO:
-	 * CHECK PLS
-	 * */
 	bt_msg_res_t rsp_code;
 	uint8 i;
 
@@ -381,5 +384,5 @@ void bt_stim_trg_cfg_req(uint8 *msg)
 	TD_DEBUG_PRINT(("Trigger Input Act POL: %d\r\n", TD_MANUAL_TRG_IN_ACT_POL));
 	TD_DEBUG_PRINT(("Trigger Input Toggled : %d\r\n", TD_MANUAL_TRG_IN_TOGGLED));
 
-	td_Stim_Trigger_Config_Update();
+	td_updateStimTriggerConfiguration();
 }

@@ -210,7 +210,7 @@ stim_lib_rsp_t stimLib_stimSessionStop(void)
 		return stim_lib_stim_rsp_system_fault;
 	}
 
-	if (stimLib_stateGet() == stim_lib_state_session_idle) // if (stimLib_stateGet() == stim_lib_state_session_idle)
+	if (stimLib_stateGet() == stim_lib_state_session_idle)
 	{
 		stimLib_stepupStop();
 
@@ -232,7 +232,6 @@ stim_lib_rsp_t stimLib_stimSessionStop(void)
  */
 stim_lib_rsp_t stimLib_stimStart(void)
 {
-
 	if (stimLib_stateGet() == stim_lib_state_session_idle)
 	{
 		stimLib_stimPulseStart();
@@ -254,6 +253,10 @@ stim_lib_rsp_t stimLib_stimPause(void)
 {
 	if (stimLib_stateGet() == stim_lib_state_stimulating)
 	{
+		/*
+		 * TODO:
+		 * STIM ENDPOINT TEST
+		 * */
 #if 0
 		/*
 		 * CALL STIMULATION STOP FUNCTION
@@ -277,3 +280,89 @@ stim_lib_rsp_t stimLib_stimPause(void)
 	}
 }
 
+stim_lib_rsp_t stimLib_stimIntensiveChange(stim_signal_cfg_t *signal_cfg)
+{
+	if (signal_cfg == NULL || stimLib_signalParamCheck(signal_cfg) == false)
+	{
+		return stim_lib_stim_rsp_invalid_parameter;
+	}
+
+	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
+			|| stimLib_stateGet() == stim_lib_state_stimulating)
+	{
+#ifdef STIM_LIB_EVKIT_CC
+		stimLib_stateSigParamSet(signal_cfg);
+#if 1
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStopRaw();
+		}
+		stimLib_stimPulseSetiing();
+#endif
+		stimLib_pulseConfigRaw();
+		HAL_Delay(20);
+#if 1
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			/*
+			 * stimLib_stimPulseStart();
+			 * >> stimLib_pulseConfigRaw();
+			 * >> stimLib_stimStartRaw();
+			 * */
+			stimLib_stimStartRaw();
+		}
+#endif
+		stimLib_dacctrl_Set();
+#endif
+
+#ifdef STIM_LIB_EVKIT_CV
+#if 1
+		stimLib_stateSigParamSet(signal_cfg);
+
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			stimLib_stimStopRaw();
+		}
+		stimLib_stimPulseSetiing();
+#endif
+		stimLib_pulseConfigRaw();
+		HAL_Delay(20);
+#if 1
+		if (stimLib_stateGet() == stim_lib_state_stimulating)
+		{
+			/*
+			 * stimLib_stimPulseStart();
+			 * >> stimLib_pulseConfigRaw();
+			 * >> stimLib_stimStartRaw();
+			 * */
+			stimLib_stimStartRaw();
+		}
+#endif
+#endif
+		return stim_lib_stim_rsp_ok;
+	}
+	else
+	{
+		return stim_lib_stim_rsp_invalid_status;
+	}
+}
+
+stim_lib_rsp_t stimLib_stimParameterChange(stim_signal_cfg_t *signal_cfg)
+{
+	if (signal_cfg == NULL || stimLib_signalParamCheck(signal_cfg) == false)
+	{
+		return stim_lib_stim_rsp_invalid_parameter;
+	}
+
+	if (stimLib_stateGet() == stim_lib_state_idle || stimLib_stateGet() == stim_lib_state_session_idle
+			|| stimLib_stateGet() == stim_lib_state_stimulating)
+	{
+		stimLib_stateSigParamSet(signal_cfg);
+		stimLib_stimPulseSetiing();
+		return stim_lib_stim_rsp_ok;
+	}
+	else
+	{
+		return stim_lib_stim_rsp_invalid_status;
+	}
+}

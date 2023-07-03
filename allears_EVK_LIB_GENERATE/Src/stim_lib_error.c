@@ -8,14 +8,6 @@
 
 void stimLib_errorHandle(void)
 {
-	/*
-	 TODO:
-
-	 1. Stop voltage
-	 2. Stop Stimulation
-	 3. Set state to error
-	 ...
-	 */
 	stimLib_stepupStop();
 	stimLib_stimPulseStop();
 	stimLib_paramClear();
