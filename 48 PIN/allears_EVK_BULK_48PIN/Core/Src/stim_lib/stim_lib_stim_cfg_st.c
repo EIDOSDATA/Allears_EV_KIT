@@ -231,7 +231,7 @@ bool stimLib_stimStopRaw(void)
 	 * TODO:
 	 * STIM ENDPOINT TEST
 	 * */
-#if 0
+#if 1
 	if (STIM_LIB_STATE_TRG_IN_ENABLE == true)
 	{
 		TIM2->CCMR1 &= ~(TIM_CCMR1_OC1M | TIM_CCMR1_OC2M);
