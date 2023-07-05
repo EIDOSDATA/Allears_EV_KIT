@@ -74,7 +74,7 @@ void td_setSystemFSMState(td_sys_state_t state)
 #ifdef TD_LAB_MODE
 		exTd_pulseCfg.freq = 250;
 		exTd_pulseCfg.pulse_width = 100;
-		exTd_pulseCfg.degree = 255;
+		exTd_pulseCfg.degree = 0;
 		stimLib_stimSignalConfig(&exTd_pulseCfg);
 
 		exTd_triggerCfg.volt_prestart = false; /* STEP UP PRESTART */

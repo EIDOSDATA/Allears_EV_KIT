@@ -207,7 +207,7 @@ void stimLib_tim_msppostInit(TIM_HandleTypeDef *htim)
 		 */
 		GPIO_InitStruct.Pin = STIM_LIB_STIM_ANODE_PIN | STIM_LIB_STIM_CATHODE_PIN | STIM_LIB_DAC_ON_N_PIN | STIM_LIB_STIM_TRIGGER_OUTPUT_PIN;
 		GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		GPIO_InitStruct.Pull = GPIO_PULLDOWN;
 		GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
 		GPIO_InitStruct.Alternate = GPIO_AF1_TIM2;
 		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);

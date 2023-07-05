@@ -105,7 +105,14 @@ void stimLib_timPwmPluseFinished_callback(TIM_HandleTypeDef *htim)
 {
 	if (htim->Instance == TIM2)
 	{
+#if 0
+		stimLib_stimStopRaw();
+		stimLib_stimPulseSetiing();
+		stimLib_pulseConfigRaw();
+		stimLib_stateSet(stim_lib_state_session_idle);
+#else
 		stimLib_stimPulseStop();
+#endif
 	}
 }
 
