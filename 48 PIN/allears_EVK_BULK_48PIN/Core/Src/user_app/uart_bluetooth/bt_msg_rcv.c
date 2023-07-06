@@ -207,8 +207,8 @@ void bt_man_mode_req(uint8 *msg)
 #endif
 		/* Level: size 1. Range: 0 ~ 50. Step: 5 */
 #ifdef STIM_LIB_EVKIT_CV
+		i = 6;
 		TD_MANUAL_TARGET_VOLTAGE = msg[i];
-
 		if (TD_MANUAL_TARGET_VOLTAGE > 50)
 		{
 			break;
@@ -268,7 +268,15 @@ void bt_man_mode_req(uint8 *msg)
 #else
 	exTd_pulseCfg.freq = 250;
 	exTd_pulseCfg.pulse_width = 100;
+
+#ifdef STIM_LIB_EVKIT_CC
 	exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
+#endif
+
+#ifdef STIM_LIB_EVKIT_CV
+	exTd_pulseCfg.degree = TD_MANUAL_TARGET_VOLTAGE;
+#endif
+
 	stimLib_stateSigParamSet(&exTd_pulseCfg);
 	stimLib_dacctrl_Set();
 #endif

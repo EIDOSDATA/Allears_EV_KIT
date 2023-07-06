@@ -133,7 +133,8 @@
 									<listOptionValue builtIn="false" value="STM32L412xx"/>
 									<listOptionValue builtIn="false" value="TD_DEBUG_ENABLED"/>
 									<listOptionValue builtIn="false" value="STIM_LIB_EVKIT_CV"/>
-									<listOptionValue builtIn="false" value="STIM_LIB_FREQ_LIMIT_60"/>
+									<listOptionValue builtIn="false" value="STIM_LIB_FREQ_LIMIT_LESS"/>
+									<listOptionValue builtIn="false" value="TD_LAB_MODE"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.1967913512" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
@@ -221,7 +222,6 @@
 									<listOptionValue builtIn="false" value="STIM_LIB_EVKIT_CC"/>
 									<listOptionValue builtIn="false" value="STIM_LIB_FREQ_LIMIT_LESS"/>
 									<listOptionValue builtIn="false" value="TD_LAB_MODE"/>
-									<listOptionValue builtIn="false" value="TD_DEBUG_ENABLED"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths.2056280297" name="Include paths (-I)" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.option.includepaths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="../Core/Inc"/>
