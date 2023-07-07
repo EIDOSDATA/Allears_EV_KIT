@@ -10,11 +10,10 @@
 #include "stim_lib_state.h"
 
 /* STEPUP FEEDBACK :: ADC1 BUFFER and CLAC Value */
-extern uint16_t adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; // ADC1
+extern uint16_t exStimLib_adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; // ADC1
 
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
-extern int voltage_ctrl_pulse;
-extern int stepup_feedback_cnt;
+extern int exStimLib_voltageCtrlPulse;
 
 void stimLib_stepup_startRaw(void)
 {
@@ -40,7 +39,7 @@ void stimLib_stepup_stopRaw(void)
 
 void stimLib_stepup_adcStartRaw(void)
 {
-	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) adc1_conv_buff, STIM_LIB_ADC1_TOTAL_SIZE);
+	HAL_ADC_Start_DMA(&hadc1, (uint32_t*) exStimLib_adc1_conv_buff, STIM_LIB_ADC1_TOTAL_SIZE);
 	__HAL_DMA_DISABLE_IT(&hdma_adc1, DMA_IT_HT | DMA_IT_TC);
 	__HAL_ADC_DISABLE_IT(&hadc1, ADC_IT_OVR);
 }

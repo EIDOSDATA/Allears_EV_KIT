@@ -3,6 +3,7 @@
 
 #include "stim_lib.h"
 #include "stim_lib_common.h"
+#include "stim_lib_current.h"
 #include "stim_lib_st_init.h"
 #include "stim_lib_init.h"
 #include "stim_lib_private.h"

@@ -20,19 +20,17 @@ typedef struct
 } stim_lib_stepup_ref_value_t;
 
 #ifdef STIM_LIB_EVKIT_CC
-#define STEPUP_TARGET_VOLTAGE						40
-#define DAC_CONTROL_VALUE							STIM_LIB_STATE_SIG_DEGREE
+#define STIM_LIB_STEPUP_TARGET_VOLTAGE				40
 #endif
 #ifdef STIM_LIB_EVKIT_CV
-#define STEPUP_TARGET_VOLTAGE						STIM_LIB_STATE_SIG_DEGREE
-#define DAC_CONTROL_VALUE							0
+#define STIM_LIB_STEPUP_TARGET_VOLTAGE				STIM_LIB_STATE_SIG_DEGREE
 #endif
 
 #ifdef STIM_LIB_EVKIT_CC
-#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				40
+#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				40 /* UNUSED */
 #endif
 #ifdef STIM_LIB_EVKIT_CV
-#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				45
+#define STIM_LIB_STEPUP_MAXIMUM_VOLTAGE				45 /* USED */
 #endif
 
 #define STIM_LIB_STEPUP_TABLE_SIZE					30
@@ -44,14 +42,20 @@ typedef struct
 #define STIM_LIB_ADC1_TOTAL_SIZE					STIM_LIB_ADC1_CONV_SIZE * STIM_LIB_ADC1_CHECK_CHANNEL
 
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
-#define STIM_LIB_VOLTAGE_CTRL_PULSE					voltage_ctrl_pulse
-#define STIM_LIB_STEPUP_FEEDBACK_CNT				stepup_feedback_cnt
+#define STIM_LIB_VOLTAGE_CTRL_PULSE					exStimLib_voltageCtrlPulse
+#define STIM_LIB_STEPUP_FEEDBACK_CNT				gStimLIb_stepupFeedbackCnt
 
-/* STEPUP STATUS CHECK :: FLAG */
-#define STIM_LIB_STEPUP_IS_STARTED()				(stepup_status == true)
-#define STIM_LIB_STEPUP_SET_START()					stepup_status = true
-#define STIM_LIB_STEPUP_SET_STOP()					stepup_status = false
-extern bool stepup_status;
+/* STEPUP :: CONTROL FLAG */
+#define STIM_LIB_SLOPE_CTRL_END_FLAG				gStimLib_slopeCtrl_F
+#define STIM_LIB_STEPUP_DATA_PRINT_FLAG				gStimLib_stepupDataPrint_F
+#define STIM_LIB_STEPUP_VOLTAGTE_STABILIZED_FLAG	exStimLib_voltageStabilized_F
+extern bool exStimLib_voltageStabilized_F;
+
+/* STEPUP STATUS CHECK :: CONTROL FLAG */
+#define STIM_LIB_STEPUP_IS_STARTED()				(exStimLib_stepupStatus == true)
+#define STIM_LIB_STEPUP_SET_START()					exStimLib_stepupStatus = true
+#define STIM_LIB_STEPUP_SET_STOP()					exStimLib_stepupStatus = false
+extern bool exStimLib_stepupStatus;
 
 /* STEPUP FEEDBACK */
 void stimLib_stepup_ctrlScheduler(void);
@@ -67,10 +71,6 @@ uint64_t stimLib_stepup_voltCalc(uint32_t stepup_adc_avg, uint32_t r1, uint32_t 
 
 /* STEPUP DATA PRINT */
 void stimLib_stepup_dataPrint(void);
-
-/* DAC GPIO CONTROL */
-void stimLib_dacctrl_Set(void);
-void stimLib_dacctrl_Off(void);
 
 /* STEPUP START AND STOP */
 void stimLib_stepup_timerStart(void);
@@ -89,11 +89,5 @@ void stimLib_stepup_stopRaw(void);
 
 void stimLib_stepup_adcStartRaw(void);
 void stimLib_stepup_adcStopRaw(void);
-
-/*
- * stim_lib_current_st.c
- * */
-void stimLib_dacctrl_setRaw(void);
-void stimLib_dacctrl_offRaw(void);
 
 #endif /* SRC_STIM_LIB_STIM_LIB_VOLT_H_ */

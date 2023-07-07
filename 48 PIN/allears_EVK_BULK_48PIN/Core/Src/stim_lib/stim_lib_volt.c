@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 #include "stim_lib_volt.h"
+#include "stim_lib_current.h"
 #include "stim_lib_st_init.h"
 #include "stim_lib_private.h"
 #include "stim_lib_stim_cfg.h"
@@ -31,19 +32,22 @@
 extern stim_lib_stepup_ref_value_t exStimLib_stepup_table[STIM_LIB_STEPUP_TABLE_SIZE];
 
 /* STEPUP CONTROL VALUE :: PULSE and Counter */
-int voltage_ctrl_pulse = 0;
-int stepup_feedback_cnt = 0;
+int exStimLib_voltageCtrlPulse = 0;
+int gStimLIb_stepupFeedbackCnt = 0;
 
-/* CONTROL FLAG */
-bool SLOPE_CTRL_END_FLAG = false;
-bool STEPUP_DATA_PRINT_FLAG = false;
-bool stepup_status = false;
+/* STEPUP :: CONTROL FLAG */
+bool gStimLib_slopeCtrl_F = false;
+bool gStimLib_stepupDataPrint_F = false;
+bool exStimLib_voltageStabilized_F = false;
+
+/* STEPUP STATUS CHECK :: CONTROL FLAG */
+bool exStimLib_stepupStatus = false;
 
 /* STEPUP FEEDBACK :: ADC1 BUFFER and CLAC Value */
-uint16_t adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; /* ADC1 */
-uint16_t setpup_buff[STIM_LIB_ADC1_TOTAL_SIZE]; /* ADC1 */
-uint32_t stepup_fdbk_adc_avg;
-uint32_t stepup_fdbk_volt;
+uint16_t exStimLib_adc1_conv_buff[STIM_LIB_ADC1_TOTAL_SIZE]; /* ADC1 */
+uint16_t gStimLib_setpupBuff[STIM_LIB_ADC1_TOTAL_SIZE]; /* ADC1 */
+uint32_t gStimLib_stepupFeedback_adcAvg;
+uint32_t gStimLib_stepupFeedback_volt;
 
 /*
  * STEPUP CONTROL SCHEDULER
@@ -53,20 +57,20 @@ uint32_t stepup_fdbk_volt;
 void stimLib_stepup_ctrlScheduler(void)
 {
 	STIM_LIB_STEPUP_FEEDBACK_CNT++;
-	stimLib_adc1_readBuffer(setpup_buff, adc1_conv_buff, STIM_LIB_ADC1_TOTAL_SIZE);
+	stimLib_adc1_readBuffer(gStimLib_setpupBuff, exStimLib_adc1_conv_buff, STIM_LIB_ADC1_TOTAL_SIZE);
 	/* SLOPE VOLTAGE RISE CONTROL */
-	if (STIM_LIB_STEPUP_FEEDBACK_CNT == 10 && SLOPE_CTRL_END_FLAG == false)
+	if (STIM_LIB_STEPUP_FEEDBACK_CNT == 10 && STIM_LIB_SLOPE_CTRL_END_FLAG == false)
 	{
 		stimLib_stepup_voltFeedback();
 		STIM_LIB_STEPUP_FEEDBACK_CNT = 0;
-		STEPUP_DATA_PRINT_FLAG = true;
+		STIM_LIB_STEPUP_DATA_PRINT_FLAG = true;
 	}
 	/* VOLTAGE RANGE KEEPING CONTROL */
-	if (STIM_LIB_STEPUP_FEEDBACK_CNT == 1 && SLOPE_CTRL_END_FLAG == true)
+	if (STIM_LIB_STEPUP_FEEDBACK_CNT == 1 && STIM_LIB_SLOPE_CTRL_END_FLAG == true)
 	{
 		stimLib_stepup_voltFeedback();
 		STIM_LIB_STEPUP_FEEDBACK_CNT = 0;
-		STEPUP_DATA_PRINT_FLAG = true;
+		STIM_LIB_STEPUP_DATA_PRINT_FLAG = true;
 	}
 	/* STEP UP DATA PRINT */
 #ifdef STIM_LIB_STEPUP_DATA_PRINT
@@ -81,12 +85,12 @@ void stimLib_stepup_ctrlScheduler(void)
 void stimLib_stepup_voltFeedback(void)
 {
 	/* STEPUP DATA CLAC */
-	stepup_fdbk_adc_avg = stimLib_stepup_adcAVG(setpup_buff, STIM_LIB_ADC1_TOTAL_SIZE);
-	stepup_fdbk_volt = stimLib_stepup_voltCalc(stepup_fdbk_adc_avg, R1_Vstup, R2_Vstup);
+	gStimLib_stepupFeedback_adcAvg = stimLib_stepup_adcAVG(gStimLib_setpupBuff, STIM_LIB_ADC1_TOTAL_SIZE);
+	gStimLib_stepupFeedback_volt = stimLib_stepup_voltCalc(gStimLib_stepupFeedback_adcAvg, R1_Vstup, R2_Vstup);
 
 	/* STEPUP VOLTAGE CONFIG and FEEDBACK */
 #ifndef STIM_LIB_STEPUP_TUNING
-	stimLib_voltCfg(stepup_fdbk_volt);
+	stimLib_voltCfg(gStimLib_stepupFeedback_volt);
 #endif
 }
 
@@ -95,7 +99,7 @@ void stimLib_stepup_voltFeedback(void)
  * */
 void stimLib_voltCfg(uint32_t stepup_voltage)
 {
-	uint32_t voltage_scaleup_val = STEPUP_TARGET_VOLTAGE * STEPUP_VOLTAGE_SCALE_SIZE;
+	uint32_t voltage_scaleup_val = STIM_LIB_STEPUP_TARGET_VOLTAGE * STEPUP_VOLTAGE_SCALE_SIZE;
 
 #define VOLTAGE_DIFFERENCE_ABS		abs(voltage_scaleup_val - stepup_voltage)
 #define FAST_STEPUP_VOLTAGE			6 * STEPUP_VOLTAGE_SCALE_SIZE /* 6 V(voltage) */
@@ -118,12 +122,21 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 	TD_DEBUG_PRINT(("STEPUP_FDBK_VOLT_RANGE : %d\n", STEPUP_FDBK_VOLT_RANGE));
 	TD_DEBUG_PRINT(("\r\n"));
 
-	TD_DEBUG_PRINT(("SLOPE_CTRL_END_FLAG : %d\n", SLOPE_CTRL_END_FLAG));
+	TD_DEBUG_PRINT(("SLOPE_CTRL_END_FLAG : %d\n", STIM_LIB_SLOPE_CTRL_END_FLAG));
 	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_LOW : %d\n", OUTPUT_VOLTAGE_IS_LOW));
 	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_HIGH : %d\n", OUTPUT_VOLTAGE_IS_HIGH));
 	TD_DEBUG_PRINT(("OUTPUT_VOLTAGE_IS_SAME : %d\n", OUTPUT_VOLTAGE_IS_SAME));
 	TD_DEBUG_PRINT(("\r\n"));
 #endif
+
+	if (OUTPUT_VOLTAGE_IS_SAME)
+	{
+		STIM_LIB_STEPUP_VOLTAGTE_STABILIZED_FLAG = true;
+	}
+	else
+	{
+		STIM_LIB_STEPUP_VOLTAGTE_STABILIZED_FLAG = false;
+	}
 
 	if (VOLTAGE_DIFFERENCE_ABS < STEPUP_FDBK_VOLT_RANGE)
 	{
@@ -146,7 +159,8 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 				STIM_LIB_VOLTAGE_CTRL_PULSE = 0;
 			}
 		}
-		SLOPE_CTRL_END_FLAG = true;
+
+		STIM_LIB_SLOPE_CTRL_END_FLAG = true;
 		TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
 		return;
 	}
@@ -158,7 +172,7 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 			if (FAST_STEPUP_INC_ENABLE)
 			{
 #ifdef STIM_LIB_EVKIT_CC
-				STIM_LIB_VOLTAGE_CTRL_PULSE += 5;
+				STIM_LIB_VOLTAGE_CTRL_PULSE += 1;
 #endif
 #ifdef STIM_LIB_EVKIT_CV
 				STIM_LIB_VOLTAGE_CTRL_PULSE += 1;
@@ -191,18 +205,19 @@ void stimLib_voltCfg(uint32_t stepup_voltage)
 				STIM_LIB_VOLTAGE_CTRL_PULSE = 0;
 			}
 		}
-		SLOPE_CTRL_END_FLAG = false;
+
+		STIM_LIB_SLOPE_CTRL_END_FLAG = false;
 		TIM1->CCR1 = STIM_LIB_VOLTAGE_CTRL_PULSE;
 		return;
 	}
 
 	else if (OUTPUT_VOLTAGE_IS_SAME)
 	{
-		SLOPE_CTRL_END_FLAG = true;
+		STIM_LIB_SLOPE_CTRL_END_FLAG = true;
 	}
 	else
 	{
-		SLOPE_CTRL_END_FLAG = true;
+		STIM_LIB_SLOPE_CTRL_END_FLAG = true;
 	}
 }
 
@@ -229,7 +244,7 @@ void stimLib_adc1_readBuffer(uint16_t *stepup_buff, uint16_t *adc1_conv_buff, ui
 			stepup_buff[i] = adc1_conv_buff[i + 1];
 		}
 #else
-	stepup_buff[i] = adc1_conv_buff[i];
+	stepup_buff[i] = exStimLib_adc1_conv_buff[i];
 #endif
 	}
 }
@@ -267,49 +282,31 @@ uint64_t stimLib_stepup_voltCalc(uint32_t stepup_adc_avg, uint32_t r1, uint32_t 
  * */
 void stimLib_stepup_dataPrint(void)
 {
-	if (STEPUP_DATA_PRINT_FLAG == true)
+	if (STIM_LIB_STEPUP_DATA_PRINT_FLAG == true)
 	{
 		uint8_t i;
 		uint8_t dec_point[STEPUP_DEC_PLACES];
 		uint32_t mode_val = STEPUP_VOLTAGE_SCALE_SIZE;
-		uint32_t n_number = stepup_fdbk_volt / STEPUP_VOLTAGE_SCALE_SIZE;
+		uint32_t n_number = gStimLib_stepupFeedback_volt / STEPUP_VOLTAGE_SCALE_SIZE;
 
 		STIM_LIB_VOLTAGE_CTRL_PULSE = TIM1->CCR1;
 
 		for (i = 0; i < STEPUP_DEC_PLACES; i++)
 		{
-			dec_point[i] = (stepup_fdbk_volt % mode_val) / (mode_val / 10);
+			dec_point[i] = (gStimLib_stepupFeedback_volt % mode_val) / (mode_val / 10);
 			mode_val /= 10;
 		}
 
 		/* dec_point[0] = fdbk_adc_voltage % STEPUP_VOLTAGE_SCALE; */
 		TD_DEBUG_PRINT(("----- STEP-UP -----\n"));
-		TD_DEBUG_PRINT(("TARGET VOLTAGE : %d\n", STEPUP_TARGET_VOLTAGE));
+		TD_DEBUG_PRINT(("TARGET VOLTAGE : %d\n", STIM_LIB_STEPUP_TARGET_VOLTAGE));
 		TD_DEBUG_PRINT(("MEAS Voltage : %ld.%d%d%d%d%d\n", n_number, dec_point[0], dec_point[1], dec_point[2], dec_point[3], dec_point[4]));
-		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", stepup_fdbk_adc_avg));
+		TD_DEBUG_PRINT(("STEP-UP ADC AVG : %ld\n", gStimLib_stepupFeedback_adcAvg));
 		TD_DEBUG_PRINT(("STEP-UP PW : %d\n", STIM_LIB_VOLTAGE_CTRL_PULSE));
 		TD_DEBUG_PRINT(("\r\n"));
-
-#ifdef STIM_LIB_EVKIT_CC
-		TD_DEBUG_PRINT(("DAC CTRL VALUE : %d\n\n", DAC_CONTROL_VALUE));
-#endif
-
 	}
-	STEPUP_DATA_PRINT_FLAG = false;
+	STIM_LIB_STEPUP_DATA_PRINT_FLAG = false;
 
-}
-
-/*
- * DAC GPIO CONTROL
- * */
-void stimLib_dacctrl_Set(void)
-{
-	stimLib_dacctrl_setRaw();
-}
-
-void stimLib_dacctrl_Off(void)
-{
-	stimLib_dacctrl_offRaw();
 }
 
 /*

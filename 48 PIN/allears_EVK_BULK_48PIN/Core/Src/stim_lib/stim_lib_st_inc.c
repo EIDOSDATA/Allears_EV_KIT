@@ -12,6 +12,7 @@
 #include "stim_lib_private.h"
 #include "stim_lib_stim_cfg.h"
 #include "stim_lib_volt.h"
+#include "stim_lib_current.h"
 #include "stim_lib_error.h"
 
 #include "td_debug.h"
@@ -62,6 +63,9 @@ void stimLib_stepup_ctrlCallback(TIM_HandleTypeDef *htim)
 	if (htim->Instance == TIM6)
 	{
 		stimLib_stepup_ctrlScheduler();
+#ifdef STIM_LIB_EVKIT_CC
+		stimLib_dac_ctrlScheduler();
+#endif
 	}
 }
 

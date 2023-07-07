@@ -171,7 +171,7 @@ void td_configureStimulationMode(uint8_t mode)
 		/* CHANGE TO NEW MODE */
 		TD_RAW_STIM_MODE = mode;
 		/*
-		 * TODO:
+		 * SEQUENCE:
 		 * 1. APPLY MODE STATE
 		 * 2. APPLY MODE SIZE
 		 * 3. UPDATE MODE FREQ and FREQ HOLDING TIME
@@ -335,7 +335,9 @@ void td_startManualStimMode(void)
 			 * ALWAYS STIM STOP :: SYSTEM FSM
 			 * Whenever the mode setting is changed, the status is set to IDLE.
 			 * */
+#if 0
 			td_clearSystemControlParameters();
+#endif
 		}
 		/* */
 		else
@@ -372,7 +374,11 @@ void td_startManualStimMode(void)
 #ifdef STIM_LIB_EVKIT_CC
 		exTd_pulseCfg.degree = TD_MANUAL_TARGET_DAC;
 #endif
+#if 0
 		stimLib_stimSignalConfig(&exTd_pulseCfg);
+#else
+		stimLib_stimIntensiveChange(&exTd_pulseCfg);
+#endif
 
 		/* SET MODE */
 		TD_STIM_STATE_MODE_UPDATE(TD_STIM_CUR_MODE);
@@ -476,7 +482,8 @@ void td_controlStimulation(uint8_t start)
 			td_clearSystemControlParameters();
 
 			/* STOP ALL ACTIVITIES */
-			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: STOP\r\n")); TD_DEBUG_PRINT(("\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: STOP\r\n"));
+			TD_DEBUG_PRINT(("\r\n"));
 
 			/* RESET ELECT DETECT */
 			TD_STIM_DETECTION_LEVEL = 0; /* RESET CURRENT STIM LEVEL ALWAYS */
@@ -510,7 +517,8 @@ void td_controlStimulation(uint8_t start)
 
 		else if (start == 1)
 		{
-			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: START\r\n")); TD_DEBUG_PRINT(("\r\n"));
+			TD_DEBUG_PRINT(("td_controlStimulation() >> STIM :: START\r\n"));
+			TD_DEBUG_PRINT(("\r\n"));
 
 			/* STIM START :: SYSTEM FSM */
 			TD_SYS_STATE_ACTIVE_CHNAGE(TD_SYS_STATE_RUN);
