@@ -8,6 +8,8 @@
 #include "stim_lib_st_init.h"
 #include "stim_lib_volt.h"
 
+#include "td_debug.h"
+
 void stimLib_dacctrl_setRaw(void)
 {
 	/* GPIO DAC CONTROL CLEAR */
@@ -16,7 +18,22 @@ void stimLib_dacctrl_setRaw(void)
 					| STIM_LIB_DAC_N6_PIN | STIM_LIB_DAC_N7_PIN, GPIO_PIN_SET);
 
 	/* GPIO DAC SETTING */
-	HAL_GPIO_WritePin(STIM_LIB_DAC_N0_GPIO_PORT, ((uint16_t) DAC_CONTROL_VALUE) << 1, GPIO_PIN_RESET);
+
+	TD_DEBUG_PRINT(("GPIOB ODR : %ld\n", GPIOB->ODR));
+
+	HAL_GPIO_TogglePin(STIM_LIB_DAC_N0_GPIO_PORT, ((uint16_t) DAC_CONTROL_VALUE) << 1);
+
+	TD_DEBUG_PRINT(("GPIOB ODR : %ld\n", GPIOB->ODR));
+
+	/*
+	 0x01fe;
+
+	 0000 0001 1111 1110
+
+	 GPIOB->ODR = 0xffff;
+
+	 HAL_GPIO_WritePin(STIM_LIB_DAC_N0_GPIO_PORT, ((uint16_t) DAC_CONTROL_VALUE) << 1, GPIO_PIN_RESET);
+	 */
 }
 
 void stimLib_dacctrl_offRaw(void)
