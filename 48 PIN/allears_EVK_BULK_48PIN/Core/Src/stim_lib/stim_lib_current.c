@@ -26,14 +26,20 @@ void stimLib_dac_ctrlScheduler(void)
 {
 	STIM_LIB_DAC_CTRL_CNT++;
 	/* DAC CONTROL */
+#ifdef STIM_LIB_STEPUP_TUNING
+	if (STIM_LIB_DAC_CTRL_CNT >= 1)
+	{
+#else
 	if (STIM_LIB_DAC_CTRL_CNT >= 1 && STIM_LIB_STEPUP_VOLTAGTE_STABILIZED_FLAG == true)
 	{
+
+#endif
 		stimLib_dac_valControl();
 		STIM_LIB_DAC_CTRL_CNT = 0;
 		STIM_LIB_DAC_DATA_PRINT_FLAG = true;
 	}
 	/* STEP UP DATA PRINT */
-#ifdef STIM_LIB_STEPUP_DATA_PRINT
+#ifdef STIM_LIB_DAC_DATA_PRINT
 	stimLib_dac_dataPrint();
 #endif
 }

@@ -180,7 +180,7 @@ void bt_man_mode_req(uint8 *msg)
 		/* Frequency: 1byt. Range: 1 ~ 50.  Step: 1, 10, 20, ... 50 */
 		TD_MANUAL_PULSE_FREQ = msg[i];
 
-		if (1 > TD_MANUAL_PULSE_FREQ || TD_MANUAL_PULSE_FREQ > 50)
+		if (1 > TD_MANUAL_PULSE_FREQ || TD_MANUAL_PULSE_FREQ > 255)
 		{
 			break;
 		}
